@@ -1,0 +1,3353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <style>
+        :root { 
+            --bg: #01061b; 
+            --card: #030314; 
+            --accent: #007AFF; 
+            --success: #32d74b; 
+            --warn: #ff9f0a; 
+            --danger: #ff453a; 
+            --sec: #8e8e93; 
+            --purple: #af52de; 
+            --neon: #00f2ff; 
+            --dark-bg: #041250;
+            --slate: #010813;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: -apple-system, sans-serif;
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* NEW Ticker Styles */
+        .ticker-fixed { 
+            background: linear-gradient(to bottom, #222222, #020000); 
+            border-bottom: 1px solid #313131; 
+            padding: 0px 4px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            width: 100%; 
+            box-shadow: 0 4px 10px rgba(6, 1, 14, 0.6);
+            height: 65px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .ticker-ribbon { 
+            display: flex; 
+            gap: 30px; 
+            animation: scroll 20s linear infinite;
+            white-space: nowrap; 
+            padding-left: 20px;
+            will-change: transform;
+        }
+        
+        @keyframes scroll { 
+            from { transform: translateX(0); } 
+            to { transform: translateX(-100%); } 
+        }
+        
+        .live-dot { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: #ff0000; 
+            font-weight: bold; 
+            font-size: 19px; 
+            flex-shrink: 0; 
+            animation: pulse-red 1.8s infinite; 
+            margin-right: 20px; 
+        }
+        .live-dot::before { 
+            content: "●"; 
+            font-size: 18px; 
+            animation: glow 1.8s infinite; 
+        }
+        @keyframes glow { 
+            0% { 
+                text-shadow: 0 0 8px #ff0000; 
+            } 
+            50% { 
+                text-shadow: 0 0 20px #ff0000, 0 0 30px #ff4444; 
+            } 
+            100% { 
+                text-shadow: 0 0 8px #ff0000; 
+            } 
+        }
+        @keyframes pulse-red { 
+            0% { 
+                opacity: 1; 
+                transform: scale(1); 
+            } 
+            50% { 
+                opacity: 0.6; 
+                transform: scale(1.1); 
+            } 
+            100% { 
+                opacity: 1; 
+                transform: scale(1); 
+            } 
+        }
+        
+        .ticker-draw {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 30px;
+            padding-top: 4px;
+        }
+
+        .ticker-time { 
+            color: #f5f5f8; 
+            font-weight: bold; 
+            min-width: 110px; 
+            text-align: right; 
+        }
+        
+        .ticker-number { 
+            width: 25px; 
+            height: 25px; 
+            line-height: 25px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 18px; 
+            text-align: center; 
+            color: #000; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            flex-shrink: 0; 
+            margin-right: 4px;
+        }
+        
+        /* Original styles */
+        .nav { 
+            position: sticky; 
+            top: 58px; 
+            width: 100%; 
+            background: rgba(4, 0, 17, 0.9); 
+            backdrop-filter: blur(20px); 
+            z-index: 100; 
+            padding: 12px; 
+            border-bottom: 0.5px solid #333; 
+            box-sizing: border-box; 
+        }
+        
+        .search-box { 
+            width: 100%; 
+            background: #242222; 
+            border: 1px solid #333; 
+            border-radius: 8px; 
+            padding: 10px; 
+            color: white; 
+            margin-top: 5px; 
+        }
+        
+        .tabs { 
+            display: flex; 
+            gap: 3px; 
+            margin-bottom: 6px; 
+        }
+        
+        .tab { 
+            flex: 1; 
+            background: #2c2c2e; 
+            border: none; 
+            color: #fff; 
+            padding: 6px; 
+            border-radius: 10px; 
+            font-weight: 800; 
+            font-size: 14px; 
+            cursor: pointer;
+        }
+        
+        .tab.active { 
+            background: var(--accent); 
+        }
+        
+        .container { 
+            padding: 10px 5px; 
+        }
+        
+        .card { 
+            background: var(--card); 
+            border-radius: 14px; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            border: 0.5px solid #2c2c2e; 
+        }
+        
+        .ball-big { 
+            width: 45px; 
+            height: 45px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 22px; 
+            font-weight: 900; 
+            color: #000; 
+        }
+        
+        .due-tag { 
+            font-size: 10px; 
+            font-weight: 900; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            margin-top: 4px; 
+            display: inline-block; 
+        }
+        
+        .panel { 
+            display: none; 
+            margin-top: 15px; 
+            border-top: 1px solid #333; 
+            padding-top: 10px; 
+        }
+        
+        .table { 
+            width: 100%; 
+            font-size: 13px; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+        }
+        
+        .table th { 
+            text-align: left; 
+            color: var(--sec); 
+            font-size:10px; 
+        }
+        
+        .table td { 
+            padding: 8px 0; 
+            border-bottom: 0.5px solid #222; 
+        }
+        
+        .rank-btn { 
+            background: var(--success); 
+            color: #000; 
+            font-weight: bold; 
+            border: none; 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            margin-top: 10px; 
+            cursor: pointer;
+        }
+        
+        .input-select { 
+            width: 100%; 
+            background: #2c2c2e; 
+            border: 1px solid #3a3a3c; 
+            border-radius: 10px; 
+            padding: 12px; 
+            color: #fff; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+        }
+        
+        /* Marks Outstanding Dropdown CSS */
+        .dropdown-btn {
+            width: 100%;
+            background: #2c2c2e;
+            color: var(--success);
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 800;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .outstanding-panel {
+            display: none;
+            background: #111;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+        .out-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 0.5px solid #222;
+            align-items: center;
+        }
+        .out-label { color: var(--accent); font-weight: bold; font-size: 12px; }
+        .out-nums { color: #fff; font-family: monospace; font-size: 14px; }
+        .ball-small {
+            display: inline-block;
+            width: 22px; height: 22px; line-height: 22px;
+            border-radius: 50%; text-align: center;
+            font-size: 11px; font-weight: bold; margin-left: 4px;
+        }
+
+        /* NEW WIDGET STYLES */
+        .widget-card {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .widget-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #58a6ff;
+            letter-spacing: 0.5px;
+        }
+        
+        .widget-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .live-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .live-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .live-time {
+            font-size: 10px;
+            color: #ffa500;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .live-number {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 16px;
+            text-align: center;
+            color: #000;
+            margin-bottom: 6px;
+        }
+        
+        .live-marks {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 4px;
+        }
+        
+        .mark-badge {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .chart-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            margin: 4px 0;
+            align-items: center;
+        }
+        
+        .chart-line {
+            font-weight: bold;
+            font-size: 14px;
+            color: #58a6ff;
+            width: 30px;
+        }
+        
+        .chart-marks {
+            font-size: 11px;
+            color: #8b949e;
+            width: 100px;
+        }
+        
+        .chart-played {
+            color: #69db7c;
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .chart-coldest {
+            font-size: 10px;
+            font-weight: bold;
+            width: 90px;
+            text-align: right;
+        }
+        
+        .chart-trend {
+            font-weight: bold;
+            font-size: 12px;
+            width: 40px;
+            text-align: right;
+        }
+        
+        .coldest-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .coldest-rank {
+            font-weight: bold;
+            font-size: 12px;
+            color: #58a6ff;
+            width: 25px;
+        }
+        
+        .coldest-ball {
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            color: #000;
+            margin: 0 8px;
+        }
+        
+        .coldest-info {
+            flex: 1;
+        }
+        
+        .coldest-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .coldest-days {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        
+        .coming-under-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .coming-under-table th {
+            color: #58a6ff;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .coming-under-table td {
+            padding: 8px 4px;
+            text-align: center;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        
+        .date-cell {
+            font-weight: bold;
+            font-size: 11px;
+            color: #58a6ff;
+            text-align: left !important;
+        }
+        
+        .coming-under-ball {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 11px;
+            color: #000;
+            text-align: center;
+        }
+        
+        /* QUANTUM CHART STYLES */
+        .quantum-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #45515c; 
+            margin-bottom: 15px; 
+            padding-bottom: 10px; 
+        }
+        
+        .quantum-header h2 { 
+            color: var(--neon); 
+            margin: 0; 
+            font-size: 18px; 
+            letter-spacing: 1px; 
+        }
+        
+        .btn-rand { 
+            background: var(--danger); 
+            color: white; 
+            border: none; 
+            padding: 8px 14px; 
+            border-radius: 20px; 
+            font-size: 10px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 6px; 
+            margin-bottom: 15px; 
+        }
+        
+        .triplet { 
+            display: flex; 
+            border: 1px solid #949596; 
+            border-radius: 6px; 
+            background: rgba(5, 5, 5, 0.5); 
+            overflow: hidden; 
+            height: 42px; 
+        }
+        
+        .cell { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-right: 1px solid #f4f6f8; 
+            font-weight: 700; 
+            font-size: 14px; 
+            color: #f6f8fa; 
+            cursor: pointer; 
+        }
+        
+        .cell.highlight { 
+            background: var(--neon) !important; 
+            color: #000 !important; 
+        }
+        
+        .cell.dim { 
+            opacity: 2.5; 
+        }
+        
+        .quantum-instructions { 
+            padding: 12px; 
+            background: var(--slate); 
+            border-radius: 8px; 
+            border: 1px solid #334155; 
+            min-height: 220px; 
+        }
+        
+        .chart-tabs { 
+            display: flex; 
+            gap: 5px; 
+            margin-bottom: 12px; 
+            border-bottom: 1px solid #334155; 
+            padding-bottom: 10px; 
+        }
+        
+        .chart-tab { 
+            background: #334155; 
+            color: #ffffff; 
+            padding: 6px 10px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+        }
+        
+        .chart-tab.active { 
+            background: var(--neon); 
+            color: #ffffff; 
+        }
+        
+        .comparison { 
+            display: flex; 
+            gap: 8px; 
+            flex-direction: column;
+        }
+        
+        @media (min-width: 768px) {
+            .comparison {
+                flex-direction: row;
+            }
+        }
+        
+        .column { 
+            flex: 1; 
+            background: rgba(2, 0, 0, 0.3); 
+            padding: 10px; 
+            border-radius: 6px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        
+        .column h4 { 
+            color: var(--neon); 
+            font-size: 8px; 
+            margin: 0 0 8px 0; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #334155; 
+            padding-bottom: 4px; 
+            text-align: center; 
+        }
+        
+        .data-box { 
+            text-align: center; 
+            padding: 10px; 
+        }
+        
+        .data-val { 
+            font-size: 24px; 
+            font-weight: 800; 
+            color: white; 
+            margin: 10px 0; 
+            letter-spacing: 2px; 
+        }
+        
+        .diamond-text { 
+            font-size: 11px; 
+            color: #cbd5e1; 
+            font-style: italic; 
+        }
+
+        /* Splash & Dashboard Transitions */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .stage {
+            width: 300%;
+            height: 300%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            perspective: 800px;
+            padding: 0 10vw;
+        }
+
+        .scene {
+            width: 50vw;
+            height: 50vw;
+            max-width: 56px;
+            max-height: 56px;
+            position: relative;
+        }
+
+        .cube {
+            width: 130%;
+            height: 130%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .face {
+            position: absolute;
+            width: 130%;
+            height: 130%;
+            background: #ffffff;
+            border-radius: 12%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            backface-visibility: hidden;
+        }
+
+        /* Position based 18vw width (half is 9vw) */
+        .face--1 { transform: rotateY(0deg) translateZ(9vw); }
+        .face--2 { transform: rotateY(90deg) translateZ(9vw); }
+        .face--3 { transform: rotateY(180deg) translateZ(9vw); }
+        .face--4 { transform: rotateY(-90deg) translateZ(9vw); }
+        .face--5 { transform: rotateX(90deg) translateZ(9vw); }
+        .face--6 { transform: rotateX(-90deg) translateZ(9vw); }
+
+        /* Cap the translateZ for larger screens using media query */
+        @media (min-width: 400px) {
+            .face--1 { transform: rotateY(0deg) translateZ(35px); }
+            .face--2 { transform: rotateY(90deg) translateZ(35px); }
+            .face--3 { transform: rotateY(180deg) translateZ(35px); }
+            .face--4 { transform: rotateY(-90deg) translateZ(35px); }
+            .face--5 { transform: rotateX(90deg) translateZ(35px); }
+            .face--6 { transform: rotateX(-90deg) translateZ(35px); }
+        }
+
+        .dot { width: 2.5vw; height: 2.5vw; max-width: 8px; max-height: 8px; background: #111; border-radius: 50%; }
+        .dots { display: grid; gap: 1vw; grid-template-columns: repeat(3, 1fr); }
+
+        .reveal {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+            flex: 1;
+        }
+
+        .reveal.show { opacity: 1; transform: translateY(0); }
+
+        .title { font-size: 6vw; font-weight: 10; color: #fff; margin: 0; white-space: nowrap; }
+        .subtitle { font-size: 3.5vw; color: #58a6ff; margin-top: 5px; white-space: nowrap; }
+
+        .fade-out { opacity: 0 !important; pointer-events: none; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 100px;
+            }
+            
+            .ticker-fixed {
+                height: 85px;
+            }
+            
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .live-grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chart-row {
+                flex-wrap: wrap;
+            }
+            
+            .chart-marks {
+                width: 80px;
+                font-size: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 9vw;
+            }
+            
+            .subtitle {
+                font-size: 4.5vw;
+            }
+            
+            .stage {
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px;
+            }
+            
+            .scene {
+                width: 15vw;
+                height: 15vw;
+                max-width: 30px;
+                max-height: 30px;
+            }
+            
+            .ticker-time {
+                min-width: 90px;
+                font-size: 12px;
+            }
+            
+            .nav {
+                top: 85px;
+            }
+            
+            .widget-card {
+                padding: 12px;
+            }
+        }
+        
+        /* Main content visibility */
+        #main-content {
+            display: none;
+        }
+        
+        #main-content.show {
+            display: block;
+        }
+
+        /* Offline indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff453a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 9998;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 10px rgba(255, 69, 58, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* Calendar Dropdown Styles */
+        .calendar-table-widget {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 320px;
+        }
+
+        .calendar-table-widget th {
+            background: #1c1c1e;
+            color: #58a6ff;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            border-bottom: 2px solid #333;
+        }
+
+        .calendar-table-widget td {
+            padding: 8px 5px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+
+        .calendar-table-widget .date-header {
+            position: sticky;
+            left: 0;
+            background: #111;
+            font-weight: bold;
+            color: #58a6ff;
+            min-width: 60px;
+            border-right: 2px solid #333;
+            font-size: 11px;
+        }
+
+        .calendar-table-widget .draw-ball-widget {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 11px;
+            color: #000;
+            margin: 1px;
+            text-align: center;
+        }
+
+        .calendar-table-widget .current-day-row {
+            background: rgba(0, 122, 255, 0.1);
+            border-left: 3px solid #00ffff;
+        }
+
+        .calendar-table-widget .holiday-cell {
+            background: #1a1a1a;
+            color: #ffa500;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 5px;
+            text-align: center;
+        }
+
+        .pending-hourglass {
+            display: inline-block;
+            animation: hourglass-spin 2.5s infinite ease-in-out;
+            filter: drop-shadow(0 0 5px rgba(255, 212, 59, 0.5));
+            font-size: 16px;
+        }
+
+        @keyframes hourglass-spin {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(180deg); }
+            50% { transform: rotate(180deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Compact layout for dropdown */
+        @media (max-width: 768px) {
+            .calendar-table-widget {
+                font-size: 11px;
+            }
+            
+            .calendar-table-widget .draw-ball-widget {
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                font-size: 10px;
+            }
+            
+            .calendar-table-widget .date-header {
+                min-width: 50px;
+                font-size: 10px;
+            }
+        }
+
+        /* Side-by-side buttons container */
+        .dropdown-buttons-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .dropdown-buttons-container .dropdown-btn {
+            flex: 1;
+            min-width: 200px;
+            margin: 0;
+        }
+
+        /* Mobile horizontal scrolling */
+        @media (max-width: 768px) {
+            .dropdown-buttons-container {
+                display: flex;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: thin;
+                scrollbar-color: #444 #111;
+                padding-bottom: 5px;
+                gap: 8px;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .dropdown-buttons-container .dropdown-btn {
+                flex: 0 0 auto;
+                min-width: 180px;
+                white-space: nowrap;
+            }
+            
+            /* Custom scrollbar for mobile */
+            .dropdown-buttons-container::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .dropdown-buttons-container::-webkit-scrollbar-track {
+                background: #111;
+                border-radius: 2px;
+            }
+            
+            .dropdown-buttons-container::-webkit-scrollbar-thumb {
+                background: #444;
+                border-radius: 2px;
+            }
+        }
+
+        /* Ensure dropdown panels stack vertically */
+        .dropdown-panel-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* Scroll container for Home tab */
+        .home-scroll-container {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 3px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Shelf Marks Card Styles */
+        .card.data-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card.data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
+        }
+
+        /* Draw Details Panel Styles */
+        #shelf-tab, #draws-tab {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #shelf-tab::-webkit-scrollbar,
+        #draws-tab::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-track,
+        #draws-tab::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 3px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-thumb,
+        #draws-tab::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-thumb:hover,
+        #draws-tab::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Responsive adjustments for shelf cards */
+        @media (max-width: 768px) {
+            .ball-big {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .card {
+                padding: 12px;
+            }
+            
+            .due-tag {
+                font-size: 9px;
+                padding: 2px 5px;
+            }
+        }
+
+        /* Subscribe/Donate Button Styles */
+        .subscribe-btn {
+            background: #ff9d00;
+            color: black;
+            padding: 5px 3px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+            font-family: -apple-system, sans-serif;
+            box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+        }
+
+        .subscribe-btn:hover {
+            background: #ffb733;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 157, 0, 0.4);
+        }
+
+        .subscribe-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(255, 157, 0, 0.3);
+        }
+
+        .subscribe-btn.donate-mode {
+            background: #ff4757;
+            color: white;
+        }
+
+        .subscribe-btn.donate-mode:hover {
+            background: #ff6b81;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="splash-screen">
+        <div class="stage">
+            <div class="scene">
+                <div class="cube" id="cube1"></div>
+            </div>
+            
+            <div class="reveal" id="revealText">
+                <h4 class="title">WHE PLAY</h4>
+                <br>
+                <h4 class="title">ANALYSIS</h4>
+                <h4 class="title">DASHBOARD</h4>
+                <br>
+                <h4 class="title">WEB APP</h4>
+                <br>
+                <p class="subtitle">CODEWITHGLASGOW</p>
+            </div>
+            
+            <div class="scene">
+                <div class="cube" id="cube2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <!-- NEW Ticker -->
+        <div class="ticker-fixed">
+            <div class="ticker-ribbon" id="tickerRibbon1"></div>
+            <div class="ticker-ribbon" id="tickerRibbon2"></div>
+            <div class="ticker-ribbon" id="tickerRibbon3"></div>
+            <div class="ticker-ribbon" id="tickerRibbon4"></div>
+        </div>
+
+        <div class="nav">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-weight:900; font-size:14px;">WHE PLAY • DASHBOARD</span>
+                    <button id="subscribeBtn" class="subscribe-btn" onclick="handleSubscribe()">
+                        🇹🇹 SUPPORT TTD$10
+                    </button>
+                </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="show('home', this)">HOME</button>
+                <button class="tab" onclick="show('shelf', this)">SHELF</button>
+                <button class="tab" onclick="show('draws', this)">DRAWS</button>
+                <button class="tab" onclick="show('analyzer', this)">ANALYZER</button>
+            </div>
+            <input type="text" id="masterSearch" class="search-box" placeholder="Search Mark..." onkeyup="doSearch()">
+            
+            <!-- CALENDAR DROPDOWN -->
+            <!-- Side-by-side dropdown buttons with mobile scrolling -->
+            <div class="dropdown-buttons-container">
+                <button id="calBtn" class="dropdown-btn" onclick="toggleDropdown('calendar')">📅 WHE PLAY DRAW CHART ▾</button>
+                <button id="outBtn" class="dropdown-btn" onclick="toggleDropdown('outstanding')">🧮 MARKS OUTSTANDING ▾</button>
+            </div>
+
+            <!-- Dropdown panels (will stack vertically) -->
+            <div class="dropdown-panel-container">
+                <!-- CALENDAR DROPDOWN -->
+                <div id="calendar-dropdown" class="outstanding-panel" style="display: none;">
+                    <div class="calendar-dropdown-header">
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            
+                        </div>
+                        <h3 id="current-week-title" class="calendar-dropdown-title" style="margin: 10px 0;">LOADING...</h3>
+                        <div style="display: flex; gap: 2px; flex-wrap: wrap; justify-content: center;">
+                            <button class="week-nav-btn-small" onclick="navigateWeek(1)">◀</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Monday')">MON</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Tuesday')">TUE</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Wednesday')">WED</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Thursday')">THU</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Friday')">FRI</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Saturday')">SAT</button>
+                            <button class="week-nav-btn-small" onclick="navigateWeek(-1)">▶</button>
+                        </div>
+                    </div>
+                    <div id="calendar-content" class="calendar-dropdown-container">
+                        <!-- Calendar will be loaded here -->
+                    </div>
+                    <div style="text-align: center; margin-top: 10px; font-size: 10px; color: #666;">
+                        <div>Use WEEK buttons to go back/forward in time</div>
+                        <div>Use DAY buttons to switch between weekdays</div>
+                    </div>
+                </div>
+
+                <!-- MARKS OUTSTANDING DROPDOWN -->
+                <div id="outstanding-dropdown" class="outstanding-panel" style="display: none;">
+                    <div id="outstanding-table"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HOME TAB (Formerly Shelf) -->
+        <div id="home-tab" class="container">
+            <div class="home-scroll-container">
+                <!-- What We're Coming Under Container -->
+                <div class="widget-card" id="coming-under-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">Coming Under In Whe Play Today</div>
+                            <div class="widget-subtitle" id="coming-under-subtitle">Today • Previous 5 Weeks • Live </div>
+                        </div>
+                    </div>
+                    
+                    <div id="coming-under-content">
+                        <table class="coming-under-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">DATE</th>
+                                    <th>MORNING</th>
+                                    <th>MIDDAY</th>
+                                    <th>AFTERNOON</th>
+                                    <th>EVENING</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coming-under-body">
+                                <!-- Content will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Live Draws Section -->
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #334155;">
+                        <div style="text-align: center; font-size: 11px; color: #999999; margin-bottom: 10px;">
+                            WHE PLAY DRAWS • LIVE • ⏰ <span id="live-update-time">Loading...</span>
+                        </div>
+                        
+                        <div class="live-grid-container" id="live-draws-container">
+                            <!-- Live draws will be populated by JavaScript -->
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 15px; font-size: 10px; color: #00ffff; font-weight: bold;">
+                            TAP FOR 53 WK+ INSIGHT DASHBOARD
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Line Chart Widget -->
+                <div class="widget-card" id="line-chart-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">WHE PLAY LINE CHART</div>
+                            <div class="widget-subtitle">Last 12 Weeks Analysis</div>
+                        </div>
+                    </div>
+                    
+                    <div id="line-chart-content">
+                        <!-- Line chart rows will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Suite Chart Widget -->
+                <div class="widget-card" id="suite-chart-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">WHE PLAY SUITE CHART</div>
+                            <div class="widget-subtitle">Last 12 Weeks Analysis</div>
+                        </div>
+                    </div>
+                    
+                    <div id="suite-chart-content">
+                        <!-- Suite chart rows will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Top 10 Shelf Marks Container -->
+                <div class="widget-card" id="top-shelf-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">TOP 10 SHELF MARKS</div>
+                            <div class="widget-subtitle">Coldest Marks (Most Days Since Last Draw)</div>
+                        </div>
+                    </div>
+                    
+                    <div id="top-shelf-content">
+                        <!-- Top 10 shelf marks will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Quantum Chart Widget (Moved from separate tab) -->
+                <div class="widget-card quantum-chart" id="quantum-chart-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title">SAGi QUANTUM CHART</div>
+                            <div class="widget-subtitle">Quantum Mapping & Analysis</div>
+                        </div>
+                        <button class="btn-rand" onclick="randomPick()">Quick Pick</button>
+                    </div>
+                    
+                    <div id="quantum-grid" class="grid"></div>
+                    
+                    <div id="quantum-instructions" class="quantum-instructions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHELF MARKS TAB -->
+        <div id="shelf-tab" class="container">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+
+        <div id="draws-tab" class="container" style="display:none;"></div>
+
+        <div id="analyzer-tab" class="container" style="display:none;">
+            <div class="card" style="border-left: 5px solid var(--purple);">
+                <h3 style="text-align:center; color:var(--purple); margin:0 0 15px 0;">MARK ANALYZER</h3>
+                <select id="sDay" class="input-select">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                </select>
+                <select id="sTime" class="input-select">
+                    <option value="ALL">All Times</option>
+                    <option value="MOR">Morning</option>
+                    <option value="MID">Midday</option>
+                    <option value="NON">Afternoon</option>
+                    <option value="EVE">Evening</option>
+                </select>
+                <select id="sScope" class="input-select">
+                    <option value="4">Last 4 Weeks</option>
+                    <option value="8">Last 8 Weeks</option>
+                    <option value="12">Last 12 Weeks</option>
+                    <option value="16">Last 16 Weeks</option>
+                    <option value="20">Last 20 Weeks</option>
+                    <option value="24">Last 24 Weeks</option>
+                    <option value="28">Last 28 Weeks</option>
+                    <option value="32">Last 32 Weeks</option>
+                    <option value="36">Last 36 Weeks</option>
+                    <option value="40">Last 40 Weeks</option>
+                    <option value="44">Last 44 Weeks</option>
+                    <option value="48">Last 48 Weeks</option>
+                    <option value="52">Last 52 Weeks</option>
+                    <option value="159">Full History (159 Weeks)</option>
+                </select>
+                <button class="rank-btn" onclick="runDeepSearch()">RANK MARKS</button>
+                <div id="res" style="margin-top:20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== CONSTANTS AND DATA ==========
+        const spirits = {
+            1:"Centipede",2:"Old Lady",3:"Carriage",4:"Dead Man",5:"Parson Man",6:"Belly",7:"Hog",8:"Tiger",
+            9:"Cattle",10:"Monkey",11:"Corbeau",12:"King",13:"Crapaud",14:"Money",15:"Sick Woman",16:"Jamette",
+            17:"Pigeon",18:"Water Boat",19:"Horse",20:"Dog",21:"Mouth",22:"Rat",23:"House",24:"Queen",
+            25:"Morrocoy",26:"Fowl",27:"Little Snake",28:"Red Fish",29:"Opium Man",30:"House Cat",
+            31:"Parson Wife",32:"Shrimp",33:"Spider",34:"Blind Man",35:"Big Snake",36:"Donkey"
+        };
+        
+        const intervals = {
+            1:12,2:13,3:13,4:11,5:11,6:11,7:12,8:12,9:11,10:13,11:11,12:12,13:12,14:11,15:12,
+            16:10,17:13,18:11,19:12,20:10,21:11,22:13,23:12,24:11,25:12,26:12,27:12,28:12,
+            29:12,30:11,31:10,32:10,33:12,34:12,35:13,36:12
+        };
+        
+        const numberColors = {
+            "01":"#ff6b6b","02":"#ffa94d","03":"#ffd43b","04":"#69db7c","05":"#38d9a9","06":"#4dabf7",
+            "07":"#9775fa","08":"#f783ac","09":"#ff922b","10":"#fab005","11":"#82c91e","12":"#20c997",
+            "13":"#339af0","14":"#845ef7","15":"#e599f7","16":"#ff8787","17":"#ffc078","18":"#ffe066",
+            "19":"#8ce99a","20":"#63e6be","21":"#74c0fc","22":"#b197fc","23":"#faa2c1","24":"#ffa8a8",
+            "25":"#ffec99","26":"#c0eb75","27":"#96f2d7","28":"#a5d8ff","29":"#d0bfff","30":"#fcc2d7",
+            "31":"#ff6b6b","32":"#ffa94d","33":"#ffd43b","34":"#69db7c","35":"#4dabf7","36":"#9775fa"
+        };
+        
+        const markColors = {
+            WB:{bg:"#ffffff",txt:"#000000"},
+            PB:{bg:"#ffd700",txt:"#000000"},
+            GB:{bg:"#ffd700",txt:"#000000"},
+            MB:{bg:"#cc0000",txt:"#ffffff"},
+            MU:{bg:"#cc0000",txt:"#ffffff"},
+            MX:{bg:"#cc0000",txt:"#ffffff"}
+        };
+        
+        // Line and Suite chart data structures
+        const lineNumbers = {
+            1:[1,10,19,28],
+            2:[2,11,20,29],
+            3:[3,12,21,30],
+            4:[4,13,22,31],
+            5:[5,14,23,32],
+            6:[6,15,24,33],
+            7:[7,16,25,34],
+            8:[8,17,26,35],
+            9:[9,18,27,36]
+        };
+        
+        const suites = {
+            0: [10, 20, 30],
+            1: [1, 11, 21, 31],
+            2: [2, 12, 22, 32],
+            3: [3, 13, 23, 33],
+            4: [4, 14, 24, 34],
+            5: [5, 15, 25, 35],
+            6: [6, 16, 26, 36],
+            7: [7, 17, 27],
+            8: [8, 18, 28],
+            9: [9, 19, 29]
+        };
+        
+        // ========== QUANTUM CHART DATA ==========
+        const quantumData = [
+            [[1,5,17],[2,6,18],[3,7,19]],[[4,8,20],[5,9,21],[6,10,22]],
+            [[7,11,23],[8,12,24],[9,13,25]],[[10,14,26],[11,15,27],[12,16,28]],
+            [[13,17,29],[14,18,30],[15,19,31]],[[16,20,32],[17,21,33],[18,22,34]],
+            [[19,23,35],[20,24,36],[21,25,1]],[[22,26,2],[23,27,3],[24,28,4]],
+            [[25,29,5],[26,30,6],[27,31,7]],[[28,32,8],[29,33,9],[30,34,10]],
+            [[31,35,11],[32,36,12],[33,1,13]],[[34,2,14],[35,3,15],[36,4,16]]
+        ];
+        
+        const sixteenGroups = [
+            [1,16,29], [2,17,30], [3,18,31], [4,19,32], [5,20,33], [6,21,34], [7,22,35], [8,23,36],
+            [9,24,1], [10,25,2], [11,26,3], [12,27,4], [13,28,5], [14,29,6], [15,30,7], [16,31,8],
+            [17,32,9], [18,33,10], [19,34,11], [20,35,12], [21,36,13], [22,1,14], [23,2,15], [24,3,16],
+            [25,4,17], [26,5,18], [27,6,19], [28,7,20], [29,8,21], [30,9,22], [31,10,23], [32,11,24],
+            [33,12,25], [34,13,26], [35,14,27], [36,15,28]
+        ];
+        
+        const bankBlocking = {
+            1:[10,34], 2:[11,35,10,34], 3:[12,36], 4:[12,13,36,1], 5:[14,2], 6:[2,3,14,15], 7:[4,16], 8:[4,5,16,17],
+            9:[6,18], 10:[1,2,19,20], 11:[2,21,27,15], 12:[3,4,22,23], 13:[4,24], 14:[5,6,25,26], 15:[6,27],
+            16:[7,8,19,28], 17:[8,29], 18:[9,21], 19:[16,28,32,7], 20:[17,29,33,8], 21:[18,30], 22:[18,19,30,31],
+            23:[20,32], 24:[20,21,32,33], 25:[22,34], 26:[22,23,34,35], 27:[24,36,12,15], 28:[19,20,16,17],
+            29:[16,20], 30:[17,21], 31:[18,22], 32:[19,23], 33:[20,24], 34:[1,2,25,26], 35:[2,27], 36:[3,4,28,29]
+        };
+        
+        const luckyDiamond = {
+            1:[36], 2:[33], 3:[34], 4:[35], 5:[1], 6:[2], 7:[3], 8:[4], 9:[20,28], 10:[21,29], 11:[22,30],
+            12:[19,31], 13:[24], 14:[25], 15:[26], 16:[27], 17:[28], 18:[29], 19:[8,12], 20:[9], 21:[10,16],
+            22:[11,15], 23:[12], 24:[13], 25:[14], 26:[15], 27:[16], 28:[17], 29:[18], 30:[19], 31:[20],
+            32:[21], 33:[22], 34:[23], 35:[24], 36:[1,25]
+        };
+        
+        // ========== GLOBAL VARIABLES ==========
+        let timeline = [];
+        let markInfo = {};
+        let currentWeekHits = {};
+        let outstandingBuckets = {};
+        let marks = [];
+        let jsNowTs = Date.now();
+        
+        // Chart data
+        let calendarWeeks = [];
+        let currentWeekIndex = 0;
+        let currentDayOfWeek = '';
+        let activeDropdown = null;
+        
+        // Quantum Chart Variables
+        let quantumView = 'Matrix';
+        let selectedQuantumNum = 27;
+        
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', async function() {
+            startSplash();
+            initializeQuantumChart();
+            
+            // Load data from your APIs
+            await loadData();
+            
+            // Setup ticker
+            setupTicker();
+            
+            // Update Home tab widgets
+            updateHomeWidgets();
+            
+            // Start periodic updates
+            setInterval(updateHomeWidgets, 60000); // Update every minute
+
+            // Start the alternating text after splash screen
+            setTimeout(() => {
+                setupSubscribeButton();
+            }, 4000); // Start after splash screen (4 seconds)
+
+            renderShelfTab(); // Add this
+            renderDrawsTab(); // Add this
+            renderOutstandingTable(); // Add this
+        });
+
+        // ========== HOME WIDGET FUNCTIONS ==========
+        function updateHomeWidgets() {
+            updateComingUnder();
+            updateLiveDraws();
+            updateLineChart();
+            updateSuiteChart();
+            updateTopShelf();
+        }
+
+        // ========== SUPPORT / DONATE BUTTON FUNCTIONS ==========
+        let isDonateMode = false;
+        const SUBSCRIBE_URL = "https://tt.wipayfinancial.com/scan2pay/MichaelGlasgow";
+        const ALTERNATE_TEXT_INTERVAL = 10000; // 10 seconds
+
+        function handleSubscribe() {
+            // Open the subscription URL
+            window.open(SUBSCRIBE_URL, '_blank', 'noopener,noreferrer');
+            
+            // Show confirmation message
+            showNotification(isDonateMode ? '🎗️ Thank you for your donation!' : '🙏 Thank you for your support!', 'success');
+        }
+
+        function toggleSubscribeText() {
+            const button = document.getElementById('subscribeBtn');
+            if (!button) return;
+            
+            // Toggle between SUBSCRIBE and DONATE
+            if (isDonateMode) {
+                button.innerHTML = '🇹🇹 SUPPORT TTD$10';
+                button.classList.remove('donate-mode');
+            } else {
+                button.innerHTML = '🎗️ DONATE TTD$10';
+                button.classList.add('donate-mode');
+            }
+            
+            // Toggle mode
+            isDonateMode = !isDonateMode;
+        }
+
+        function setupSubscribeButton() {
+            // Set up the alternating text timer
+            setInterval(toggleSubscribeText, ALTERNATE_TEXT_INTERVAL);
+            
+            // Add click animation
+            const button = document.getElementById('subscribeBtn');
+            if (button) {
+                button.addEventListener('click', function(e) {
+                    // Add a "pulse" animation on click
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            }
+        }
+        
+        // ========== UPDATED COMING UNDER FUNCTION ==========
+        async function updateComingUnder() {
+            if (!calendarWeeks || calendarWeeks.length === 0) {
+                document.getElementById('coming-under-body').innerHTML = 
+                    '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ff6b6b;">No data available</td></tr>';
+                return;
+            }
+            
+            // Helper function to format numbers exactly like the widget
+            function fmt(n) {
+                return (!n || n === "-" || n === "PENDING") ? "–" : String(n).padStart(2, "0");
+            }
+            
+            const now = new Date();
+            let todayName = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+            todayName = todayName === 'Sunday' ? 'Monday' : todayName;
+            
+            // Get the last 6 weeks (excluding current week as widget does)
+            const daysToShow = [];
+            
+            // Start from the week BEFORE current (widget shows previous weeks, not current)
+            for (let i = 1; i < calendarWeeks.length; i++) {
+                if (daysToShow.length >= 5) break;
+                
+                const week = calendarWeeks[i]; // Start from week 1 (skip week 0 which is current)
+                if (!week || !week.days) continue;
+                
+                const day = week.days.find(d => d.dayName === todayName);
+                if (day) {
+                    // Calculate the actual date for this specific day of the week
+                    const parts = week.startDate.split(' ');
+                    const dayNum = parseInt(parts[0], 10);
+                    const monthName = parts[1];
+                    const year = parseInt(parts[2], 10);
+                    
+                    // Map month names to numbers (0-11)
+                    const monthMap = {
+                        "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                        "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                    };
+                    
+                    // Create base date (Monday of that week)
+                    const baseDate = new Date(year, monthMap[monthName], dayNum);
+                    
+                    // Get day index (0 = Monday, 5 = Saturday)
+                    const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(todayName);
+                    
+                    // Calculate actual date by adding day index
+                    const actualDate = new Date(baseDate);
+                    actualDate.setDate(baseDate.getDate() + dayIndex);
+                    
+                    // Format as "DD-MMM" (e.g., "17-Dec")
+                    const dayOfMonth = actualDate.getDate();
+                    const displayMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const displayMonthName = displayMonthNames[actualDate.getMonth()];
+                    const dateStr = `${dayOfMonth}-${displayMonthName}`;
+                    
+                    daysToShow.push({
+                        date: dateStr,
+                        draws: day.draws || {},
+                        weekIndex: i,
+                        actualDate: actualDate
+                    });
+                }
+            }
+            
+            // If we don't have enough weeks, look further back
+            if (daysToShow.length < 5) {
+                for (let i = 1; i < calendarWeeks.length; i++) {
+                    if (daysToShow.length >= 5) break;
+                    
+                    // Check if we already have this week
+                    if (daysToShow.some(d => d.weekIndex === i)) continue;
+                    
+                    const week = calendarWeeks[i];
+                    if (!week || !week.days) continue;
+                    
+                    const day = week.days.find(d => d.dayName === todayName);
+                    if (day) {
+                        // Calculate actual date (same logic as above)
+                        const parts = week.startDate.split(' ');
+                        const dayNum = parseInt(parts[0], 10);
+                        const monthName = parts[1];
+                        const year = parseInt(parts[2], 10);
+                        
+                        const monthMap = {
+                            "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                            "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                        };
+                        
+                        const baseDate = new Date(year, monthMap[monthName], dayNum);
+                        const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(todayName);
+                        const actualDate = new Date(baseDate);
+                        actualDate.setDate(baseDate.getDate() + dayIndex);
+                        
+                        const dayOfMonth = actualDate.getDate();
+                        const displayMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        const displayMonthName = displayMonthNames[actualDate.getMonth()];
+                        const dateStr = `${dayOfMonth}-${displayMonthName}`;
+                        
+                        daysToShow.push({
+                            date: dateStr,
+                            draws: day.draws || {},
+                            weekIndex: i,
+                            actualDate: actualDate
+                        });
+                    }
+                }
+            }
+            
+            // Sort by date (oldest first, most recent last - REVERSE ORDER)
+            daysToShow.sort((a, b) => a.actualDate - b.actualDate);
+            
+            let html = '';
+            
+            daysToShow.forEach(day => {
+                const draws = day.draws;
+                
+                // Check if it's a holiday (all draws are empty or pending)
+                const isHoliday = !draws || Object.values(draws).every(v => 
+                    !v || v === "-" || v === "–" || v === "PENDING"
+                );
+                
+                html += '<tr>';
+                html += `<td class="date-cell">${day.date}</td>`;
+                
+                if (isHoliday) {
+                    html += `<td colspan="4" style="text-align:center; background:#1a1a1a; color:#ffa500; font-size:12px; font-weight:bold;">🗓️ HOLIDAY 🗓️</td>`;
+                } else {
+                    // Show draws for each time slot
+                    ['MOR', 'MID', 'NON', 'EVE'].forEach(timeSlot => {
+                        const num = fmt(draws[timeSlot]);
+                        
+                        if (num === "–") {
+                            html += '<td><span style="color:#666; font-weight:bold;">–</span></td>';
+                        } else {
+                            const color = numberColors[num] || '#ffffff';
+                            html += `<td><span class="coming-under-ball" style="background:${color}">${num}</span></td>`;
+                        }
+                    });
+                }
+                
+                html += '</tr>';
+            });
+            
+            // Update the table
+            document.getElementById('coming-under-body').innerHTML = html;
+            document.getElementById('coming-under-subtitle').textContent = 
+                `${todayName} • Previous ${daysToShow.length} Weeks • Live `;
+            
+            // If we have no data, show message
+            if (daysToShow.length === 0) {
+                document.getElementById('coming-under-body').innerHTML = 
+                    '<tr><td colspan="5" style="text-align:center; padding:20px; color:#ffa500;">No completed data for ' + todayName + ' in previous weeks</td></tr>';
+            }
+        }
+
+        // ========== CORRECTED LIVE DRAWS FUNCTION ==========
+        async function updateLiveDraws() {
+            const container = document.getElementById('live-draws-container');
+            const timeElement = document.getElementById('live-update-time');
+            
+            if (!container) return;
+            
+            try {
+                // Fetch real data from the ticker endpoint
+                const TICKER_URL = "https://script.google.com/macros/s/AKfycbymSUZ3cuBP7wZSKkxs8QmjMkKP6q3j-LOW_CVpY3n6Sw1EzsdwPu6yTEkpOmiAJz95/exec?action=ticker";
+                const response = await fetch(`${TICKER_URL}&_t=${new Date().getTime()}`);
+                const data = await response.json();
+                
+                // Update timestamp
+                const updated = data.lastUpdated || "N/A";
+                timeElement.textContent = updated;
+                
+                const draws = data.games?.PLAYWHE || [];
+                
+                // Create map for easy access
+                const drawMap = {};
+                draws.forEach(d => { 
+                    if (d.name) drawMap[d.name] = d; 
+                });
+                
+                // Build 2x2 grid exactly like widget
+                let html = '';
+                
+                // Define draw slots in order (2x2 grid)
+                const drawSlots = [
+                    { key: "Morning", time: "10:30 AM", fallback: {time:"10:30 AM", name:"Morning", numbers:"–"} },
+                    { key: "Midday", time: "1:00 PM", fallback: {time:"1:00 PM", name:"Midday", numbers:"–"} },
+                    { key: "Afternoon", time: "4:00 PM", fallback: {time:"4:00 PM", name:"Afternoon", numbers:"–"} },
+                    { key: "Evening", time: "7:00 PM", fallback: {time:"7:00 PM", name:"Evening", numbers:"–"} }
+                ];
+                
+                // Process each draw slot
+                drawSlots.forEach(slot => {
+                    const draw = drawMap[slot.key] || slot.fallback;
+                    
+                    // Parse the numbers string using widget's regex pattern
+                    const m = draw.numbers.trim().match(/^(\d+)\s+(.+?)\s+\(([^)]+)\)$/);
+                    
+                    html += `
+                        <div class="live-card">
+                            <div class="live-time">${draw.time}<br>${draw.name}</div>`;
+                    
+                    if (m && m[1] !== "–") {
+                        const num = m[1].padStart(2, "0");
+                        const spirit = m[2].trim();
+                        const marks = m[3].split(",").map(mark => mark.trim());
+                        const color = numberColors[num] || '#ffffff';
+                        
+                        html += `
+                            <div class="live-number" style="background:${color}">${num}</div>
+                            <div style="font-size:9px; font-weight:bold; color:#fff; margin-top:2px; line-height:1.1;">${spirit}</div>
+                            <div class="live-marks">
+                                ${marks.map(mark => {
+                                    const markColor = markColors[mark] || markColors.WB;
+                                    return `<span class="mark-badge" style="background:${markColor.bg}; color:${markColor.txt}">${mark}</span>`;
+                                }).join('')}
+                            </div>`;
+                    } else {
+                        // No data or pending
+                        html += `
+                            <div class="live-number" style="background:#333333; color:#fff;">⏳</div>
+                            <div style="font-size:9px; color:#666; margin-top:2px;">Pending</div>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error fetching live draws:', error);
+                
+                // Fallback to static data on error
+                timeElement.textContent = "Error - Using cached";
+                
+                const staticDraws = [
+                    { time: "10:30 AM", name: "Morning", numbers: "16 Jamette (WB,PB)" },
+                    { time: "1:00 PM", name: "Midday", numbers: "29 Opium Man (GB)" },
+                    { time: "4:00 PM", name: "Afternoon", numbers: "08 Tiger (MB,MU)" },
+                    { time: "7:00 PM", name: "Evening", numbers: "12 King (WB,GB)" }
+                ];
+                
+                let html = '';
+                staticDraws.forEach(draw => {
+                    const m = draw.numbers.match(/^(\d+)\s+(.+?)\s+\(([^)]+)\)$/);
+                    
+                    html += '<div class="live-card">';
+                    html += `<div class="live-time">${draw.time}<br>${draw.name}</div>`;
+                    
+                    if (m) {
+                        const num = m[1].padStart(2, "0");
+                        const spirit = m[2].trim();
+                        const marks = m[3].split(",").map(mark => mark.trim());
+                        const color = numberColors[num] || '#ffffff';
+                        
+                        html += `<div class="live-number" style="background:${color}">${num}</div>`;
+                        html += `<div style="font-size:9px; font-weight:bold; color:#fff; margin-top:2px;">${spirit}</div>`;
+                        html += '<div class="live-marks">';
+                        html += marks.map(mark => {
+                            const markColor = markColors[mark] || markColors.WB;
+                            return `<span class="mark-badge" style="background:${markColor.bg}; color:${markColor.txt}">${mark}</span>`;
+                        }).join('');
+                        html += '</div>';
+                    } else {
+                        html += '<div class="live-number" style="background:#333333; color:#fff;">–</div>';
+                        html += '<div style="font-size:9px; color:#666; margin-top:2px;">No data</div>';
+                    }
+                    
+                    html += '</div>';
+                });
+                
+                container.innerHTML = html;
+            }
+        }
+        
+        function updateLineChart() {
+            const container = document.getElementById('line-chart-content');
+            if (!container || !calendarWeeks || calendarWeeks.length === 0) return;
+            
+            // Get current week and last week
+            const currentWeek = calendarWeeks.find(w => w.isCurrentWeek) || calendarWeeks[0];
+            const lastWeekIndex = calendarWeeks.indexOf(currentWeek) + 1;
+            const lastWeek = lastWeekIndex < calendarWeeks.length ? calendarWeeks[lastWeekIndex] : null;
+            
+            // Get played numbers for current and last week
+            const currentPlayed = new Set();
+            const lastPlayed = new Set();
+            const currentWeekRepeats = {};
+            
+            // Collect current week played numbers
+            if (currentWeek && currentWeek.days) {
+                currentWeek.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(val => {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 36) {
+                            currentPlayed.add(n);
+                            currentWeekRepeats[n] = (currentWeekRepeats[n] || 0) + 1;
+                        }
+                    });
+                });
+            }
+            
+            // Collect last week played numbers
+            if (lastWeek && lastWeek.days) {
+                lastWeek.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(val => {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 36) lastPlayed.add(n);
+                    });
+                });
+            }
+            
+            // Hot repeats this week
+            const hotRepeats = Object.entries(currentWeekRepeats)
+                .filter(([_, count]) => count > 1)
+                .sort((a, b) => b[1] - a[1]);
+            
+            let html = '';
+            
+            // Add hot repeats header if any
+            if (hotRepeats.length > 0) {
+                const hotText = hotRepeats.map(([n, c]) => `${n} ${spirits[n]} (${c}×)`).join(" • ");
+                html += `<div style="text-align:center; background:#ffffff; color:#000; border-radius:6px; padding:4px; margin-bottom:8px; font-size:10px; font-weight:bold;">
+                    🔥 H.R.T.WK: ${hotText}
+                </div>`;
+            }
+            
+            // Generate rows for each line
+            for (let line = 1; line <= 9; line++) {
+                const lineNums = lineNumbers[line];
+                const played = lineNums.filter(n => currentPlayed.has(n)).sort((a, b) => a - b);
+                const hits = played.length;
+                const lastHits = lineNums.filter(n => lastPlayed.has(n)).length;
+                const diff = hits - lastHits;
+                
+                // Determine trend text and color
+                let trendText, trendColor;
+                if (diff > 0) {
+                    trendText = `↑${hits}×`;
+                    trendColor = "#ff4444";
+                } else if (diff < 0) {
+                    trendText = `↓${hits}×`;
+                    trendColor = "#69db7c";
+                } else {
+                    trendText = `${hits}×`;
+                    trendColor = hits >= 3 ? "#ff4444" : hits === 2 ? "#ff6b6b" : "#69db7c";
+                }
+                
+                // Get coldest unplayed number (using markInfo from existing data)
+                const unplayed = lineNums.filter(n => !currentPlayed.has(n));
+                let coldestInfo = "All Played";
+                let coldestColor = "#69db7c";
+                
+                if (unplayed.length > 0) {
+                    // Find the unplayed number with most days since last seen
+                    const coldest = unplayed.map(n => {
+                        const info = markInfo[n] || { lastDate: null };
+                        const daysAgo = info.lastDate ? Math.floor((Date.now() - info.lastDate.getTime()) / 86400000) : 999;
+                        return { num: n, daysAgo };
+                    }).sort((a, b) => b.daysAgo - a.daysAgo)[0];
+                    
+                    if (coldest) {
+                        const numStr = String(coldest.num).padStart(2, '0');
+                        coldestInfo = `${numStr} • ${coldest.daysAgo}d ago`;
+                        coldestColor = coldest.daysAgo > 30 ? "#ff0000" : 
+                                     coldest.daysAgo > 20 ? "#FF9F0A" : 
+                                     coldest.daysAgo > 10 ? "#ffff00" : "#ffffff";
+                    }
+                }
+                
+                // Determine row background
+                let rowBg = '';
+                if (hits === 0) rowBg = 'background:#ff000040;';
+                else if (hits <= 1) rowBg = 'background:#ff6b6b30;';
+                
+                html += `
+                    <div class="chart-row" style="${rowBg}">
+                        <div class="chart-line">L${line}</div>
+                        <div class="chart-marks">${lineNums.map(n => String(n).padStart(2, '0')).join(' ')}</div>
+                        <div class="chart-played">${played.length > 0 ? played.map(n => String(n).padStart(2, '0')).join(' ') : '—'}</div>
+                        <div class="chart-coldest" style="color:${coldestColor}">${coldestInfo}</div>
+                        <div class="chart-trend" style="color:${trendColor}">${trendText}</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function updateSuiteChart() {
+            const container = document.getElementById('suite-chart-content');
+            if (!container || !calendarWeeks || calendarWeeks.length === 0) return;
+            
+            // Get current week and last week
+            const currentWeek = calendarWeeks.find(w => w.isCurrentWeek) || calendarWeeks[0];
+            const lastWeekIndex = calendarWeeks.indexOf(currentWeek) + 1;
+            const lastWeek = lastWeekIndex < calendarWeeks.length ? calendarWeeks[lastWeekIndex] : null;
+            
+            // Get played numbers for current and last week
+            const currentPlayed = new Set();
+            const lastPlayed = new Set();
+            const currentWeekRepeats = {};
+            
+            // Collect current week played numbers
+            if (currentWeek && currentWeek.days) {
+                currentWeek.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(val => {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 36) {
+                            currentPlayed.add(n);
+                            currentWeekRepeats[n] = (currentWeekRepeats[n] || 0) + 1;
+                        }
+                    });
+                });
+            }
+            
+            // Collect last week played numbers
+            if (lastWeek && lastWeek.days) {
+                lastWeek.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(val => {
+                        const n = parseInt(val);
+                        if (n >= 1 && n <= 36) lastPlayed.add(n);
+                    });
+                });
+            }
+            
+            // Hot repeats this week
+            const hotRepeats = Object.entries(currentWeekRepeats)
+                .filter(([_, count]) => count > 1)
+                .sort((a, b) => b[1] - a[1]);
+            
+            let html = '';
+            
+            // Add hot repeats header if any
+            if (hotRepeats.length > 0) {
+                const hotText = hotRepeats.map(([n, c]) => `${n} ${spirits[n]} (${c}×)`).join(" • ");
+                html += `<div style="text-align:center; background:#ffffff; color:#000; border-radius:6px; padding:4px; margin-bottom:8px; font-size:10px; font-weight:bold;">
+                    🔥 H.R.T.WK: ${hotText}
+                </div>`;
+            }
+            
+            // Generate rows for each suite
+            for (let suite = 0; suite <= 9; suite++) {
+                const suiteNums = suites[suite] || [];
+                const played = suiteNums.filter(n => currentPlayed.has(n)).sort((a, b) => a - b);
+                const hits = played.length;
+                const lastHits = suiteNums.filter(n => lastPlayed.has(n)).length;
+                const diff = hits - lastHits;
+                
+                // Determine trend text and color
+                let trendText, trendColor;
+                if (diff > 0) {
+                    trendText = `↑${hits}×`;
+                    trendColor = "#ff4444";
+                } else if (diff < 0) {
+                    trendText = `↓${hits}×`;
+                    trendColor = "#69db7c";
+                } else {
+                    trendText = `${hits}×`;
+                    trendColor = "#69db7c";
+                }
+                
+                // Get coldest unplayed number
+                const unplayed = suiteNums.filter(n => !currentPlayed.has(n));
+                let coldestInfo = "All Played";
+                let coldestColor = "#69db7c";
+                
+                if (unplayed.length > 0) {
+                    // Find the unplayed number with most days since last seen
+                    const coldest = unplayed.map(n => {
+                        const info = markInfo[n] || { lastDate: null };
+                        const daysAgo = info.lastDate ? Math.floor((Date.now() - info.lastDate.getTime()) / 86400000) : 999;
+                        return { num: n, daysAgo };
+                    }).sort((a, b) => b.daysAgo - a.daysAgo)[0];
+                    
+                    if (coldest) {
+                        const numStr = String(coldest.num).padStart(2, '0');
+                        coldestInfo = `${numStr} • ${coldest.daysAgo}d ago`;
+                        coldestColor = coldest.daysAgo > 30 ? "#ff0000" : 
+                                     coldest.daysAgo > 20 ? "#FF9F0A" : 
+                                     coldest.daysAgo > 10 ? "#ffff00" : "#ffffff";
+                    }
+                }
+                
+                // Determine row background
+                let rowBg = '';
+                if (hits === 0) rowBg = 'background:#ff000040;';
+                else if (hits <= 1 && suiteNums.length > 2) rowBg = 'background:#ff6b6b30;';
+                
+                html += `
+                    <div class="chart-row" style="${rowBg}">
+                        <div class="chart-line" style="color:#ffd43b;">S${suite}</div>
+                        <div class="chart-marks">${suiteNums.map(n => String(n).padStart(2, '0')).join(' ')}</div>
+                        <div class="chart-played">${played.length > 0 ? played.map(n => String(n).padStart(2, '0')).join(' ') : '—'}</div>
+                        <div class="chart-coldest" style="color:${coldestColor}">${coldestInfo}</div>
+                        <div class="chart-trend" style="color:${trendColor}">${trendText}</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function updateTopShelf() {
+            const container = document.getElementById('top-shelf-content');
+            if (!container || !marks || marks.length === 0) return;
+            
+            // Get top 10 coldest marks (most days since last draw)
+            const coldestMarks = [...marks]
+                .sort((a, b) => b.days - a.days)
+                .slice(0, 10)
+                .reverse(); // Reverse to show coldest at bottom
+            
+            let html = '';
+            
+            coldestMarks.forEach((mark, index) => {
+                const rank = index + 1;
+                const numStr = String(mark.num).padStart(2, '0');
+                const color = numberColors[numStr] || '#ffffff';
+                
+                // Determine status color
+                let statusColor = '#32d74b'; // Normal
+                if (mark.days > mark.avg) statusColor = '#ff453a'; // Overdue
+                else if (mark.days > mark.avg - 2) statusColor = '#ff9f0a'; // Close
+                
+                html += `
+                    <div class="coldest-item">
+                        <div class="coldest-rank">#${rank}</div>
+                        <div class="coldest-ball" style="background:${color}">${numStr}</div>
+                        <div class="coldest-info">
+                            <div class="coldest-name">${mark.spirit}</div>
+                            <div class="coldest-days">${mark.days} days ago • Last: ${mark.date}</div>
+                        </div>
+                        <div style="font-weight:bold; font-size:12px; color:${statusColor};">
+                            ${mark.status === 'OVERDUE' ? 'TODAY' : (mark.status === 'CLOSE' ? 'CLOSE' : mark.dLeft + 'd left')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ========== QUANTUM CHART FUNCTIONS ==========
+        function initializeQuantumChart() {
+            const gridEl = document.getElementById('quantum-grid');
+            if (!gridEl) return;
+            
+            gridEl.innerHTML = '';
+            quantumData.forEach(set => {
+                set.forEach(trip => {
+                    const d = document.createElement('div');
+                    d.className = 'triplet';
+                    trip.forEach(n => {
+                        const c = document.createElement('div');
+                        c.className = 'cell';
+                        c.textContent = n;
+                        c.onclick = () => updateQuantumDisplay(n);
+                        d.appendChild(c);
+                    });
+                    gridEl.appendChild(d);
+                });
+            });
+            
+            updateQuantumDisplay(selectedQuantumNum);
+        }
+        
+        function updateQuantumDisplay(num) {
+            selectedQuantumNum = num;
+            const cells = document.querySelectorAll('#quantum-grid .cell');
+            
+            cells.forEach(el => {
+                el.classList.remove('highlight', 'dim');
+                if (parseInt(el.textContent) === num) {
+                    el.classList.add('highlight');
+                } else {
+                    el.classList.add('dim');
+                }
+            });
+            
+            const eight = quantumData.flat().filter(t => t.includes(num));
+            const sixteen = sixteenGroups.filter(t => t.includes(num));
+            
+            let html = `
+                <div class="chart-tabs">
+                    <div class="chart-tab ${quantumView === 'Matrix' ? 'active' : ''}" onclick="setQuantumView('Matrix')">1/8 & 1/16 Chart</div>
+                    <div class="chart-tab ${quantumView === 'Bank' ? 'active' : ''}" onclick="setQuantumView('Bank')">Bank Chart</div>
+                    <div class="chart-tab ${quantumView === 'Diamond' ? 'active' : ''}" onclick="setQuantumView('Diamond')">Diamond Chart</div>
+                </div>
+                <h3 style="color:var(--neon);margin:5px 0 10px;">MARK: #${num}</h3>
+            `;
+            
+            if (quantumView === 'Matrix') {
+                html += `<div class="comparison">
+                    <div class="column"><h4>1/8 CHART</h4>${eight.map(g => '<div style="font-size:12px;margin:2px 0;">' + g.join(', ') + '</div>').join('')}</div>
+                    <div class="column"><h4>1/16 CHART</h4>${sixteen.map(g => '<div style="font-size:12px;margin:2px 0;">' + g.join(', ') + '</div>').join('')}</div>
+                </div>`;
+            } else if (quantumView === 'Bank') {
+                const b = bankBlocking[num] || ["Check Sequence"];
+                html += `<div class="column data-box"><h4>Blocking Marks</h4><div class="data-val" style="color:white">${b.join(' • ')}</div><p style="font-size:9px;color:#64748b;">Hedge these marks against your main play.</p></div>`;
+            } else if (quantumView === 'Diamond') {
+                const d = luckyDiamond[num] || ["Neutral"];
+                html += `<div class="column data-box"><h4>Lucky Diamond Chart</h4><div class="data-val" style="color:var(--neon)">${d.join(' • ')}</div><p class="diamond-text">"The mirror reflection of the current sequence."</p></div>`;
+            }
+            
+            const instructionsEl = document.getElementById('quantum-instructions');
+            if (instructionsEl) {
+                instructionsEl.innerHTML = html;
+            }
+        }
+        
+        function setQuantumView(v) {
+            quantumView = v;
+            updateQuantumDisplay(selectedQuantumNum);
+        }
+        
+        function randomPick() {
+            const r = Math.floor(Math.random() * 36) + 1;
+            updateQuantumDisplay(r);
+        }
+        
+        // ========== EXISTING FUNCTIONS (from original code) ==========
+        // ... [All the existing functions from your original code remain unchanged below]
+        // I've preserved all the original functionality while adding the new Home section features
+        
+        // ========== NOTIFICATION SYSTEM ==========
+        function showNotification(message, type = 'info') {
+            // Remove any existing notifications first
+            const existing = document.querySelectorAll('.notification-toast');
+            existing.forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast';
+            notification.innerHTML = `
+                <div style="position:fixed; top:20px; right:20px; background:${type === 'error' ? '#ff453a' : type === 'warning' ? '#ff9f0a' : '#32d74b'}; color:white; padding:12px 20px; border-radius:8px; z-index:9999; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out;">
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // Add CSS animation
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // ========== DATA LOADING ==========
+        async function loadData() {
+            try {
+                const PLAY_WHE_URL = "https://script.google.com/macros/s/AKfycbwyr-M_ZzIscNgxJmR_UYHgZqmamn62Np4msDFaCjX9KgyUmyjuzuIYbawBmT0_mw4j/exec?action=calendar&game=P2WHE&weeks=159";
+                
+                // Check if we have cached data and it's less than 1 hour old
+                const cachedData = localStorage.getItem('playwhe_data');
+                const lastUpdated = localStorage.getItem('playwhe_last_updated');
+                const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                
+                if (navigator.onLine) {
+                    // Try to fetch fresh data
+                    showNotification('🔄 Fetching latest data...', 'info');
+                    
+                    const response = await fetch(PLAY_WHE_URL);
+                    const json = await response.json();
+                    
+                    // Cache the data
+                    localStorage.setItem('playwhe_data', JSON.stringify(json.data.weeks));
+                    localStorage.setItem('playwhe_last_updated', Date.now());
+                    
+                    // Process and render
+                    processData(json.data.weeks);
+                    initCalendar();
+                    renderShelfTab();
+                    renderDrawsTab();
+                    renderOutstandingTable();
+                    updateTimeDisplay();
+
+                    showNotification('✅ Data updated successfully!', 'success');
+                    
+                    // Set auto-refresh (every 5 minutes)
+                    if (window.autoRefreshInterval) {
+                        clearInterval(window.autoRefreshInterval);
+                    }
+                    window.autoRefreshInterval = setInterval(async () => {
+                        console.log('Auto-refreshing data...');
+                        await loadData();
+                    }, 5 * 60 * 1000);
+                    
+                } else if (cachedData && lastUpdated && parseInt(lastUpdated) > oneHourAgo) {
+                    // Use cached data if offline and cache is fresh
+                    showNotification('📡 Offline - Using cached data', 'warning');
+                    const json = JSON.parse(cachedData);
+                    processData(json);
+                    initCalendar();
+                    renderShelfTab();
+                    renderDrawsTab();
+                    renderOutstandingTable();
+                    updateTimeDisplay();
+                    
+                } else {
+                    // No cache or cache is old
+                    if (cachedData) {
+                        showNotification('📡 Using outdated cache - connect for fresh data', 'warning');
+                        const json = JSON.parse(cachedData);
+                        processData(json);
+                        initCalendar();
+                    } else {
+                        showNotification('❌ No internet connection and no cached data', 'error');
+                        loadSampleData();
+                    }
+                    renderShelfTab();
+                    renderDrawsTab();
+                    renderOutstandingTable();
+                    updateTimeDisplay();
+                }
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                
+                // Try to use cache as fallback
+                const cachedData = localStorage.getItem('playwhe_data');
+                if (cachedData) {
+                    showNotification('⚠️ Using cached data (network error)', 'warning');
+                    const json = JSON.parse(cachedData);
+                    processData(json);
+                    initCalendar();
+                } else {
+                    showNotification('❌ Network error - loading sample data', 'error');
+                    loadSampleData();
+                }
+                
+                renderShelfTab();
+                renderDrawsTab();
+                renderOutstandingTable();
+                updateTimeDisplay();
+            }
+        }
+
+        // ========== UPDATE TIME DISPLAY ==========
+        function updateTimeDisplay() {
+            const now = new Date();
+            const timeStr = `Last updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            
+            // Create or update the time display
+            let timeDisplay = document.getElementById('last-update-display');
+            
+            if (!timeDisplay) {
+                timeDisplay = document.createElement('div');
+                timeDisplay.id = 'last-update-display';
+                timeDisplay.style.cssText = 'text-align:center; color:#8e8e93; font-size:12px; margin:15px 0; font-weight:500;';
+                
+                // Add to the bottom of the shelf tab (you can change this location)
+                const shelfTab = document.getElementById('shelf-tab');
+                if (shelfTab) {
+                    shelfTab.appendChild(timeDisplay);
+                } else {
+                    // Fallback to body
+                    document.body.appendChild(timeDisplay);
+                }
+            }
+            
+            timeDisplay.textContent = timeStr;
+            
+            // Also show how long ago
+            const lastUpdated = localStorage.getItem('playwhe_last_updated');
+            if (lastUpdated) {
+                const minutesAgo = Math.floor((Date.now() - parseInt(lastUpdated)) / 60000);
+                if (minutesAgo > 0) {
+                    timeDisplay.innerHTML += ` <span style="color:${minutesAgo > 30 ? '#ff453a' : '#32d74b'};">(${minutesAgo}m ago)</span>`;
+                } else {
+                    timeDisplay.innerHTML += ' <span style="color:#32d74b;">(Just now | 🔄 5 min)</span>';
+                }
+            }
+        }
+
+        // ========== CALENDAR FUNCTIONS ==========
+        function initCalendar() {
+            // Process calendar data from existing data
+            const cachedData = localStorage.getItem('playwhe_data');
+            if (cachedData) {
+                try {
+                    const weeks = JSON.parse(cachedData);
+                    if (weeks && weeks.length > 0) {
+                        // Store all weeks
+                        calendarWeeks = weeks.map(week => ({
+                            ...week,
+                            days: week.days || []
+                        })).reverse(); // Most recent first (week 0 = current/most recent)
+                        
+                        // Get today's day name (skip Sunday)
+                        const today = new Date();
+                        let todayName = today.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+                        todayName = todayName === 'Sunday' ? 'Monday' : todayName;
+                        currentDayOfWeek = todayName;
+                        
+                        // Find current week index (week containing today)
+                        currentWeekIndex = calendarWeeks.findIndex(w => w.isCurrentWeek);
+                        if (currentWeekIndex === -1) currentWeekIndex = 0;
+                        
+                        console.log(`Calendar initialized with ${calendarWeeks.length} weeks`);
+                        console.log(`Current day: ${currentDayOfWeek}, Current week index: ${currentWeekIndex}`);
+                        
+                        // Render initial calendar
+                        renderCalendarWidgetStyle();
+
+                        // Start countdown timers
+                        setTimeout(startCountdownTimers, 100);
+                    }
+                } catch (error) {
+                    console.error('Error parsing calendar data:', error);
+                }
+            }
+        }
+
+        function renderCalendarWidgetStyle() {
+            // Clear any existing countdown timers before rendering new ones
+            if (window.countdownTimers) {
+                window.countdownTimers = [];
+            }
+
+            const container = document.getElementById('calendar-content');
+            const title = document.getElementById('current-week-title');
+            
+            if (!calendarWeeks || calendarWeeks.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#ff6b6b;">No calendar data available</div>';
+                title.textContent = 'No Data';
+                return;
+            }
+            
+            // Get day name (handle Sunday)
+            let dayName = currentDayOfWeek;
+            if (dayName === 'Sunday') dayName = 'Monday';
+            
+            // Find 5 most recent weeks that have this day
+            const daysToShow = [];
+            for (let i = currentWeekIndex; i < calendarWeeks.length; i++) {
+                const week = calendarWeeks[i];
+                const day = week.days.find(d => d.dayName === dayName);
+                
+                if (day) {
+                    const parts = week.startDate.split(' ');
+                    const dayNum = parseInt(parts[0], 10);
+                    const monthName = parts[1];
+                    const year = parseInt(parts[2], 10);
+                    
+                    // Map month names to numbers
+                    const monthMap = {
+                        "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                        "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                    };
+                    
+                    // Create base date (Monday)
+                    const baseDate = new Date(year, monthMap[monthName], dayNum);
+                    const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);
+                    const actualDate = new Date(baseDate);
+                    actualDate.setDate(baseDate.getDate() + dayIndex);
+                    
+                    // Format date
+                    const dayOfMonth = actualDate.getDate();
+                    const displayMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const displayMonthName = displayMonthNames[actualDate.getMonth()];
+                    const displayYear = actualDate.getFullYear();
+                    
+                    const displayDateStr = `${dayOfMonth}-${displayMonthName}`;
+                    
+                    daysToShow.push({
+                        date: displayDateStr,
+                        year: displayYear.toString(),
+                        draws: day.draws || {},
+                        dayName: day.dayName,
+                        weekIndex: i,
+                        isCurrentWeek: i === currentWeekIndex,
+                        isPastWeek: i > currentWeekIndex,
+                        weekData: week,
+                        actualDate: actualDate
+                    });
+                    
+                    if (daysToShow.length >= 6) break;
+                }
+            }
+            
+            // If we don't have enough recent weeks, look further back
+            if (daysToShow.length < 5) {
+                for (let i = currentWeekIndex + 1; i < calendarWeeks.length; i++) {
+                    const week = calendarWeeks[i];
+                    const day = week.days.find(d => d.dayName === dayName);
+                    
+                    if (day) {
+                        const parts = week.startDate.split(' ');
+                        const dayNum = parseInt(parts[0], 10);
+                        const monthName = parts[1];
+                        const year = parseInt(parts[2], 10);
+                        
+                        const monthMap = {
+                            "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                            "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                        };
+                        
+                        const baseDate = new Date(year, monthMap[monthName], dayNum);
+                        const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);
+                        const actualDate = new Date(baseDate);
+                        actualDate.setDate(baseDate.getDate() + dayIndex);
+                        
+                        const dayOfMonth = actualDate.getDate();
+                        const displayMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        const displayMonthName = displayMonthNames[actualDate.getMonth()];
+                        const displayYear = actualDate.getFullYear();
+                        
+                        const displayDateStr = `${dayOfMonth}-${displayMonthName}`;
+                        
+                        daysToShow.push({
+                            date: displayDateStr,
+                            year: displayYear.toString(),
+                            draws: day.draws || {},
+                            dayName: day.dayName,
+                            weekIndex: i,
+                            isCurrentWeek: i === currentWeekIndex,
+                            isPastWeek: i > currentWeekIndex,
+                            weekData: week,
+                            actualDate: actualDate
+                        });
+                        
+                        if (daysToShow.length >= 6) break;
+                    }
+                }
+            }
+            
+            // Build HTML table matching widget style (current at BOTTOM)
+            let html = `
+                <table class="calendar-table-widget">
+                    <thead>
+                        <tr>
+                            <th class="date-header">DATE</th>
+                            <th>MORNING<br>10:30 AM</th>
+                            <th>MIDDAY<br>1:00 PM</th>
+                            <th>AFTERNOON<br>4:00 PM</th>
+                            <th>EVENING<br>7:00 PM</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            // Show in REVERSE order (oldest first, current at bottom)
+            const reversedDays = [...daysToShow].reverse();
+            const now = new Date();
+            
+            reversedDays.forEach((day, idx) => {
+                const draws = day.draws || {};
+                const isPastWeek = day.isPastWeek;
+                const isCurrentWeek = day.isCurrentWeek;
+                const isToday = day.actualDate.toDateString() === now.toDateString();
+                const isFutureDay = day.actualDate > now && isCurrentWeek;
+                
+                // Check if it's a holiday (all draws are empty)
+                const isHoliday = !draws || Object.values(draws).every(v => !v || v === "-" || v === "–" || v === "PENDING");
+                
+                // For current week, never show HOLIDAY - show pending/countdown instead
+                const shouldShowHoliday = isHoliday && !isCurrentWeek;
+                
+                html += `<tr${isCurrentWeek ? ' class="current-day-row"' : ''}>`;
+                html += `<td class="date-header"><small style="color:#666;">${day.dayName.slice(0,3)}</small><br>${day.date}<br><small style="color:#888; font-size:9px;">${day.year}</small></td>`;
+                
+                if (shouldShowHoliday) {
+                    // Past week holiday - show HOLIDAY
+                    html += `<td colspan="4" class="holiday-cell">🗓️ HOLIDAY 🗓️</td>`;
+                } else {
+                    // Current week or has draws - show draws or pending
+                    ['MOR', 'MID', 'NON', 'EVE'].forEach(timeSlot => {
+                        const drawValue = draws[timeSlot];
+                        html += '<td>';
+                        
+                        if (!drawValue || drawValue === "-" || drawValue === "PENDING") {
+                            if (isCurrentWeek) {
+                                if (isFutureDay) {
+                                    // Future day in current week - show "FUTURE" or days until
+                                    const daysUntil = Math.ceil((day.actualDate - now) / (1000 * 60 * 60 * 24));
+                                    if (daysUntil === 1) {
+                                        html += `<span style="color:#00ccff; font-size:10px; font-weight:bold;">TOMORROW</span>`;
+                                    } else if (daysUntil === 2) {
+                                        html += `<span style="color:#00ccff; font-size:10px; font-weight:bold;">IN 2 DAYS</span>`;
+                                    } else if (daysUntil === 3) {
+                                        html += `<span style="color:#00ccff; font-size:10px; font-weight:bold;">IN 3 DAYS</span>`;
+                                    } else {
+                                        html += `<span style="color:#00ccff; font-size:10px; font-weight:bold;">FUTURE</span>`;
+                                    }
+                                } else if (isToday) {
+                                    // Today in current week - show countdown/pending indicator
+                                    const drawTime = getDrawTime(timeSlot);
+                                    const timeDiff = drawTime - now;
+                                    
+                                if (timeDiff > 0) {
+                                    // Draw hasn't happened yet today - create a countdown timer
+                                    const countdownId = `countdown-${day.date}-${timeSlot}`;
+                                    html += `DRAW<br><span id="${countdownId}" style="color:#ffa500; font-size:10px; font-weight:bold;">00h:00m:00s</span>`;
+                                    
+                                    // Store countdown data for the timer function
+                                    if (!window.countdownTimers) window.countdownTimers = [];
+                                    window.countdownTimers.push({
+                                        id: countdownId,
+                                        drawTime: drawTime.getTime(),
+                                        timeSlot: timeSlot
+                                    });
+                                } else {
+                                    // Draw time has passed but no result yet
+                                    html += 'STANDBY<br><span class="pending-hourglass">⏳</span>';
+                                }
+                                } else {
+                                    // Past day in current week (already happened) with no result
+                                    html += '<span style="color:#666; font-size:11px;">–</span>';
+                                }
+                            } else {
+                                // Past week with no draw
+                                html += '<span style="color:#666; font-size:11px;">–</span>';
+                            }
+                        } else {
+                            // Has draw value
+                            const num = String(drawValue).padStart(2, '0');
+                            const color = numberColors[num] || '#ffffff';
+                            html += `<span class="draw-ball-widget" style="background:${color}">${num}</span>`;
+                        }
+                        
+                        html += '</td>';
+                    });
+                }
+                
+                html += '</tr>';
+            });
+            
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+            
+            // Update title
+            const weekDiff = currentWeekIndex; // Weeks from most recent
+            const weekLabel = weekDiff === 0 ? "THIS WEEK" : 
+                            weekDiff === 1 ? "LAST WEEK" : 
+                            `${weekDiff} WEEKS AGO`;
+            
+            title.textContent = `${weekLabel} (${dayName}) • ${daysToShow.length} WKS`;
+            
+            // Start countdown timers after rendering
+            setTimeout(startCountdownTimers, 100);
+        }
+
+        // Function to update all countdown timers
+        function updateAllCountdowns() {
+            if (!window.countdownTimers || window.countdownTimers.length === 0) return;
+            
+            const now = new Date().getTime();
+            
+            window.countdownTimers.forEach((timer, index) => {
+                const element = document.getElementById(timer.id);
+                if (!element) {
+                    // Remove timer if element doesn't exist
+                    window.countdownTimers.splice(index, 1);
+                    return;
+                }
+                
+                const timeDiff = timer.drawTime - now;
+                
+                if (timeDiff > 0) {
+                    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                    
+                    if (hours > 0) {
+                        element.textContent = `${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
+                        element.style.color = '#ffa500';
+                    } else if (minutes > 0) {
+                        element.textContent = `${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
+                        element.style.color = '#ff4444';
+                    } else {
+                        element.textContent = `${seconds.toString().padStart(2, '0')}s`;
+                        element.style.color = '#ff4444';
+                    }
+                } else {
+                    // Countdown expired - update to pending
+                    element.outerHTML = '<span class="pending-hourglass">⏳</span>';
+                    window.countdownTimers.splice(index, 1);
+                }
+            });
+        }
+
+        // Function to start the countdown timer interval
+        function startCountdownTimers() {
+            // Clear any existing interval
+            if (window.countdownInterval) {
+                clearInterval(window.countdownInterval);
+            }
+            
+            // Initialize if not exists
+            if (!window.countdownTimers) {
+                window.countdownTimers = [];
+            }
+            
+            // Update immediately and then every second
+            updateAllCountdowns();
+            window.countdownInterval = setInterval(updateAllCountdowns, 1000);
+        }
+
+        // Helper function to get draw times
+        function getDrawTime(timeSlot) {
+            const now = new Date();
+            const times = {
+                'MOR': { hour: 10, minute: 30 },
+                'MID': { hour: 13, minute: 0 },
+                'NON': { hour: 16, minute: 0 },
+                'EVE': { hour: 19, minute: 0 }
+            };
+            
+            if (times[timeSlot]) {
+                const drawTime = new Date(now);
+                drawTime.setHours(times[timeSlot].hour, times[timeSlot].minute, 0, 0);
+                return drawTime;
+            }
+            
+            return now;
+        }
+
+        function navigateDay(direction) {
+            if (!calendarWeeks || calendarWeeks.length === 0) return;
+            
+            // Get list of weekdays (skip Sunday)
+            const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const currentIndex = weekdays.indexOf(currentDayOfWeek);
+            
+            if (currentIndex === -1) return;
+            
+            // Calculate new day index with wrapping
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = 5; // Wrap to Saturday
+            if (newIndex > 5) newIndex = 0; // Wrap to Monday
+            
+            currentDayOfWeek = weekdays[newIndex];
+            renderCalendarWidgetStyle();
+        }
+
+        function navigateWeek(direction) {
+            if (!calendarWeeks || calendarWeeks.length === 0) return;
+            
+            // Move to next/previous week
+            currentWeekIndex += direction;
+            
+            // Ensure we stay within bounds
+            if (currentWeekIndex < 0) currentWeekIndex = 0;
+            if (currentWeekIndex >= calendarWeeks.length) currentWeekIndex = calendarWeeks.length - 1;
+            
+            renderCalendarWidgetStyle();
+        }
+
+        function navigateToDayOfWeek(dayName) {
+            currentDayOfWeek = dayName;
+            renderCalendarWidgetStyle();
+        }
+
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(`${type}-dropdown`);
+            if (!dropdown) {
+                console.error(`Dropdown element not found: ${type}-dropdown`);
+                return;
+            }
+            
+            // The button IDs are 'calBtn' and 'outBtn', not 'calendarBtn' and 'outstandingBtn'
+            const button = type === 'calendar' ? document.getElementById('calBtn') : 
+                        type === 'outstanding' ? document.getElementById('outBtn') : null;
+            
+            if (!button) {
+                console.error(`Button element not found for type: ${type}`);
+                return;
+            }
+            
+            // Close other dropdown if open
+            if (activeDropdown && activeDropdown !== dropdown) {
+                activeDropdown.style.display = 'none';
+                const otherType = activeDropdown.id.replace('-dropdown', '');
+                const otherButton = otherType === 'calendar' ? document.getElementById('calBtn') : 
+                                otherType === 'outstanding' ? document.getElementById('outBtn') : null;
+                if (otherButton) {
+                    otherButton.innerHTML = otherButton.innerHTML.replace('▴', '▾');
+                }
+            }
+            
+            // Toggle current dropdown
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                button.innerHTML = button.innerHTML.replace('▴', '▾');
+                activeDropdown = null;
+            } else {
+                dropdown.style.display = 'block';
+                button.innerHTML = button.innerHTML.replace('▾', '▴');
+                activeDropdown = dropdown;
+                
+                // Load/refresh data if needed
+                if (type === 'calendar') {
+                    if (!calendarWeeks || calendarWeeks.length === 0) {
+                        initCalendar();
+                    } else {
+                        renderCalendarWidgetStyle();
+                    }
+                } else if (type === 'outstanding') {
+                    renderOutstandingTable();
+                }
+            }
+        }
+    
+        function processData(weeks) {
+            // EXACT data processing logic from your second code
+            const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const timeOrder = ["MOR", "MID", "NON", "EVE"];
+            const timeNames = { MOR: "Morning", MID: "Midday", NON: "Afternoon", EVE: "Evening" };
+            
+            // Reset data structures
+            timeline = [];
+            markInfo = {};
+            currentWeekHits = {};
+            const lastSeenDate = {}, lastSeenTime = {}, frequency = {};
+            
+            // Sort weeks chronologically
+            weeks.sort((a, b) => {
+                let pa = a.startDate.split(" ");
+                let pb = b.startDate.split(" ");
+                return new Date(`${pa[2]}-${pa[1]}-${pa[0]}`) - new Date(`${pb[2]}-${pb[1]}-${pb[0]}`);
+            });
+            
+            for (let week of weeks) {
+                let parts = week.startDate.split(" ");
+                let monthMap = {"Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,"Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11};
+                let startDate = new Date(parts[2], monthMap[parts[1]], parts[0]);
+                
+                for (let day of week.days) {
+                    let dDate = new Date(startDate);
+                    dDate.setDate(dDate.getDate() + dayOrder.indexOf(day.dayName));
+                    
+                    for (let t of timeOrder) {
+                        let n = day.draws[t];
+                        if (!n || n === "-" || n === "PENDING") continue;
+                        let num = parseInt(n);
+                        if (num < 1 || num > 36) continue;
+                        
+                        // Track current week hits for widget
+                        if (week.isCurrentWeek === true) {
+                            currentWeekHits[num] = (currentWeekHits[num] || 0) + 1;
+                        }
+                        
+                        // Track frequency and last seen for widget
+                        frequency[num] = (frequency[num] || 0) + 1;
+                        lastSeenDate[num] = dDate;
+                        lastSeenTime[num] = timeNames[t];
+                        
+                        // Original timeline processing
+                        let entry = { 
+                            num, 
+                            date: dDate.getTime(), 
+                            dateStr: dDate.toLocaleDateString("en-GB", {weekday:"short", day:"2-digit", month:"short", year: "numeric"}).toUpperCase(), 
+                            dayName: day.dayName, 
+                            timeSlot: t, 
+                            time: timeNames[t] 
+                        };
+                        timeline.push(entry);
+                        
+                        if (!(num in markInfo)) { 
+                            markInfo[num] = { 
+                                frequency: 0, 
+                                lastDate: null, 
+                                history: [], 
+                                nextNums: {} 
+                            }; 
+                        }
+                        markInfo[num].frequency++;
+                        markInfo[num].lastDate = dDate;
+                        markInfo[num].history.push({ 
+                            date: entry.dateStr, 
+                            time: entry.time, 
+                            ts: entry.date 
+                        });
+                        
+                        if (timeline.length > 1) {
+                            let prev = timeline[timeline.length - 2];
+                            if (markInfo[prev.num]) {
+                                markInfo[prev.num].nextNums[num] = (markInfo[prev.num].nextNums[num] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Generate marks array
+            marks = [];
+            let now = new Date();
+            for (let n = 1; n <= 36; n++) {
+                let info = markInfo[n] || { frequency: 0, lastDate: null };
+                let daysAgo = info.lastDate ? Math.floor((now.getTime() - info.lastDate.getTime()) / 86400000) : 999;
+                let avg = intervals[n] || 12;
+                let dLeft = avg - daysAgo;
+                let status = (dLeft <= 0) ? "OVERDUE" : (dLeft <= 2 ? "CLOSE" : "NORMAL");
+                
+                marks.push({ 
+                    num: n, 
+                    spirit: spirits[n], 
+                    date: info.lastDate ? info.lastDate.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year: "numeric"}).toUpperCase() : "N/A", 
+                    days: daysAgo, 
+                    dLeft, 
+                    status, 
+                    avg, 
+                    frequency: info.frequency,
+                    time: lastSeenTime[n] || "N/A",
+                    isHitThisWeek: !!currentWeekHits[n]
+                });
+            }
+            marks.sort((a,b) => b.days - a.days);
+            
+            // Calculate marks outstanding EXACTLY as in your code
+            let weeksForOutstanding = weeks.slice().reverse(); // Recent first
+            outstandingBuckets = { "THIS": [] };
+            for (let i = 0; i < 12; i++) outstandingBuckets[i] = [];
+            
+            for (let n = 1; n <= 36; n++) {
+                if (currentWeekHits[n]) {
+                    outstandingBuckets["THIS"].push({num: n, freq: currentWeekHits[n]});
+                    continue;
+                }
+                let found = false;
+                for (let i = 1; i < weeksForOutstanding.length && i <= 12; i++) {
+                    let weekData = weeksForOutstanding[i];
+                    let weekNums = new Set();
+                    weekData.days.forEach(d => Object.values(d.draws).forEach(v => {
+                        if(v && v !== "-" && v !== "PENDING") weekNums.add(parseInt(v));
+                    }));
+                    
+                    if (weekNums.has(n)) {
+                        outstandingBuckets[i-1].push(n);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            
+            jsNowTs = now.getTime();
+            
+            // ========== CALENDAR DATA PROCESSING ==========
+            try {
+                if (weeks && weeks.length > 0) {
+                    calendarWeeks = weeks.map(week => ({
+                        ...week,
+                        days: week.days || []
+                    })).reverse(); // Most recent first
+                    
+                    // Set current week index
+                    const currentWeekIndexInArray = calendarWeeks.findIndex(w => w.isCurrentWeek);
+                    if (currentWeekIndexInArray !== -1) {
+                        currentWeekIndex = currentWeekIndexInArray;
+                    } else {
+                        currentWeekIndex = 0; // Show most recent week by default
+                    }
+                    
+                    // Get today's day (skip Sunday)
+                    const today = new Date();
+                    let todayName = today.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+                    todayName = todayName === 'Sunday' ? 'Monday' : todayName;
+                    currentDayOfWeek = todayName;
+                    
+                    console.log(`Processed ${calendarWeeks.length} calendar weeks`);
+                    console.log(`Current day: ${currentDayOfWeek}, Week index: ${currentWeekIndex}`);
+                }
+            } catch (error) {
+                console.error('Error processing calendar data:', error);
+            }
+        }
+            
+        function loadSampleData() {
+            // Generate sample data matching your structure
+            const sampleWeeks = [];
+            const now = new Date();
+            const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const timeOrder = ["MOR", "MID", "NON", "EVE"];
+            
+            for (let w = 0; w < 12; w++) {
+                const weekStart = new Date(now.getTime() - (w * 7 * 86400000));
+                const week = {
+                    startDate: weekStart.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year:"numeric"}),
+                    isCurrentWeek: w === 0,
+                    days: []
+                };
+                
+                for (let d = 0; d < 6; d++) {
+                    const dayDate = new Date(weekStart.getTime() + (d * 86400000));
+                    const day = {
+                        dayName: dayOrder[d],
+                        draws: {}
+                    };
+                    
+                    for (let t = 0; t < 4; t++) {
+                        // Generate realistic data
+                        let drawNum = Math.floor(Math.random() * 36) + 1;
+                        // Make some numbers appear more frequently
+                        if (Math.random() > 0.7) {
+                            drawNum = Math.floor(Math.random() * 12) + 1; // Hot numbers 1-12
+                        }
+                        day.draws[timeOrder[t]] = drawNum.toString();
+                    }
+                    
+                    week.days.push(day);
+                }
+                
+                sampleWeeks.push(week);
+            }
+            
+            processData(sampleWeeks);
+            initCalendar();
+        }
+        
+        // ========== RENDERING FUNCTIONS ==========
+        function renderShelfTab() {
+            const shelfTab = document.getElementById('shelf-tab');
+            if (!shelfTab) return;
+            
+            shelfTab.innerHTML = marks.map(m => `
+                <div class="card data-card" data-search="${m.num} ${m.spirit}">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div class="ball-big" style="background:${numberColors[String(m.num).padStart(2,'0')]}">${m.num}</div>
+                        <div style="flex:1; margin-left:15px;">
+                            <div style="font-weight:800; font-size:16px;">${m.spirit}</div>
+                            <div style="font-size:11px; color:var(--sec);">${m.date}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:900; font-size:20px; color:${m.days > m.avg ? 'var(--danger)' : 'var(--success)'}">${m.days}d ago</div>
+                            <div class="due-tag" style="background:${m.status==='OVERDUE'?'var(--danger)':(m.status==='CLOSE'?'var(--warn)':'#333')}; color:#fff">
+                                ${m.status==='OVERDUE'?'TODAY':(m.status==='CLOSE'?'CLOSE':m.dLeft+'d left')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDrawsTab() {
+            const drawsTab = document.getElementById('draws-tab');
+            if (!drawsTab) return;
+            
+            drawsTab.innerHTML = marks.map((m, idx) => {
+                let follows = Object.entries(markInfo[m.num]?.nextNums || {}).sort((a,b) => b[1] - a[1]).slice(0,4);
+                return `
+                <div class="card data-card" data-search="${m.num} ${m.spirit}" onclick="toggle(${idx})">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center;">
+                            <div style="background:#fff; width:30px; height:30px; border-radius:50%; color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold;">${m.num}</div>
+                            <div style="margin-left:10px; font-weight:bold;">${m.spirit}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:14px; color:var(--warn); font-weight:bold;"> ${m.frequency}x PLAYED</div>
+                            <div style="font-size:10px; color:var(--accent);">VIEW ▾</div>
+                        </div>
+                    </div>
+                    <div id="p-${idx}" class="panel">
+                        <div style="font-size:11px; color:var(--warn); margin-bottom:10px; font-weight:bold;">LIKELY FOLLOWS:</div>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            ${follows.map(f => `<div style="background:var(--accent); padding:5px 10px; border-radius:6px; font-weight:800;">#${f[0]}</div>`).join('')}
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>MARK</th>
+                                <th>DATE PLAYED</th>
+                                <th>DRAW TIME</th>
+                                <th>DAYS AGO</th>
+                            </tr>
+                            ${(markInfo[m.num]?.history || []).slice().reverse().slice(0,20).map(h => {
+                                let ago = Math.floor((jsNowTs - h.ts)/86400000);
+                                return `<tr><td>${m.num}</td><td>${h.date}</td><td>${h.time}</td><td>${ago} days ago</td></tr>`;
+                            }).join('')}
+                        </table>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        
+        function renderOutstandingTable() {
+            const outTable = document.getElementById('outstanding-table');
+            if (!outTable) return;
+            
+            outTable.innerHTML = `
+                <div style="font-size:14px; color:gray; margin-bottom:8px; text-align:center;">AGING ANALYSIS (LAST 12 WEEKS)</div>
+                ${Object.keys(outstandingBuckets).filter(k => outstandingBuckets[k].length > 0).sort((a,b) => {
+                    if(a==="THIS") return -1; if(b==="THIS") return 1; return a-b;
+                }).map(k => {
+                    let label = k === "THIS" ? "THIS WEEK" : (k === "0" ? "LAST WEEK" : k + " WEEKS AGO");
+                    let content = "";
+                    if(k === "THIS") {
+                        content = outstandingBuckets[k].map(obj => {
+                            let color = obj.freq >= 4 ? "#ff453a" : (obj.freq === 3 ? "#ff9f0a" : (obj.freq === 2 ? "#32d74b" : "#007AFF"));
+                            return `<span class="ball-small" style="background:${color}">${String(obj.num).padStart(2,'0')}</span>`;
+                        }).join('');
+                    } else {
+                        content = `<span class="out-nums">${outstandingBuckets[k].sort((a,b)=>a-b).map(n => String(n).padStart(2,'0')).join(' ')}</span>`;
+                    }
+                    return `<div class="out-row"><span class="out-label">${label}</span><div>${content}</div></div>`;
+                }).join('')}
+            `;
+        }
+
+        // ========== OFFLINE DETECTION ==========
+        function updateOnlineStatus() {
+            if (!navigator.onLine) {
+                showNotification('📡 You are offline - using cached data', 'warning');
+                
+                // Create offline indicator
+                let indicator = document.getElementById('offline-indicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'offline-indicator';
+                    indicator.className = 'offline-indicator';
+                    indicator.textContent = '📡 OFFLINE MODE';
+                    document.body.appendChild(indicator);
+                }
+            } else {
+                // Remove offline indicator
+                const indicator = document.getElementById('offline-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        
+        // Initial check
+        updateOnlineStatus();
+        
+        // ========== TICKER FUNCTIONS ==========
+        function setupTicker() {
+            updateTicker();
+            setInterval(updateTicker, 60000);
+        }
+        
+        async function updateTicker() {
+            try {
+                const TICKER_URL = "https://script.google.com/macros/s/AKfycbymSUZ3cuBP7wZSKkxs8QmjMkKP6q3j-LOW_CVpY3n6Sw1EzsdwPu6yTEkpOmiAJz95/exec?action=ticker";
+                const response = await fetch(`${TICKER_URL}&_t=${new Date().getTime()}`);
+                const data = await response.json();
+                const allGames = data.games || {};
+                
+                const tickerContent = buildAllDrawsRibbon(allGames);
+                const ribbons = ['tickerRibbon1', 'tickerRibbon2', 'tickerRibbon3', 'tickerRibbon4'];
+                
+                ribbons.forEach(ribbonId => {
+                    const ribbon = document.getElementById(ribbonId);
+                    if (ribbon) {
+                        ribbon.innerHTML = tickerContent;
+                    }
+                });
+            } catch (error) {
+                console.log('Ticker update failed:', error);
+                // Fallback to sample ticker
+                const sampleGames = {
+                    PLAYWHE: [
+                        { time: "10:00 AM", name: "Morning", numbers: "16 JAMETTE (WB,PB)" },
+                        { time: "1:00 PM", name: "Midday", numbers: "29 OPIUM MAN (GB)" }
+                    ],
+                    PICK2: [
+                        { time: "10:05 AM", name: "PICK 2", numbers: "12/34 x2" }
+                    ],
+                    PICK4: [
+                        { time: "10:10 AM", name: "PICK 4", numbers: "1234" }
+                    ]
+                };
+                
+                const tickerContent = buildAllDrawsRibbon(sampleGames);
+                const ribbons = ['tickerRibbon1', 'tickerRibbon2', 'tickerRibbon3', 'tickerRibbon4'];
+                ribbons.forEach(ribbonId => {
+                    const ribbon = document.getElementById(ribbonId);
+                    if (ribbon) {
+                        ribbon.innerHTML = tickerContent;
+                    }
+                });
+            }
+        }
+        
+        function buildAllDrawsRibbon(allGames) {
+            if (!allGames || Object.keys(allGames).length === 0) {
+                return '<span style="color:#666;">♠️FSP•SAGi: Initializing...</span>';
+            }
+            
+            let html = '<div class="live-dot">LIVE</div>';
+            
+            // Process PLAY WHE if available
+            if (allGames.PLAYWHE && allGames.PLAYWHE.length > 0) {
+                allGames.PLAYWHE.forEach(draw => {
+                    const numMatch = draw.numbers.match(/^(\d+)/);
+                    const num = numMatch ? numMatch[1].padStart(2, '0') : '--';
+                    const color = num !== '--' ? (numberColors[num] || '#ffffff') : '#333333';
+                    const spiritMatch = draw.numbers.match(/\d+\s+(.+?)\s+\(/);
+                    const spiritName = spiritMatch ? spiritMatch[1].trim() : "";
+                    const marks = (draw.numbers.match(/\(([^)]+)\)/)?.[1] || "").split(',').map(m => m.trim()).filter(m => m);
+                    
+                    html += createTickerItem(draw.time + ' ' + draw.name, 
+                        generateBall(num, color, '#000') + marks.map(m => generateMarkBall(m)).join(''),
+                        spiritName);
+                });
+            }
+            
+            // Process PICK 2 if available
+            if (allGames.PICK2 && allGames.PICK2.length > 0) {
+                allGames.PICK2.forEach(p2 => {
+                    const parts = p2.numbers.trim().split(" ");
+                    const pair = (parts[0] || "").split("/");
+                    const mult = parts[1] || "";
+                    if (pair.length < 2) return;
+                    
+                    const ballsHtml = generateBall(pair[0], "#054517", "#ffff00", true) + 
+                                     generateBall(pair[1], "#ffff00", "#000000", true) +
+                                     (mult ? generateMarkBall(mult) : "");
+                    
+                    html += createTickerItem(p2.time + ' ' + p2.name, ballsHtml, "Pick 2 Results");
+                });
+            }
+            
+            // Process PICK 4 if available
+            if (allGames.PICK4 && allGames.PICK4.length > 0) {
+                allGames.PICK4.forEach(p4 => {
+                    const p4Nums = p4.numbers.match(/.{2}/g) || [];
+                    const p4Colors = ["#ff0000", "#ffff00", "#00ff00", "#ffffff"];
+                    const p4Texts = ["#ffffff", "#000000", "#000000", "#000000"];
+                    
+                    const ballsHtml = p4Nums.map((n, i) => generateBall(n, p4Colors[i], p4Texts[i])).join('');
+                    
+                    html += createTickerItem(p4.time + ' ' + p4.name, ballsHtml, "Pick 4 Results");
+                });
+            }
+            
+            return html;
+        }
+        
+        function generateBall(num, bg, txt, forceSingle = false) {
+            const parsedNum = parseInt(num, 10);
+            const displayNum = isNaN(parsedNum) ? num : parsedNum.toString();
+            return '<span class="ticker-number" style="background:' + bg + '; color:' + txt + '; margin-right:4px;">' + displayNum + '</span>';
+        }
+        
+        function generateMarkBall(mk) {
+            const c = markColors[mk] || {bg:"#ffffff", txt:"#000000"};
+            return '<span style="width:25px; height:25px; line-height:25px; border-radius:11px; background:' + c.bg + '; color:' + c.txt + '; font-size:14px; font-weight:900; text-align:center; display:inline-block; box-shadow:0 2px 4px rgba(0,0,0,0.3); margin-right:4px;">' + mk + '</span>';
+        }
+        
+        function createTickerItem(time, balls, label) {
+            return '<div class="ticker-draw">' +
+                   '  <span class="ticker-time">' + time + '</span>' +
+                   '  <div style="display:flex; align-items:center; margin-top:2px;">' + balls + '</div>' +
+                   '  <div style="color:#fff; font-size:11px; font-weight:bold; margin-top:2px; opacity:0.8;">' + label + '</div>' +
+                   '</div>';
+        }
+        
+        // ========== UI FUNCTIONS ==========
+        function show(t, el) {
+            // Hide all tab containers
+            document.getElementById('home-tab').style.display = 'none';
+            document.getElementById('shelf-tab').style.display = 'none';
+            document.getElementById('draws-tab').style.display = 'none';
+            document.getElementById('analyzer-tab').style.display = 'none';
+            
+            // Show the selected tab
+            document.getElementById(t + '-tab').style.display = 'block';
+            
+            // Toggle search box visibility
+            document.getElementById('masterSearch').style.display = (t === 'analyzer') ? 'none' : 'block';
+            
+            // Update active tab button
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+        
+        function toggle(i) {
+            let p = document.getElementById('p-' + i);
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function doSearch() {
+            let q = document.getElementById('masterSearch').value.toLowerCase();
+            document.querySelectorAll('.data-card').forEach(c => {
+                c.style.display = c.getAttribute('data-search').toLowerCase().includes(q) ? 'block' : 'none';
+            });
+        }
+        
+        function runDeepSearch() {
+            const d = document.getElementById('sDay').value;
+            const t = document.getElementById('sTime').value;
+            const s = parseInt(document.getElementById('sScope').value);
+            
+            const targeted = timeline.slice(-(s * 24));
+            const counts = {};
+            const logs = {};
+            
+            targeted.forEach(x => {
+                if (x.dayName === d && (t === 'ALL' || x.timeSlot === t)) {
+                    counts[x.num] = (counts[x.num] || 0) + 1;
+                    if (!logs[x.num]) logs[x.num] = [];
+                    logs[x.num].push(x);
+                }
+            });
+            
+            let sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0,10);
+            
+            document.getElementById('res').innerHTML = sorted.map(([n, c]) => {
+                let rows = logs[n].slice().reverse().slice(0,10).map(l => {
+                    const ago = Math.floor((jsNowTs - l.date)/86400000);
+                    return `<tr><td>${l.dateStr}</td><td>${l.time}</td><td>${ago}d</td></tr>`;
+                }).join('');
+                
+                return `<div style="background:#111; padding:12px; border-radius:12px; margin-bottom:12px; border-left:4px solid var(--accent);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><span style="font-weight:900; font-size:18px;">#${n}</span> <span style="font-size:12px; color:var(--sec);">${spirits[n]}</span></div>
+                        <div style="color:var(--success); font-weight:900;">${c} HITS</div>
+                    </div>
+                    <table class="table">${rows}</table>
+                </div>`;
+            }).join('') || '<div style="text-align:center; color:gray;">No Data Found</div>';
+        }
+        
+        // ========== SPLASH SCREEN FUNCTIONS ==========
+        function makeFace(num) {
+            const face = document.createElement('div');
+            face.className = 'face face--' + num;
+            const dot = '<div class="dot"></div>';
+            const dots = {
+                1: dot,
+                2: '<div class="dots">' + dot + '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>' + dot + '</div>',
+                3: '<div class="dots">' + dot + '<div></div><div></div><div></div>' + dot + '<div></div><div></div><div></div>' + dot + '</div>',
+                4: '<div class="dots">' + dot + '<div></div>' + dot + '<div></div><div></div><div></div>' + dot + '<div></div>' + dot + '</div>',
+                5: '<div class="dots">' + dot + '<div></div>' + dot + '<div></div>' + dot + '<div></div>' + dot + '<div></div>' + dot + '</div>',
+                6: '<div class="dots">' + dot + dot + dot + dot + dot + dot + '</div>'
+            };
+            face.innerHTML = dots[num] || '';
+            return face;
+        }
+        
+        function rollDice(cubeId) {
+            const cube = document.getElementById(cubeId);
+            cube.innerHTML = '';
+            for (let i = 1; i <= 6; i++) cube.appendChild(makeFace(i));
+            
+            const result = Math.floor(Math.random() * 6) + 1;
+            const rotations = {
+                1: 'rotateX(0deg) rotateY(0deg)',
+                2: 'rotateY(-90deg)',
+                3: 'rotateY(180deg)',
+                4: 'rotateY(90deg)',
+                5: 'rotateX(-90deg)',
+                6: 'rotateX(90deg)'
+            };
+            
+            // High-speed pre-spin
+            cube.style.transform = 'rotateX(720deg) rotateY(720deg)';
+            
+            setTimeout(() => {
+                cube.style.transform = rotations[result];
+            }, 100);
+        }
+        
+        function startSplash() {
+            rollDice('cube1');
+            rollDice('cube2');
+            
+            setTimeout(() => {
+                document.getElementById('revealText').classList.add('show');
+            }, 1200);
+            
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const main = document.getElementById('main-content');
+                
+                splash.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    main.style.display = 'block';
+                    setTimeout(() => main.classList.add('show'), 50);
+                }, 800);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
