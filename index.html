@@ -3221,24 +3221,52 @@
         
         // ========== UI FUNCTIONS ==========
         function show(t, el) {
-            // Hide all tab containers
-            document.getElementById('home-tab').style.display = 'none';
-            document.getElementById('shelf-tab').style.display = 'none';
-            document.getElementById('draws-tab').style.display = 'none';
-            document.getElementById('analyzer-tab').style.display = 'none';
+            console.log('Switching to tab:', t);
             
-            // Show the selected tab
-            document.getElementById(t + '-tab').style.display = 'block';
+            // Get references
+            const mainContent = document.getElementById('main-content');
+            const tabs = ['home', 'shelf', 'draws', 'analyzer'];
             
-            // Toggle search box visibility
-            document.getElementById('masterSearch').style.display = (t === 'analyzer') ? 'none' : 'block';
+            // Hide all tabs with !important
+            tabs.forEach(tabName => {
+                const tab = document.getElementById(tabName + '-tab');
+                if (tab) {
+                    tab.style.display = 'none';
+                    tab.style.opacity = '0';
+                    tab.style.visibility = 'hidden';
+                    tab.style.position = 'absolute'; // Remove from flow
+                }
+            });
             
-            // Update active tab button
+            // Show selected tab
+            const activeTab = document.getElementById(t + '-tab');
+            if (activeTab) {
+                activeTab.style.display = 'block';
+                activeTab.style.opacity = '1';
+                activeTab.style.visibility = 'visible';
+                activeTab.style.position = 'relative'; // Back in flow
+            }
+            
+            // Reset scroll - CRITICAL!
+            if (mainContent) {
+                mainContent.scrollTop = 0;
+                setTimeout(() => {
+                    mainContent.scrollTop = 0;
+                }, 50);
+            }
+            
+            // Force browser to repaint
+            void document.body.offsetHeight;
+            
+            // Update active button
             document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
             
-            // Scroll to top
-            window.scrollTo(0,0);
+            // Show/hide search
+            document.getElementById('masterSearch').style.display = 
+                (t === 'analyzer') ? 'none' : 'block';
+            
+            console.log('Tab switch complete');
         }
         
         function toggle(i) {
