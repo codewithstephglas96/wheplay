@@ -1158,44 +1158,49 @@
         <!-- NEW Ticker -->
 <!-- NEW Ticker -->
 <div class="ticker-fixed">
-    <div class="ticker-ribbon" id="tickerRibbon1"></div>
-    <div class="ticker-ribbon" id="tickerRibbon2"></div>
-    <div class="ticker-ribbon" id="tickerRibbon3"></div>
-    <div class="ticker-ribbon" id="tickerRibbon4"></div>
-</div>
-
-<!-- Support Banner - ADD THIS RIGHT AFTER TICKER -->
-<div id="support-ribbon" style="
-    background: linear-gradient(90deg, #1a1a1a, #222);
-    border-bottom: 1px solid #333;
-    padding: 8px 15px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 999;
-">
-    <span style="color: #ffd700; font-weight: bold;">♥</span>
-    <span style="color: #f5f5f8; font-size: 13px;">
-        Enjoying the content? Support WhePlay Web App by FSP SAGi.
-    </span>
-    <button onclick="handleSupportClick()" 
-            style="
-                background: linear-gradient(90deg, #ffd700, #ff9d00);
-                color: #000;
-                border: none;
-                padding: 4px 12px;
-                border-radius: 6px;
-                font-weight: bold;
-                font-size: 12px;
-                cursor: pointer;
-                margin-left: 10px;
-            ">
-        Donate TTD$10
-    </button>
+    <!-- Support Banner FIRST -->
+    <div id="support-ribbon" style="
+        background: linear-gradient(90deg, #1a1a1a, #222);
+        border-bottom: 1px solid #333;
+        padding: 8px 15px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1002;
+        height: 65px;
+    ">
+        <span style="color: #ffd700; font-weight: bold;">♥</span>
+        <span style="color: #f5f5f8; font-size: 13px;">
+            Support WhePlay Web App by FSP SAGi.
+        </span>
+        <button onclick="handleSupportClick()" 
+                style="
+                    background: linear-gradient(90deg, #ffd700, #ff9d00);
+                    color: #000;
+                    border: none;
+                    padding: 4px 12px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                ">
+            Donate TTD$10
+        </button>
+    </div>
+    
+    <!-- Ticker ribbons BELOW support banner -->
+    <div class="ticker-ribbon" id="tickerRibbon1" style="margin-top: 30px;"></div>
+    <div class="ticker-ribbon" id="tickerRibbon2" style="margin-top: 30px;"></div>
+    <div class="ticker-ribbon" id="tickerRibbon3" style="margin-top: 30px;"></div>
+    <div class="ticker-ribbon" id="tickerRibbon4" style="margin-top: 30px;"></div>
 </div>
 
         <div class="nav">
