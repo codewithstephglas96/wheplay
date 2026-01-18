@@ -147,52 +147,6 @@
     animation-play-state: paused !important;
     background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), rgba(0, 122, 255, 0.2));
 }
-        /* Support Ribbon Animation */
-@keyframes scrollSupport {0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-}
-
-/* Pause animation on hover */
-.support-ribbon:hover .support-content {
-    animation-play-state: paused;
-}
-
-.support-ribbon button:hover {
-    background: #ffb733;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 157, 0, 0.4);
-}
-
-.support-ribbon button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(255, 157, 0, 0.3);
-}
-        /* Support Ribbon Animation */
-@keyframes scrollSupport {0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-}
-
-/* Pause animation on hover */
-.support-ribbon:hover .support-content {
-    animation-play-state: paused;
-}
-
-.support-ribbon button:hover {
-    background: #ffb733;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 157, 0, 0.4);
-}
-
-.support-ribbon button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(255, 157, 0, 0.3);
-}
         /* Original styles */
         .nav { 
             position: sticky; 
@@ -1053,7 +1007,32 @@
             position: relative;
             width: 100%;
         }
-    
+        
+        /* Scroll container for Home tab */
+      /*  .home-scroll-container {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 3px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        
+        .home-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }*/
+
         /* Shelf Marks Card Styles */
         .card.data-card {
             transition: all 0.3s ease;
@@ -1065,6 +1044,35 @@
             box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
         }
 
+        /* Draw Details Panel Styles */
+/*        #shelf-tab, #draws-tab {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #shelf-tab::-webkit-scrollbar,
+        #draws-tab::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-track,
+        #draws-tab::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 3px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-thumb,
+        #draws-tab::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        #shelf-tab::-webkit-scrollbar-thumb:hover,
+        #draws-tab::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+*/
         /* Responsive adjustments for shelf cards */
         @media (max-width: 768px) {
             .ball-big {
@@ -1151,94 +1159,38 @@
 <!-- NEW Ticker -->
 <div class="ticker-fixed">
     <!-- Support Banner FIRST -->
-<div id="support-ribbon" class="support-ribbon" style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 200%;
-    height: 26px;
-    background: transparent;
-    z-index: 1002;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-">
-    <div class="support-content" style="
+    <div id="support-ribbon" style="
+        background: transparent;
+        border-bottom: 1px solid #333;
+        padding: 8px 8px;
+        text-align: center;
         display: flex;
-        gap: 30px;
-        animation: scrollSupport 30s linear infinite;
-        white-space: nowrap;
-        padding: 0 15px;
-        will-change: transform;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1002;
+        height: 65px;
     ">
-        <!-- Multiple repeated items for continuous scrolling -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 12px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 4px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10/month</button>
-        </div>
-        <!-- Duplicate for continuous scrolling -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 12px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 4px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10/month</button>
-        </div>
-        <!-- Add more duplicates for smoother animation -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 12px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 4px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10/month</button>
-        </div>
+        <span style="color: #ffd700; font-weight: bold;">♥</span>
+        <span style="color: #f5f5f8; font-size: 13px;">
+        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
+        </span>
+        <span style="color: #f5f5f8; font-size: 13px;">
+        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
+        </span>
+        <span style="color: #f5f5f8; font-size: 13px;">
+        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
+        </span>
+        <span style="color: #f5f5f8; font-size: 13px;">
+        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
+        </span>
     </div>
-</div>
+    
     <!-- Ticker ribbons BELOW support banner -->
     <div class="ticker-ribbon" id="tickerRibbon1" style="margin-top: 30px;"></div>
     <div class="ticker-ribbon" id="tickerRibbon2" style="margin-top: 30px;"></div>
