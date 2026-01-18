@@ -1544,6 +1544,14 @@
                 restoreTabFromHash();
             }, 100);
 
+            setTimeout(() => {
+                    const lastTab = localStorage.getItem('lastActiveTab') || 'home';
+                    const tabButton = document.querySelector(`.tab[onclick*="${lastTab}"]`);
+                    if (tabButton) {
+                        show(lastTab, tabButton);
+                    }
+                }, 100);
+
             // SAGi Quantum Chart
             initializeQuantumChart();
             
