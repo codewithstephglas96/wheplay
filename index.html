@@ -814,6 +814,32 @@
                 min-width: 90px;
                 font-size: 12px;
             }
+            /* Support Ribbon Animation - Fixed Width */
+@keyframes scrollSupport {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%); /* Move by exactly half (one complete item) */
+    }
+}
+
+.support-content {
+    display: flex;
+    gap: 30px;
+    animation: scrollSupport 40s linear infinite; /* Slower animation */
+    white-space: nowrap;
+    will-change: transform;
+    min-width: 200%; /* Ensure there's enough content */
+}
+
+/* Exact duplicate styling for seamless loop */
+.support-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* Prevent items from shrinking */
+}
             
             .nav {
                 top: 85px;
@@ -1156,40 +1182,97 @@
 
     <div id="main-content">
         <!-- NEW Ticker -->
-<!-- NEW Ticker -->
 <div class="ticker-fixed">
-    <!-- Support Banner FIRST -->
-    <div id="support-ribbon" style="
-        background: transparent;
-        border-bottom: 1px solid #333;
-        padding: 8px 8px;
-        text-align: center;
+<!-- Support Ribbon - Transparent Horizontal Scroll -->
+<div id="support-ribbon" class="support-ribbon" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 25px;
+    background: transparent;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+">
+    <div class="support-content" style="
         display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1002;
-        height: 65px;
+        gap: 30px;
+        animation: scrollSupport 30s linear infinite;
+        white-space: nowrap;
+        width: 200%;
+        padding: 0 15px;
+        will-change: transform;
     ">
-        <span style="color: #ffd700; font-weight: bold;">♥</span>
-        <span style="color: #f5f5f8; font-size: 13px;">
-        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
-        </span>
-        <span style="color: #f5f5f8; font-size: 13px;">
-        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
-        </span>
-        <span style="color: #f5f5f8; font-size: 13px;">
-        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
-        </span>
-        <span style="color: #f5f5f8; font-size: 13px;">
-        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive. Click the button below.
-        </span>
+        <!-- Multiple repeated items for continuous scrolling -->
+        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+            <span style="color: #f5f5f8; font-size: 13px;">
+                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+            </span>
+            <button onclick="handleSupportClick()" style="
+                background: #ff9d00;
+                color: black;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                min-width: 120px;
+                font-family: -apple-system, sans-serif;
+                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                margin-left: 10px;
+            ">SUPPORT TTD$10</button>
+        </div>
+        <!-- Duplicate for continuous scrolling -->
+        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+            <span style="color: #f5f5f8; font-size: 13px;">
+                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+            </span>
+            <button onclick="handleSupportClick()" style="
+                background: #ff9d00;
+                color: black;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                min-width: 120px;
+                font-family: -apple-system, sans-serif;
+                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                margin-left: 10px;
+            ">SUPPORT TTD$10</button>
+        </div>
+        <!-- Add more duplicates for smoother animation -->
+        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+            <span style="color: #f5f5f8; font-size: 13px;">
+                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+            </span>
+            <button onclick="handleSupportClick()" style="
+                background: #ff9d00;
+                color: black;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                min-width: 120px;
+                font-family: -apple-system, sans-serif;
+                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                margin-left: 10px;
+            ">SUPPORT TTD$10</button>
+        </div>
     </div>
+</div>
     
     <!-- Ticker ribbons BELOW support banner -->
     <div class="ticker-ribbon" id="tickerRibbon1" style="margin-top: 30px;"></div>
