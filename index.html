@@ -139,7 +139,7 @@
     background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(0, 122, 255, 0.1));
     border-left: 3px solid #ffd700;
     border-right: 3px solid #007AFF;
-    animation: scroll 25s linear infinite !important; /* Different speed */
+
     z-index: 1001; /* Above other ribbons */
 }
 
@@ -1033,31 +1033,6 @@
             position: relative;
             width: 100%;
         }
-        
-        /* Scroll container for Home tab */
-      /*  .home-scroll-container {
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-        
-        .home-scroll-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .home-scroll-container::-webkit-scrollbar-track {
-            background: #0f172a;
-            border-radius: 3px;
-        }
-        
-        .home-scroll-container::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-        
-        .home-scroll-container::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }*/
 
         /* Shelf Marks Card Styles */
         .card.data-card {
@@ -1070,35 +1045,6 @@
             box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
         }
 
-        /* Draw Details Panel Styles */
-/*        #shelf-tab, #draws-tab {
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        #shelf-tab::-webkit-scrollbar,
-        #draws-tab::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #shelf-tab::-webkit-scrollbar-track,
-        #draws-tab::-webkit-scrollbar-track {
-            background: #0f172a;
-            border-radius: 3px;
-        }
-
-        #shelf-tab::-webkit-scrollbar-thumb,
-        #draws-tab::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-
-        #shelf-tab::-webkit-scrollbar-thumb:hover,
-        #draws-tab::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-*/
         /* Responsive adjustments for shelf cards */
         @media (max-width: 768px) {
             .ball-big {
@@ -1184,7 +1130,7 @@
         <!-- NEW Ticker -->
 <div class="ticker-fixed">
 <!-- Support Ribbon - Transparent Horizontal Scroll -->
-<div id="support-ribbon" class="support-ribbon" style="
+<div id="support-ribbon" class="ticker-ribbon" style="
     position: absolute;
     top: 0;
     left: 0;
@@ -1198,7 +1144,7 @@
 ">
     <div class="support-content" style="
         display: flex;
-        gap: 30px;
+        gap: 280px;
         animation: scrollSupport 30s linear infinite;
         white-space: nowrap;
         width: 200%;
