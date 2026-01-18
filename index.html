@@ -3357,26 +3357,37 @@
                 searchBox.style.display = (t === 'analyzer') ? 'none' : 'block';
             }
             
+            // Save to localStorage for persistence
+            localStorage.setItem('lastActiveTab', t);
+            
             // Update URL hash without triggering page scroll
             window.history.replaceState(null, null, `#${t}`);
             
             console.log('Tab switch complete to:', t);
         }
-
+        
         function restoreTabFromHash() {
-            // Get the tab from URL hash
-            const hash = window.location.hash.substring(1); // Remove the '#'
+            // First try to get from URL hash
+            const hash = window.location.hash.substring(1);
             const validTabs = ['home', 'shelf', 'draws', 'analyzer'];
             
-            // If hash is a valid tab name
+            let tabToShow = 'home'; // Default
+            
+            // Check URL hash first
             if (validTabs.includes(hash)) {
-                // Find the corresponding tab button
-                const tabButton = document.querySelector(`.tab[onclick*="${hash}"]`);
-                if (tabButton) {
-                    console.log('Restoring tab from URL hash:', hash);
-                    show(hash, tabButton);
-                    return true;
-                }
+                tabToShow = hash;
+            } 
+            // Then check localStorage
+            else if (localStorage.getItem('lastActiveTab') && validTabs.includes(localStorage.getItem('lastActiveTab'))) {
+                tabToShow = localStorage.getItem('lastActiveTab');
+            }
+            
+            // Find the corresponding tab button
+            const tabButton = document.querySelector(`.tab[onclick*="${tabToShow}"]`);
+            if (tabButton) {
+                console.log('Restoring tab:', tabToShow);
+                show(tabToShow, tabButton);
+                return true;
             }
             
             // Default to home tab
