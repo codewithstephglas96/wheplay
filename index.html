@@ -147,6 +147,32 @@
     animation-play-state: paused !important;
     background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), rgba(0, 122, 255, 0.2));
 }
+        /* Support Ribbon Animation - Fixed Width */
+@keyframes scrollSupport {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%); /* Move by exactly half (one complete item) */
+    }
+}
+
+.support-content {
+    display: flex;
+    gap: 30px;
+    animation: scrollSupport 40s linear infinite; /* Slower animation */
+    white-space: nowrap;
+    will-change: transform;
+    min-width: 200%; /* Ensure there's enough content */
+}
+
+/* Exact duplicate styling for seamless loop */
+.support-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* Prevent items from shrinking */
+}
         /* Original styles */
         .nav { 
             position: sticky; 
