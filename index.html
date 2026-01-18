@@ -44,7 +44,7 @@
             z-index: 1000; 
             width: 100%; 
             box-shadow: 0 4px 10px rgba(6, 1, 14, 0.6);
-            height: 65px;
+            height: 69px;
             display: flex;
             align-items: center;
             overflow: hidden;
@@ -141,6 +141,8 @@
     border-right: 3px solid #007AFF;
     animation: scroll 25s linear infinite !important; /* Different speed */
     z-index: 1001; /* Above other ribbons */
+    width: 100%; 
+    overflow: hidden;
 }
 
 #support-ribbon:hover {
@@ -153,17 +155,17 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-50%); /* Move by exactly half (one complete item) */
+        transform: translateX(-100%); /* Move by exactly half (one complete item) */
     }
 }
 
 .support-content {
     display: flex;
     gap: 30px;
-    animation: scrollSupport 40s linear infinite; /* Slower animation */
+    animation: scrollSupport 25s linear infinite; /* Slower animation */
     white-space: nowrap;
     will-change: transform;
-    min-width: 200%; /* Ensure there's enough content */
+    min-width: 300%; /* Ensure there's enough content */
 }
 
 /* Exact duplicate styling for seamless loop */
