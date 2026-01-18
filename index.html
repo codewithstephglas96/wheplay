@@ -141,7 +141,7 @@
     border-right: 3px solid #007AFF;
     animation: scroll 25s linear infinite !important; /* Different speed */
     z-index: 1001; /* Above other ribbons */
-    width: 100%; 
+    width: 200%; 
     overflow: hidden;
 }
 
@@ -178,7 +178,7 @@
         /* Original styles */
         .nav { 
             position: sticky; 
-            top: 58px; 
+            top: 54px; 
             width: 100%; 
             background: rgba(4, 0, 17, 0.9); 
             backdrop-filter: blur(20px); 
@@ -842,32 +842,6 @@
                 min-width: 90px;
                 font-size: 12px;
             }
-            /* Support Ribbon Animation - Fixed Width */
-@keyframes scrollSupport {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%); /* Move by exactly half (one complete item) */
-    }
-}
-
-.support-content {
-    display: flex;
-    gap: 30px;
-    animation: scrollSupport 40s linear infinite; /* Slower animation */
-    white-space: nowrap;
-    will-change: transform;
-    min-width: 200%; /* Ensure there's enough content */
-}
-
-/* Exact duplicate styling for seamless loop */
-.support-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0; /* Prevent items from shrinking */
-}
             
             .nav {
                 top: 85px;
