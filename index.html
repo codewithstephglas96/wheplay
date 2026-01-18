@@ -1494,6 +1494,7 @@
             renderShelfTab(); // Add this
             renderDrawsTab(); // Add this
             renderOutstandingTable(); // Add this
+            
         });
 
         // ========== HOME WIDGET FUNCTIONS ==========
@@ -1503,7 +1504,11 @@
             updateLineChart();
             updateSuiteChart();
             updateTopShelf();
-        }
+            // After all the initialization code
+            setTimeout(() => {
+              show('home', document.querySelector('.tab.active'));
+              }, 100);
+            }
 
         // ========== SUPPORT / DONATE BUTTON FUNCTIONS ==========
         let isDonateMode = false;
