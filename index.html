@@ -134,6 +134,33 @@
             flex-shrink: 0; 
             margin-right: 4px;
         }
+
+         @keyframes scrollSupport {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        
+        /* Adjust nav position to account for support ribbon */
+        .nav {
+            top: 75px; /* 71px (ticker) + 30px (support ribbon) */
+        }
+        
+        @media (max-width: 480px) {
+            .nav {
+                top: 75px; /* Adjusted for mobile */
+            }
+            
+            #support-ribbon {
+                height: 40px; /* Taller on mobile for touch targets */
+                font-size: 12px;
+            }
+            
+            #support-ribbon button {
+                padding: 3px 6px;
+                font-size: 10px;
+                min-width: 100px;
+            }
+        }
        
         /* Original styles */
         .nav { 
@@ -1090,104 +1117,104 @@
 
     <div id="main-content">
         <!-- NEW Ticker -->
-<div class="ticker-fixed">
-<!-- Support Ribbon - Transparent Horizontal Scroll -->
-<div id="support-ribbon" class="ticker-ribbon" style="
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 25px;
-    background: transparent;
-    z-index: 1002;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-">
-    <div class="support-content" style="
-        display: flex;
-        gap: 280px;
-        animation: scrollSupport 30s linear infinite;
-        white-space: nowrap;
-        width: 200%;
-        padding: 0 15px;
-        will-change: transform;
-    ">
-        <!-- Multiple repeated items for continuous scrolling -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 13px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 8px;
-                border-radius: 6px;
-                font-size: 11px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10</button>
-        </div>
-        <!-- Duplicate for continuous scrolling -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 13px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 8px;
-                border-radius: 6px;
-                font-size: 11px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10</button>
-        </div>
-        <!-- Add more duplicates for smoother animation -->
-        <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
-            <span style="color: #f5f5f8; font-size: 13px;">
-                Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
-            </span>
-            <button onclick="handleSupportClick()" style="
-                background: #ff9d00;
-                color: black;
-                padding: 4px 8px;
-                border-radius: 6px;
-                font-size: 11px;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 120px;
-                font-family: -apple-system, sans-serif;
-                box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
-                margin-left: 10px;
-            ">SUPPORT TTD$10</button>
-        </div>
-    </div>
-</div>
+        <div class="ticker-fixed">
+            <!-- Ticker ribbons TOP support banner -->
+            <div class="ticker-ribbon" id="tickerRibbon1" style="margin-top: 20px;"></div>
+            <div class="ticker-ribbon" id="tickerRibbon2" style="margin-top: 20px;"></div>
+            <div class="ticker-ribbon" id="tickerRibbon3" style="margin-top: 20px;"></div>
+            <div class="ticker-ribbon" id="tickerRibbon4" style="margin-top: 20px;"></div>
+        </div> <!-- Close the ticker-fixed div here -->
     
-    <!-- Ticker ribbons BELOW support banner -->
-    <div class="ticker-ribbon" id="tickerRibbon1" style="margin-top: 30px;"></div>
-    <div class="ticker-ribbon" id="tickerRibbon2" style="margin-top: 30px;"></div>
-    <div class="ticker-ribbon" id="tickerRibbon3" style="margin-top: 30px;"></div>
-    <div class="ticker-ribbon" id="tickerRibbon4" style="margin-top: 30px;"></div>
-</div>
+        <!-- Support Ribbon - BELOW the ticker -->
+        <div id="support-ribbon" style="
+            position: sticky;
+            top: 71px; /* Same as ticker height */
+            left: 0;
+            width: 100%;
+            height: 30px; /* Increased height for better visibility */
+            background: rgba(34, 34, 34, 0.95); /* Dark background */
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-bottom: 1px solid #444;
+        ">
+            <div class="support-content" style="
+                display: flex;
+                gap: 380px;
+                animation: scrollSupport 70s linear infinite;
+                white-space: nowrap;
+                padding: 0 10px;
+                will-change: transform;
+            ">
+                <!-- Multiple repeated items for continuous scrolling -->
+                <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+                    <span style="color: #f5f5f8; font-weight: bold; font-size: 13px;">
+                        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+                    </span>
+                    <button onclick="handleSupportClick()" style="
+                        background: #ff9d00;
+                        color: black;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: bold;
+                        border: none;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 120px;
+                        font-family: -apple-system, sans-serif;
+                        box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                        margin-left: 10px;
+                    ">SUBSCRIBE TTD$10 / MONTH</button>
+                </div>
+                <!-- Duplicate for continuous scrolling -->
+                <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+                    <span style="color: #f5f5f8; font-weight: bold; font-size: 13px;">
+                        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+                    </span>
+                    <button onclick="handleSupportClick()" style="
+                        background: #ff9d00;
+                        color: black;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: bold;
+                        border: none;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 120px;
+                        font-family: -apple-system, sans-serif;
+                        box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                        margin-left: 10px;
+                    ">SUBSCRIBE TTD$10 / MONTH</button>
+                </div>
+                <!-- Add more duplicates for smoother animation -->
+                <div class="support-item" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ffd700; font-weight: bold; font-size: 14px;">♥</span>
+                    <span style="color: #f5f5f8; font-weight: bold; font-size: 13px;">
+                        Enjoying the content? Support the site and help keep WhePlay Web App by FSP SAGi alive.
+                    </span>
+                    <button onclick="handleSupportClick()" style="
+                        background: #ff9d00;
+                        color: black;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: bold;
+                        border: none;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 120px;
+                        font-family: -apple-system, sans-serif;
+                        box-shadow: 0 2px 8px rgba(255, 157, 0, 0.3);
+                        margin-left: 10px;
+                    ">SUBSCRIBE TTD$10 / MONTH</button>
+                </div>
+            </div>
+        </div>
 
         <div class="nav">
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
@@ -1199,9 +1226,9 @@
 
             <div class="tabs">
                 <button class="tab active" onclick="show('home', this)">HOME</button>
-                <button class="tab" onclick="show('shelf', this)">SHELF</button>
-                <button class="tab" onclick="show('draws', this)">DRAWS</button>
-                <button class="tab" onclick="show('analyzer', this)">ANALYZER</button>
+                <button class="tab" onclick="show('shelf', this)">SHELF TAB</button>
+                <button class="tab" onclick="show('draws', this)">DRAWS TAB</button>
+                <button class="tab" onclick="show('analyzer', this)">ANALYZER TAB</button>
             </div>
             <input type="text" id="masterSearch" class="search-box" placeholder="Search Mark..." onkeyup="doSearch()">
             
@@ -1509,7 +1536,15 @@
         
         // ========== INITIALIZATION ==========
         document.addEventListener('DOMContentLoaded', async function() {
+           // Slash Screen
             startSplash();
+
+            // First, restore tab from URL if it exists
+            setTimeout(() => {
+                restoreTabFromHash();
+            }, 100);
+
+            // SAGi Quantum Chart
             initializeQuantumChart();
             
             // Load data from your APIs
@@ -3312,13 +3347,44 @@
             
             // Update active button
             document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+            if (el) {
+                el.classList.add('active');
+            }
             
             // Show/hide search
-            document.getElementById('masterSearch').style.display = 
-                (t === 'analyzer') ? 'none' : 'block';
+            const searchBox = document.getElementById('masterSearch');
+            if (searchBox) {
+                searchBox.style.display = (t === 'analyzer') ? 'none' : 'block';
+            }
             
-            console.log('Tab switch complete');
+            // Update URL hash without triggering page scroll
+            window.history.replaceState(null, null, `#${t}`);
+            
+            console.log('Tab switch complete to:', t);
+        }
+
+        function restoreTabFromHash() {
+            // Get the tab from URL hash
+            const hash = window.location.hash.substring(1); // Remove the '#'
+            const validTabs = ['home', 'shelf', 'draws', 'analyzer'];
+            
+            // If hash is a valid tab name
+            if (validTabs.includes(hash)) {
+                // Find the corresponding tab button
+                const tabButton = document.querySelector(`.tab[onclick*="${hash}"]`);
+                if (tabButton) {
+                    console.log('Restoring tab from URL hash:', hash);
+                    show(hash, tabButton);
+                    return true;
+                }
+            }
+            
+            // Default to home tab
+            const homeButton = document.querySelector('.tab[onclick*="home"]');
+            if (homeButton) {
+                show('home', homeButton);
+            }
+            return false;
         }
         
         function toggle(i) {
