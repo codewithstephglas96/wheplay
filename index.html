@@ -1089,6 +1089,176 @@
             background: #ff6b81;
             box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
         }
+
+        /* LW & CW COMPARISON CSS */
+        .comparison-table {
+        width: 100%;
+        min-width: unset;
+        border: 1px solid #333;
+        table-layout: fixed;
+        border-collapse: collapse;
+        background: #161b22;
+        }
+
+        .comparison-header {
+        background: #111;
+        font-size: 9px;
+        color: #58a6ff;
+        border-bottom: 1px solid #333;
+        padding: 6px 0;
+        }
+
+        .comparison-cell {
+        text-align: center;
+        padding: 5px 0;
+        border-bottom: 1px solid #333;
+        }
+
+        .day-label {
+        font-size: 10px;
+        font-weight: bold;
+        color: #8b949e;
+        text-align: center;
+        border-right: 1px solid #333;
+        background: #0d1117;
+        border-bottom: 1px solid #333;
+        }
+
+        .comparison-ball {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: bold;
+        color: #000;
+        margin: 0 auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.945);
+        }
+
+        @keyframes spinGlass {
+        0% { transform: rotate(0deg); opacity: 0.6; }
+        50% { transform: rotate(180deg); opacity: 1; }
+        100% { transform: rotate(360deg); opacity: 0.6; }
+        }
+
+        .waiting-glass {
+        display: inline-block;
+        animation: spinGlass 2s infinite linear;
+        font-size: 12px;
+        color: #020202;
+        }
+
+        .week-header {
+        background: #f8f7f7;
+        color: #fff;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 4px 4px 0 0;
+        display: flex;
+        justify-content: space-between;
+        }
+        
+        /* Subtle Current Day Highlight */
+        .current-day-highlight {
+            background: rgb(124, 124, 124) !important;
+        }
+
+        .current-day-label {
+            color: #00ff00 !important;
+            font-weight: bold !important;
+            position: relative;
+        }
+
+        .current-day-label::before {
+            content: "▶";
+            position: absolute;
+            left: 4px;
+            color: #1eff00;
+            font-size: 14px;
+        }
+
+        .current-day-cell {
+            position: relative;
+        }
+
+        .current-day-cell::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 122, 255, 0.03);
+            pointer-events: none;
+        }
+
+        .current-day-ball {
+            border: 1px solid #000b16 !important;
+        }
+
+        /* MARK APPEARANCE CSS */
+        .chart-card {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .mark-appearance-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        }
+
+        .mark-appearance-item {
+        background: #151515;
+        padding: 6px;
+        border-radius: 8px;
+        border: 1px solid #222;
+        }
+
+        .mark-appearance-number {
+        background: #444;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-weight: bold;
+        font-size: 11px;
+        color: black;
+        display: inline-block;
+        }
+
+        .mark-status {
+        font-size: 8px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        }
+
+        .mark-days-ago {
+        color: #fff;
+        font-weight: bold;
+        font-size: 10px;
+        }
+
+        .mark-average {
+        color: #666;
+        font-size: 10px;
+        }
+
+        .mark-progress-bar {
+        background: #333;
+        height: 4px;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 4px;
+        }
+
+        .mark-progress-fill {
+        height: 100%;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+        }
+
     </style>
 </head>
 <body>
@@ -1316,6 +1486,14 @@
                         
                     </div>
                 </div>
+
+                <!-- Last Week & Current Week Comparison Card -->
+                <div class="chart-card" id="comparison-card" style="border-left: 4px solid #ffffff; margin-bottom: 20px;">
+                <h4 style="margin:0 0 10px 0; color:#ffffff; text-align:center; font-family: sans-serif; letter-spacing: 1px; font-size: 14px;">
+                    Last Week & Current Week Comparison
+                </h4>
+                <div id="comparison-container" style="overflow-x: auto;"></div>
+                </div>
                 
                 <!-- Line Chart Widget -->
                 <div class="widget-card" id="line-chart-widget">
@@ -1357,6 +1535,14 @@
                     <div id="top-shelf-content">
                         <!-- Top 10 shelf marks will be populated by JavaScript -->
                     </div>
+                </div>
+
+                <!-- Mark Appearance Stats Card -->
+                <div class="chart-card" id="mark-appearance-card" style="border-left: 4px solid #ffd43b; margin-bottom: 20px;">
+                <h4 style="margin:0 0 10px 0; color:#ffd43b; text-align:center; font-family: sans-serif; letter-spacing: 1px; font-size: 14px;">
+                    MARK APPEARANCE STATS
+                </h4>
+                <div id="mark-appearance-container"></div>
                 </div>
                 
                 <!-- Quantum Chart Widget (Moved from separate tab) -->
@@ -1437,6 +1623,13 @@
             1:12,2:13,3:13,4:11,5:11,6:11,7:12,8:12,9:11,10:13,11:11,12:12,13:12,14:11,15:12,
             16:10,17:13,18:11,19:12,20:10,21:11,22:13,23:12,24:11,25:12,26:12,27:12,28:12,
             29:12,30:11,31:10,32:10,33:12,34:12,35:13,36:12
+        };
+
+        // Frequency mapping based on statistical data
+        const frequencyMap = {
+        1:12, 2:13, 3:13, 4:11, 5:11, 6:11, 7:12, 8:12, 9:11, 10:13, 11:11, 12:12,
+        13:12, 14:11, 15:12, 16:10, 17:13, 18:11, 19:12, 20:10, 21:11, 22:13, 23:12, 24:11,
+        25:12, 26:12, 27:12, 28:12, 29:12, 30:11, 31:10, 32:10, 33:12, 34:12, 35:13, 36:12
         };
         
         const numberColors = {
@@ -1527,6 +1720,8 @@
         let marks = [];
         let jsNowTs = Date.now();
         
+        let weeksData = [];
+        
         // Chart data
         let calendarWeeks = [];
         let currentWeekIndex = 0;
@@ -1566,6 +1761,11 @@
             
             // Update Home tab widgets
             updateHomeWidgets();
+
+            // Render charts if we're on home tab
+            if (weeksData.length > 0) {
+                renderChartData();
+            }
             
             // Start periodic updates
             setInterval(updateHomeWidgets, 60000); // Update every minute
@@ -1575,9 +1775,9 @@
                 setupSubscribeButton();
             }, 4000); // Start after splash screen (4 seconds)
 
-            renderShelfTab(); // Add this
-            renderDrawsTab(); // Add this
-            renderOutstandingTable(); // Add this
+            renderShelfTab();
+            renderDrawsTab();
+            renderOutstandingTable();
             
         });
 
@@ -1637,14 +1837,14 @@
             }
         }
         function handleSupportClick() {
-    // This will make your existing Subscribe/Donate button pulse
-    const btn = document.getElementById('subscribeBtn');
-    if (btn) {
-        btn.style.animation = 'pulse 0.5s 2';
-        setTimeout(() => { btn.style.animation = ''; }, 1000);
-        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
+            // This will make your existing Subscribe/Donate button pulse
+            const btn = document.getElementById('subscribeBtn');
+            if (btn) {
+                btn.style.animation = 'pulse 0.5s 2';
+                setTimeout(() => { btn.style.animation = ''; }, 1000);
+                btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
         
         // ========== UPDATED COMING UNDER FUNCTION ==========
         async function updateComingUnder() {
@@ -1971,7 +2171,7 @@
             if (hotRepeats.length > 0) {
                 const hotText = hotRepeats.map(([n, c]) => `${n} ${spirits[n]} (${c}×)`).join(" • ");
                 html += `<div style="text-align:center; background:#ffffff; color:#000; border-radius:6px; padding:4px; margin-bottom:8px; font-size:10px; font-weight:bold;">
-                    🔥 H.R.T.WK: ${hotText}
+                    🔥 > ${hotText} < 🔥
                 </div>`;
             }
             
@@ -2085,7 +2285,7 @@
             if (hotRepeats.length > 0) {
                 const hotText = hotRepeats.map(([n, c]) => `${n} ${spirits[n]} (${c}×)`).join(" • ");
                 html += `<div style="text-align:center; background:#ffffff; color:#000; border-radius:6px; padding:4px; margin-bottom:8px; font-size:10px; font-weight:bold;">
-                    🔥 H.R.T.WK: ${hotText}
+                    🔥 > ${hotText} < 🔥
                 </div>`;
             }
             
@@ -2190,7 +2390,243 @@
             
             container.innerHTML = html;
         }
-        
+
+        // ========== CHART RENDERING FUNCTION ==========
+        function renderChartData() {
+            // Check if we have data
+            if (!weeksData || weeksData.length === 0) {
+                console.log('No weeks data available for charts');
+                return;
+            }
+            
+            // Get containers
+            const markAppearanceContainer = document.getElementById('mark-appearance-container');
+            const comparisonContainer = document.getElementById('comparison-container');
+            
+            // Render if containers exist
+            if (markAppearanceContainer) {
+                try {
+                    markAppearanceContainer.innerHTML = generateMarkAppearanceHTML(weeksData);
+                    console.log('Mark Appearance chart rendered');
+                } catch (error) {
+                    console.error('Error rendering mark appearance:', error);
+                    markAppearanceContainer.innerHTML = '<div style="color:#ff6b6b; text-align:center; padding:20px;">Error loading chart</div>';
+                }
+            }
+            
+            if (comparisonContainer) {
+                try {
+                    comparisonContainer.innerHTML = generateMarkComparisonHTML(weeksData);
+                    console.log('Comparison chart rendered');
+                } catch (error) {
+                    console.error('Error rendering comparison chart:', error);
+                    comparisonContainer.innerHTML = '<div style="color:#ff6b6b; text-align:center; padding:20px;">Error loading chart</div>';
+                }
+            }
+        }
+
+        // ========== LW & CW COMPARISON CHART FUNCTIONS ==========
+        function generateMarkComparisonHTML(weeksData) {
+            if (!weeksData || weeksData.length === 0) {
+                return '<div style="text-align:center; padding:20px; color:#ff6b6b;">No data available</div>';
+            }
+            
+            // Get current day (skip Sunday)
+            const now = new Date();
+            let currentDayName = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+            currentDayName = currentDayName === 'Sunday' ? 'Monday' : currentDayName;
+            
+            // Sort weeks by date (most recent first)
+            const sortedWeeks = [...weeksData].sort((a, b) => {
+                const dateA = new Date(a.startDate.split(' ').reverse().join('-'));
+                const dateB = new Date(b.startDate.split(' ').reverse().join('-'));
+                return dateB - dateA; // Most recent first
+            });
+            
+            // Find current and last week
+            const currentWeek = sortedWeeks.find(w => w.isCurrentWeek) || sortedWeeks[0];
+            const lastWeek = sortedWeeks.find(w => !w.isCurrentWeek && w.weekNumber) || sortedWeeks[1];
+            
+            // Define the constants needed for the table
+            const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const slots = ["MOR", "MID", "NON", "EVE"];
+
+            function buildTable(weekData, title, titleColor, highlightCurrentDay = false) {
+                if (!weekData) {
+                    return `<div style="margin-bottom:15px;">
+                        <div class="week-header" style="background:${titleColor}">
+                            <span>${title}</span>
+                            <span style="opacity:0.7;">No data</span>
+                        </div>
+                        <div style="text-align:center; padding:20px; color:#ffa500;">Week data not available</div>
+                    </div>`;
+                }
+                
+                const wkNum = weekData.weekNumber || '';
+                let html = `<div style="margin-bottom:15px;">
+                    <div class="week-header" style="background:${titleColor}">
+                        <span>${title}</span>
+                        <span style="opacity:0.7;">Wk ${wkNum}</span>
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                        <tr>
+                            <th class="comparison-header" style="width:18%;">DAY</th>
+                            <th class="comparison-header">MOR</th>
+                            <th class="comparison-header">MID</th>
+                            <th class="comparison-header">NON</th>
+                            <th class="comparison-header">EVE</th>
+                        </tr>
+                        </thead>
+                        <tbody>`;
+
+                dayNames.forEach(dayName => {
+                    const day = weekData.days ? weekData.days.find(d => d.dayName === dayName) : null;
+                    const isCurrentDay = highlightCurrentDay && dayName === currentDayName;
+                    
+                    // Add highlight class if it's the current day
+                    const rowClass = isCurrentDay ? 'current-day-highlight' : '';
+                    
+                    html += `<tr class="${rowClass}">
+                        <td class="day-label ${isCurrentDay ? 'current-day-label' : ''}">${dayName.slice(0,3).toUpperCase()}</td>`;
+                    
+                    slots.forEach(slot => {
+                        let val = day?.draws ? day.draws[slot] : null;
+                        let isPending = (!val || val === "-" || val === "–" || val === "PENDING");
+                        
+                        let displayContent;
+                        let bgColor;
+
+                        if (isPending) {
+                            displayContent = `<span class="waiting-glass">⏳</span>`;
+                            bgColor = "transparent";
+                        } else {
+                            const numStr = String(val).padStart(2, '0');
+                            displayContent = numStr;
+                            bgColor = numberColors[numStr] || "#ffffff";
+                        }
+                        
+                        // Add highlight to balls if it's the current day
+                        const ballClass = isCurrentDay ? 'current-day-ball' : '';
+                        
+                        html += `<td class="comparison-cell ${isCurrentDay ? 'current-day-cell' : ''}">
+                            <div class="comparison-ball ${ballClass}" style="background:${bgColor}">
+                                ${displayContent}
+                            </div>
+                        </td>`;
+                    });
+                    html += `</tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                return html;
+            }
+
+            return `
+                <div style="display:flex; flex-direction:column; gap:5px; background:#0d1117; padding:10px;">
+                    ${buildTable(lastWeek, "PREVIOUS WEEK ANALYSIS", "#333333", true)}
+                    ${buildTable(currentWeek, "CURRENT WEEK TRACKING", "#007AFF", true)}
+                </div>`;
+        }
+
+        // ========== MARK APPEARANCE CHART FUNCTIONS ==========
+        function generateMarkAppearanceHTML(weeksData) {
+            const appearanceData = [];
+            const now = new Date();
+
+            // Process weeks data to find last appearance
+            for (let num = 1; num <= 36; num++) {
+                let lastSeenDate = null;
+                
+                // Find the most recent occurrence of this number
+                for (let week of weeksData) {
+                const parts = week.startDate.split(' ');
+                const baseDate = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
+                
+                for (let day of week.days) {
+                    const drawDate = new Date(baseDate);
+                    drawDate.setDate(baseDate.getDate() + week.days.indexOf(day));
+                    
+                    Object.values(day.draws).forEach(val => {
+                    if (parseInt(val) === num) {
+                        if (!lastSeenDate || drawDate > lastSeenDate) {
+                        lastSeenDate = drawDate;
+                        }
+                    }
+                    });
+                }
+                }
+                
+                if (lastSeenDate) {
+                const daysSince = Math.floor((now - lastSeenDate) / 86400000);
+                const expectedEvery = frequencyMap[num] || 12;
+                
+                let status = "STABLE";
+                let statusColor = "#8E8E93";
+                
+                if (daysSince >= expectedEvery + 3) {
+                    status = "OVERDUE";
+                    statusColor = "#ff3b30"; // Red
+                } else if (daysSince >= expectedEvery) {
+                    status = "DUE TODAY";
+                    statusColor = "#ff9f0a"; // Orange
+                } else if (daysSince >= expectedEvery - 2) {
+                    status = "CLOSE";
+                    statusColor = "#ffd60a"; // Yellow
+                }
+
+                appearanceData.push({
+                    no: num,
+                    daysSince: daysSince,
+                    expected: expectedEvery,
+                    status: status,
+                    statusColor: statusColor,
+                    until: daysSince === 0 ? "HIT TODAY" : `${daysSince}d ago`,
+                    lastFmt: lastSeenDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+                });
+                }
+            }
+
+            // Sort by number (1-36)
+            appearanceData.sort((a, b) => a.no - b.no);
+
+            let html = `<div style="font-size:12px;">`;
+            html += `<div class="mark-appearance-grid">`;
+            
+            appearanceData.forEach(item => {
+                const key = String(item.no).padStart(2,"0");
+                const progress = Math.min(100, (item.daysSince / item.expected) * 100);
+                
+                html += `<div class="mark-appearance-item" style="border-color: ${item.daysSince >= item.expected ? item.statusColor + '44' : '#222'};">`;
+                
+                // Header: Num and Status
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">`;
+                html += `<span class="mark-appearance-number" style="background:${numberColors[key] || "#444"};">${key}</span>`;
+                html += `<span class="mark-status" style="color:${item.statusColor};">${item.status}</span>`;
+                html += `</div>`;
+                
+                // Days Ago info
+                html += `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">`;
+                html += `<span class="mark-days-ago">${item.until}</span>`;
+                html += `<span class="mark-average">avg:${item.expected}d</span>`;
+                html += `</div>`;
+                
+                // Custom Progress Bar (Heat Bar)
+                html += `<div class="mark-progress-bar">`;
+                html += `<div class="mark-progress-fill" style="width:${progress}%; background:${item.statusColor};"></div>`;
+                html += `</div>`;
+                
+                html += `</div>`;
+            });
+            
+            html += `</div>`;
+            html += `<div style="text-align:center; margin-top:10px; color:#444; font-size:9px;">LATEST ANALYSIS • v2 FSP SAGi • CODEWITHGLASGOW</div></div>`;
+            return html;
+            }
+
+            // Usage example (when you have weeks data loaded):
+            // document.getElementById('mark-appearance-container').innerHTML = generateMarkAppearanceHTML(weeks12);
+
         // ========== QUANTUM CHART FUNCTIONS ==========
         function initializeQuantumChart() {
             const gridEl = document.getElementById('quantum-grid');
@@ -2269,10 +2705,6 @@
             updateQuantumDisplay(r);
         }
         
-        // ========== EXISTING FUNCTIONS (from original code) ==========
-        // ... [All the existing functions from your original code remain unchanged below]
-        // I've preserved all the original functionality while adding the new Home section features
-        
         // ========== NOTIFICATION SYSTEM ==========
         function showNotification(message, type = 'info') {
             // Remove any existing notifications first
@@ -2328,6 +2760,9 @@
                     const response = await fetch(PLAY_WHE_URL);
                     const json = await response.json();
                     
+                    // Store the original data for chart functions
+                    weeksData = json.data.weeks;
+
                     // Cache the data
                     localStorage.setItem('playwhe_data', JSON.stringify(json.data.weeks));
                     localStorage.setItem('playwhe_last_updated', Date.now());
@@ -2339,6 +2774,7 @@
                     renderDrawsTab();
                     renderOutstandingTable();
                     updateTimeDisplay();
+                    renderChartData();
 
                     showNotification('✅ Data updated successfully!', 'success');
                     
@@ -2361,6 +2797,7 @@
                     renderDrawsTab();
                     renderOutstandingTable();
                     updateTimeDisplay();
+                    renderChartData(); 
                     
                 } else {
                     // No cache or cache is old
@@ -3341,6 +3778,13 @@
                 activeTab.style.position = 'relative'; // Back in flow
             }
             
+            // If switching to home tab and we have data, render charts
+            if (t === 'home' && weeksData.length > 0) {
+                setTimeout(() => {
+                    renderChartData();
+                }, 100);
+            }
+
             // Reset scroll - CRITICAL!
             if (mainContent) {
                 mainContent.scrollTop = 0;
