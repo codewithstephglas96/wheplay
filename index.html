@@ -2427,107 +2427,158 @@
 
         // ========== LW & CW COMPARISON CHART FUNCTIONS ==========
         function generateMarkComparisonHTML(weeksData) {
-            if (!weeksData || weeksData.length === 0) {
-                return '<div style="text-align:center; padding:20px; color:#ff6b6b;">No data available</div>';
-            }
+    if (!weeksData || weeksData.length === 0) {
+        return '<div style="text-align:center; padding:20px; color:#ff6b6b;">No data available</div>';
+    }
+    
+    // Get current day (skip Sunday)
+    const now = new Date();
+    let currentDayName = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+    currentDayName = currentDayName === 'Sunday' ? 'Monday' : currentDayName;
+    
+    // Sort weeks by date (most recent first)
+    const sortedWeeks = [...weeksData].sort((a, b) => {
+        const dateA = new Date(a.startDate.split(' ').reverse().join('-'));
+        const dateB = new Date(b.startDate.split(' ').reverse().join('-'));
+        return dateB - dateA; // Most recent first
+    });
+    
+    // Debug: Log the first few weeks to see their order
+    console.log('First 5 sorted weeks:', sortedWeeks.slice(0, 5).map(w => ({
+        weekNumber: w.weekNumber,
+        startDate: w.startDate,
+        isCurrentWeek: w.isCurrentWeek
+    })));
+    
+    // Find current week - check both isCurrentWeek and by date
+    let currentWeek = sortedWeeks.find(w => w.isCurrentWeek);
+    
+    // If no week is marked as current, use the most recent week
+    if (!currentWeek) {
+        currentWeek = sortedWeeks[0];
+    }
+    
+    // Find last week - the week with weekNumber = currentWeek.weekNumber + 1
+    let lastWeek;
+    
+    if (currentWeek.weekNumber) {
+        // Look for the week with weekNumber = currentWeek.weekNumber + 1
+        lastWeek = sortedWeeks.find(w => w.weekNumber === (parseInt(currentWeek.weekNumber) + 1));
+    }
+    
+    // If we couldn't find by weekNumber, try to find by date (previous week)
+    if (!lastWeek && currentWeek.startDate) {
+        try {
+            // Parse current week start date
+            const currentDate = new Date(currentWeek.startDate.split(' ').reverse().join('-'));
+            const oneWeekAgo = new Date(currentDate);
+            oneWeekAgo.setDate(currentDate.getDate() - 7);
             
-            // Get current day (skip Sunday)
-            const now = new Date();
-            let currentDayName = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
-            currentDayName = currentDayName === 'Sunday' ? 'Monday' : currentDayName;
-            
-            // Sort weeks by date (most recent first)
-            const sortedWeeks = [...weeksData].sort((a, b) => {
-                const dateA = new Date(a.startDate.split(' ').reverse().join('-'));
-                const dateB = new Date(b.startDate.split(' ').reverse().join('-'));
-                return dateB - dateA; // Most recent first
+            // Format as "DD MMM YYYY"
+            const lastWeekDateStr = oneWeekAgo.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
             });
             
-            // Find current and last week
-            const currentWeek = sortedWeeks.find(w => w.isCurrentWeek) || sortedWeeks[0];
-            const lastWeek = sortedWeeks.find(w => !w.isCurrentWeek && w.weekNumber) || sortedWeeks[1];
-            
-            // Define the constants needed for the table
-            const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const slots = ["MOR", "MID", "NON", "EVE"];
+            // Find week with that start date
+            lastWeek = sortedWeeks.find(w => w.startDate === lastWeekDateStr);
+        } catch (e) {
+            console.error('Error calculating previous week:', e);
+        }
+    }
+    
+    // If still no last week, use the next week in the sorted array
+    if (!lastWeek) {
+        const currentIndex = sortedWeeks.indexOf(currentWeek);
+        lastWeek = sortedWeeks[currentIndex + 1];
+    }
+    
+    // Debug output
+    console.log('Current week:', currentWeek?.weekNumber, 'Start:', currentWeek?.startDate);
+    console.log('Last week:', lastWeek?.weekNumber, 'Start:', lastWeek?.startDate);
+    
+    // Define the constants needed for the table
+    const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const slots = ["MOR", "MID", "NON", "EVE"];
 
-            function buildTable(weekData, title, titleColor, highlightCurrentDay = false) {
-                if (!weekData) {
-                    return `<div style="margin-bottom:15px;">
-                        <div class="week-header" style="background:${titleColor}">
-                            <span>${title}</span>
-                            <span style="opacity:0.7;">No data</span>
-                        </div>
-                        <div style="text-align:center; padding:20px; color:#ffa500;">Week data not available</div>
-                    </div>`;
+    function buildTable(weekData, title, titleColor, highlightCurrentDay = false) {
+        if (!weekData) {
+            return `<div style="margin-bottom:15px;">
+                <div class="week-header" style="background:${titleColor}">
+                    <span>${title}</span>
+                    <span style="opacity:0.7;">No data</span>
+                </div>
+                <div style="text-align:center; padding:20px; color:#ffa500;">Week data not available</div>
+            </div>`;
+        }
+        
+        const wkNum = weekData.weekNumber || '';
+        let html = `<div style="margin-bottom:15px;">
+            <div class="week-header" style="background:${titleColor}">
+                <span>${title}</span>
+                <span style="opacity:0.7;">Wk ${wkNum}</span>
+            </div>
+            <table class="comparison-table">
+                <thead>
+                <tr>
+                    <th class="comparison-header" style="width:18%;">DAY</th>
+                    <th class="comparison-header">MOR</th>
+                    <th class="comparison-header">MID</th>
+                    <th class="comparison-header">NON</th>
+                    <th class="comparison-header">EVE</th>
+                </tr>
+                </thead>
+                <tbody>`;
+
+        dayNames.forEach(dayName => {
+            const day = weekData.days ? weekData.days.find(d => d.dayName === dayName) : null;
+            const isCurrentDay = highlightCurrentDay && dayName === currentDayName;
+            
+            // Add highlight class if it's the current day
+            const rowClass = isCurrentDay ? 'current-day-highlight' : '';
+            
+            html += `<tr class="${rowClass}">
+                <td class="day-label ${isCurrentDay ? 'current-day-label' : ''}">${dayName.slice(0,3).toUpperCase()}</td>`;
+            
+            slots.forEach(slot => {
+                let val = day?.draws ? day.draws[slot] : null;
+                let isPending = (!val || val === "-" || val === "–" || val === "PENDING");
+                
+                let displayContent;
+                let bgColor;
+
+                if (isPending) {
+                    displayContent = `<span class="waiting-glass">⏳</span>`;
+                    bgColor = "transparent";
+                } else {
+                    const numStr = String(val).padStart(2, '0');
+                    displayContent = numStr;
+                    bgColor = numberColors[numStr] || "#ffffff";
                 }
                 
-                const wkNum = weekData.weekNumber || '';
-                let html = `<div style="margin-bottom:15px;">
-                    <div class="week-header" style="background:${titleColor}">
-                        <span>${title}</span>
-                        <span style="opacity:0.7;">Wk ${wkNum}</span>
+                // Add highlight to balls if it's the current day
+                const ballClass = isCurrentDay ? 'current-day-ball' : '';
+                
+                html += `<td class="comparison-cell ${isCurrentDay ? 'current-day-cell' : ''}">
+                    <div class="comparison-ball ${ballClass}" style="background:${bgColor}">
+                        ${displayContent}
                     </div>
-                    <table class="comparison-table">
-                        <thead>
-                        <tr>
-                            <th class="comparison-header" style="width:18%;">DAY</th>
-                            <th class="comparison-header">MOR</th>
-                            <th class="comparison-header">MID</th>
-                            <th class="comparison-header">NON</th>
-                            <th class="comparison-header">EVE</th>
-                        </tr>
-                        </thead>
-                        <tbody>`;
+                </td>`;
+            });
+            html += `</tr>`;
+        });
 
-                dayNames.forEach(dayName => {
-                    const day = weekData.days ? weekData.days.find(d => d.dayName === dayName) : null;
-                    const isCurrentDay = highlightCurrentDay && dayName === currentDayName;
-                    
-                    // Add highlight class if it's the current day
-                    const rowClass = isCurrentDay ? 'current-day-highlight' : '';
-                    
-                    html += `<tr class="${rowClass}">
-                        <td class="day-label ${isCurrentDay ? 'current-day-label' : ''}">${dayName.slice(0,3).toUpperCase()}</td>`;
-                    
-                    slots.forEach(slot => {
-                        let val = day?.draws ? day.draws[slot] : null;
-                        let isPending = (!val || val === "-" || val === "–" || val === "PENDING");
-                        
-                        let displayContent;
-                        let bgColor;
+        html += `</tbody></table></div>`;
+        return html;
+    }
 
-                        if (isPending) {
-                            displayContent = `<span class="waiting-glass">⏳</span>`;
-                            bgColor = "transparent";
-                        } else {
-                            const numStr = String(val).padStart(2, '0');
-                            displayContent = numStr;
-                            bgColor = numberColors[numStr] || "#ffffff";
-                        }
-                        
-                        // Add highlight to balls if it's the current day
-                        const ballClass = isCurrentDay ? 'current-day-ball' : '';
-                        
-                        html += `<td class="comparison-cell ${isCurrentDay ? 'current-day-cell' : ''}">
-                            <div class="comparison-ball ${ballClass}" style="background:${bgColor}">
-                                ${displayContent}
-                            </div>
-                        </td>`;
-                    });
-                    html += `</tr>`;
-                });
-
-                html += `</tbody></table></div>`;
-                return html;
-            }
-
-            return `
-                <div style="display:flex; flex-direction:column; gap:5px; background:#0d1117; padding:10px;">
-                    ${buildTable(lastWeek, "PREVIOUS WEEK ANALYSIS", "#333333", true)}
-                    ${buildTable(currentWeek, "CURRENT WEEK TRACKING", "#007AFF", true)}
-                </div>`;
-        }
+    return `
+        <div style="display:flex; flex-direction:column; gap:5px; background:#0d1117; padding:10px;">
+            ${buildTable(lastWeek, "PREVIOUS WEEK ANALYSIS", "#333333", true)}
+            ${buildTable(currentWeek, "CURRENT WEEK TRACKING", "#007AFF", true)}
+        </div>`;
+}
 
         // ========== MARK APPEARANCE CHART FUNCTIONS ==========
         function generateMarkAppearanceHTML(weeksData) {
