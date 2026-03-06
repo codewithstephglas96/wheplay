@@ -6,6 +6,13 @@
     <link rel="icon" href="https://drive.google.com/uc?id=1vFP8OL3NIHsQBxSlS5ItXOOZEFoeiZhQ" type="image/png" sizes="192x192">
     <link rel="icon" href="https://drive.google.com/uc?id=1vFP8OL3NIHsQBxSlS5ItXOOZEFoeiZhQ" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="https://drive.google.com/uc?id=1vFP8OL3NIHsQBxSlS5ItXOOZEFoeiZhQ">
+    
+    <!-- PWA/MOBILE HOME SCREEN META TAGS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CODEWITHGLASGOW">
+    <meta name="theme-color" content="#000000">
     <style>
         :root { 
             --bg: #01061b;
@@ -1230,7 +1237,7 @@
         }
 
         .mark-status {
-        font-size: 8px;
+        font-size: 9px;
         font-weight: bold;
         letter-spacing: 0.5px;
         }
@@ -1257,6 +1264,183 @@
         .mark-progress-fill {
         height: 100%;
         box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Improved Whe Play Marks Chart Styles */
+        .wheplay-marks-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            margin: 10px 0;
+        }
+
+        .wheplay-mark-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wheplay-mark-row:hover {
+            background: rgba(88, 166, 255, 0.15);
+            transform: translateX(4px);
+            border-color: #58a6ff;
+        }
+
+        .wheplay-mark-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 16px;
+            color: #000;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .wheplay-mark-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .wheplay-mark-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #fff;
+        }
+
+        .wheplay-mark-tags {
+            font-size: 16px;
+            display: flex;
+            gap: 6px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .wheplay-tag {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .wheplay-tag-spirit {
+            font-size: 16px;
+            background: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+        }
+
+        .wheplay-tag-partner {
+            font-size: 16px;
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .wheplay-tag-mirror {
+            font-size: 16px;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .wheplay-mirror-ball {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            margin-left: 2px;
+        }
+
+        /* Chart 1/16 Styles - Clean version from second example */
+        .chart-16 {
+            background-color: #2d8a44;  /* Chart green */
+            border: 5px solid #5d4037;   /* Bamboo brown */
+            margin-top: 20px;
+            border-radius: 0;  /* Sharp corners like second example */
+        }
+
+        .chart-16-header {
+            background: #5d4037;  /* Bamboo brown */
+            color: white;
+            padding: 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .grid-16 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            background: #2d8a44;  /* Match chart green */
+        }
+
+        .cell-16 {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 10px 5px;
+            text-align: center;
+            background: #2d8a44;  /* Match chart green */
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .cell-16:hover {
+            background: #1e5e2e;  /* Darker green on hover */
+        }
+
+        .c16-main {
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: block;
+            color: white;
+        }
+
+        .c16-sub {
+            font-size: 12px;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .wheplay-marks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wheplay-mark-name {
+                font-size: 12px;
+            }
+            
+            .wheplay-tag {
+                font-size: 14px;
+                padding: 1px 4px;
+            }
+            
+            .grid-16 {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
     </style>
@@ -1420,6 +1604,7 @@
                         <h3 id="current-week-title" class="calendar-dropdown-title" style="margin: 10px 0;">LOADING...</h3>
                         <div style="display: flex; gap: 2px; flex-wrap: wrap; justify-content: center;">
                             <button class="week-nav-btn-small" onclick="navigateWeek(1)">◀</button>
+                            <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Sunday')">SUN</button>
                             <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Monday')">MON</button>
                             <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Tuesday')">TUE</button>
                             <button class="week-nav-btn-small" onclick="navigateToDayOfWeek('Wednesday')">WED</button>
@@ -1522,7 +1707,22 @@
                         <!-- Suite chart rows will be populated by JavaScript -->
                     </div>
                 </div>
-                
+
+                  <!-- Missing Lines & Suits (14D) Analysis -->
+                <div class="widget-card" id="missing-lines-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title" style="color: #ff9d00;">MISSING LINES & SUITS</div>
+                            <div class="widget-subtitle">Last 14 Days Analysis</div>
+                        </div>
+                    </div>
+                    
+                    <div id="missing-lines-container" class="missing-lines-content">
+                        <!-- Missing lines analysis will be populated by JavaScript -->
+                        <div style="text-align:center; padding:20px; color:#666;">Loading analysis...</div>
+                    </div>
+                </div>
+
                 <!-- Top 10 Shelf Marks Container -->
                 <div class="widget-card" id="top-shelf-widget">
                     <div class="widget-header">
@@ -1544,8 +1744,22 @@
                 </h4>
                 <div id="mark-appearance-container"></div>
                 </div>
+
+                <!-- WHE PLAY MARKS (Spirit • Partner • Mirror) -->
+                <div class="widget-card" id="wheplay-marks-widget">
+                    <div class="widget-header">
+                        <div>
+                            <div class="widget-title" style="color: #58a6ff;">WHE PLAY MARKS CHART</div>
+                            <div class="widget-subtitle">Spirit • Partner • Mirror</div>
+                        </div>
+                    </div>
+                    
+                    <div id="marks-container" class="marks-container">
+                        <div style="text-align:center; padding:20px; color:#666; width:100%;">Loading Play Whe marks...</div>
+                    </div>
+                </div>
                 
-                <!-- Quantum Chart Widget (Moved from separate tab) -->
+                <!-- Quantum Chart Widget (Moved from separate tab) --
                 <div class="widget-card quantum-chart" id="quantum-chart-widget">
                     <div class="widget-header">
                         <div>
@@ -1558,7 +1772,7 @@
                     <div id="quantum-grid" class="grid"></div>
                     
                     <div id="quantum-instructions" class="quantum-instructions"></div>
-                </div>
+                </div>-->
             </div>
         </div>
 
@@ -1579,6 +1793,7 @@
                     <option value="Thursday">Thursday</option>
                     <option value="Friday">Friday</option>
                     <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
                 </select>
                 <select id="sTime" class="input-select">
                     <option value="ALL">All Times</option>
@@ -1679,6 +1894,54 @@
             9: [9, 19, 29]
         };
         
+                // ========== PLAY WHE MASTER DATA (Spirit • Partner • Mirror) ==========
+        const playWheMasterData = {
+            1: { name: "CENTIPEDE", spirit: 2, partner: 16, mirror: 36, emoji: "🐛" },
+            2: { name: "OLD LADY", spirit: 24, partner: 17, mirror: 35, emoji: "👵" },
+            3: { name: "CARRIAGE", spirit: 19, partner: 18, mirror: 34, emoji: "🚗" },
+            4: { name: "DEADMAN", spirit: 3, partner: 19, mirror: 33, emoji: "💀" },
+            5: { name: "PARSON MAN", spirit: 1, partner: 20, mirror: 32, emoji: "🧍🏽‍♂️" },
+            6: { name: "BELLY", spirit: 15, partner: 21, mirror: 31, emoji: "🤰" },
+            7: { name: "HOG", spirit: 13, partner: 22, mirror: 30, emoji: "🐗" },
+            8: { name: "TIGER", spirit: 29, partner: 23, mirror: 29, emoji: "🐅" },
+            9: { name: "CATTLE", spirit: 33, partner: 24, mirror: 28, emoji: "🐄" },
+            10: { name: "MONKEY", spirit: 28, partner: 25, mirror: 27, emoji: "🐒" },
+            11: { name: "CORBEAU", spirit: 11, partner: 26, mirror: 26, emoji: "🐦‍🔥" },
+            12: { name: "KING", spirit: 32, partner: 27, mirror: 25, emoji: "👑" },
+            13: { name: "CRAPAUD", spirit: 7, partner: 28, mirror: 24, emoji: "🐸" },
+            14: { name: "MONEY", spirit: 25, partner: 29, mirror: 23, emoji: "💰" },
+            15: { name: "SICK WOMAN", spirit: 9, partner: 30, mirror: 22, emoji: "🤧" },
+            16: { name: "JAMETTE", spirit: 17, partner: 31, mirror: 21, emoji: "💃" },
+            17: { name: "PIGEON", spirit: 18, partner: 32, mirror: 20, emoji: "🦜" },
+            18: { name: "WATER BOAT", spirit: 30, partner: 33, mirror: 19, emoji: "🚤" },
+            19: { name: "HORSE", spirit: 5, partner: 34, mirror: 18, emoji: "🐎" },
+            20: { name: "DOG", spirit: 22, partner: 35, mirror: 17, emoji: "🐕" },
+            21: { name: "MOUTH", spirit: 23, partner: 36, mirror: 16, emoji: "👄" },
+            22: { name: "RAT", spirit: 20, partner: 1, mirror: 15, emoji: "🐀" },
+            23: { name: "HOUSE", spirit: 21, partner: 2, mirror: 14, emoji: "🏠" },
+            24: { name: "QUEEN", spirit: 2, partner: 3, mirror: 13, emoji: "👑" },
+            25: { name: "MOROCOY", spirit: 14, partner: 4, mirror: 12, emoji: "🐢" },
+            26: { name: "FOWL", spirit: 27, partner: 5, mirror: 11, emoji: "🐓" },
+            27: { name: "LITTLE SNAKE", spirit: 16, partner: 6, mirror: 10, emoji: "🐍" },
+            28: { name: "FISH", spirit: 10, partner: 7, mirror: 9, emoji: "🐟" },
+            29: { name: "OPIUM MAN", spirit: 4, partner: 8, mirror: 8, emoji: "🥴" },
+            30: { name: "HOUSE CAT", spirit: 12, partner: 9, mirror: 7, emoji: "🐈" },
+            31: { name: "PARSON WIFE", spirit: 34, partner: 10, mirror: 6, emoji: "👰" },
+            32: { name: "SHRIMPS", spirit: 8, partner: 11, mirror: 5, emoji: "🦐" },
+            33: { name: "SPIDER", spirit: 26, partner: 12, mirror: 4, emoji: "🕷️" },
+            34: { name: "BLIND MAN", spirit: 31, partner: 13, mirror: 3, emoji: "👨‍🦯" },
+            35: { name: "BIG SNAKE", spirit: 4, partner: 14, mirror: 2, emoji: "🐍" },
+            36: { name: "DONKEY", spirit: 11, partner: 15, mirror: 1, emoji: "🫏" }
+        };
+
+        // Partner mapping for insights
+        const partners = {
+            1:5, 2:24, 3:19, 4:35, 5:1, 6:null, 7:null, 8:12, 9:33, 10:23, 
+            11:23, 12:8, 13:17, 14:25, 15:19, 16:17, 17:16, 18:10, 19:15, 
+            20:22, 21:23, 22:20, 23:28, 24:2, 25:11, 26:8, 27:30, 28:23, 
+            29:9, 30:27, 31:14, 32:31, 33:20, 34:31, 35:4, 36:34
+        };
+
         // ========== QUANTUM CHART DATA ==========
         const quantumData = [
             [[1,5,17],[2,6,18],[3,7,19]],[[4,8,20],[5,9,21],[6,10,22]],
@@ -1761,6 +2024,9 @@
             
             // Update Home tab widgets
             updateHomeWidgets();
+            
+            renderMarksTable();
+            renderMissingLinesAndSuits();
 
             // Render charts if we're on home tab
             if (weeksData.length > 0) {
@@ -2351,6 +2617,114 @@
             container.innerHTML = html;
         }
         
+        // ========== MISSING LINES & SUITS (14D) ANALYSIS ==========
+        function renderMissingLinesAndSuits() {
+            const container = document.getElementById('missing-lines-container');
+            if (!container) {
+                console.log('Missing lines container not found');
+                return;
+            }
+            
+            // Show loading state
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Loading analysis...</div>';
+            
+            // Use weeksData instead of calendarWeeks
+            if (!weeksData || weeksData.length === 0) {
+                console.log('No weeks data available for missing lines analysis');
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#ff6b6b;">No data available</div>';
+                return;
+            }
+            
+            try {
+                // Get the last 2 weeks (14 days) of draws - weeksData is already in chronological order
+                // We need the most recent weeks, so take from the end of the array
+                const recentWeeks = weeksData.slice(-2);
+                console.log('Recent weeks for missing lines:', recentWeeks.length);
+                
+                const windowDraws = [];
+                
+                recentWeeks.forEach(week => {
+                    if (week && week.days) {
+                        week.days.forEach(day => {
+                            if (day && day.draws) {
+                                Object.values(day.draws).forEach(val => {
+                                    // Skip if val is not a valid number string
+                                    if (val && val !== "-" && val !== "PENDING" && val !== "–") {
+                                        const n = parseInt(val, 10);
+                                        if (!isNaN(n) && n >= 1 && n <= 36) {
+                                            windowDraws.push(n);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+                
+                console.log('Window draws collected:', windowDraws.length);
+                
+                // If no draws found, show message
+                if (windowDraws.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffa500;">No draw data available for last 14 days</div>';
+                    return;
+                }
+                
+                function renderGroup(group, labelPrefix) {
+                    return Object.keys(group).map(k => {
+                        const nums = group[k];
+                        const missingNums = [];
+                        
+                        const numsHtml = nums.map(n => {
+                            const appeared = windowDraws.includes(n);
+                            if (!appeared) missingNums.push(n);
+                            return `<span style="
+                                ${appeared ? 'color:#888; text-decoration:line-through; opacity:0.4;' : 'color:#ff9d00; font-weight:900;'} 
+                                margin-right:6px;">
+                                ${n}
+                            </span>`;
+                        }).join("");
+                        
+                        const missingText = missingNums.length > 0 
+                            ? `• ${missingNums.join(", ")} to complete ${k} ${labelPrefix}` 
+                            : `• ${k} ${labelPrefix} Complete`;
+                        
+                        return `<div style="margin-bottom:6px;">
+                            <b>${labelPrefix} ${k}:</b> ${numsHtml} ${missingText}
+                        </div>`;
+                    }).join("");
+                }
+                
+                const lineHtml = renderGroup(lineNumbers, "LINE");
+                const suiteHtml = renderGroup(suites, "SUITE");
+                
+                // Only show sections that have content
+                let contentHtml = '';
+                if (lineHtml) contentHtml += lineHtml;
+                if (suiteHtml) contentHtml += suiteHtml;
+                
+                if (!contentHtml) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffa500;">No line/suite data available</div>';
+                    return;
+                }
+                
+                let html = `
+                    <div style="background: var(--bg-card); border-radius: 12px; padding: 15px; margin: 10px; border: 1px solid var(--border-color);">
+                        <div style="font-size:13px; line-height:1.6;">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+                console.log('Missing lines analysis rendered successfully');
+                
+            } catch (error) {
+                console.error('Error rendering missing lines analysis:', error);
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#ff6b6b;">Error loading analysis</div>';
+            }
+        }
+        
+        // ========== UPDATED TOP 10 SHELF MARKS (Coldest) ==========
         function updateTopShelf() {
             const container = document.getElementById('top-shelf-content');
             if (!container || !marks || marks.length === 0) return;
@@ -2359,35 +2733,64 @@
             const coldestMarks = [...marks]
                 .sort((a, b) => b.days - a.days)
                 .slice(0, 10)
-                .reverse(); // Reverse to show coldest at bottom
+                .reverse(); // Show coldest at bottom
             
-            let html = '';
+            let html = '<div style="font-size:13px; padding:10px;">';
             
-            coldestMarks.forEach((mark, index) => {
-                const rank = index + 1;
-                const numStr = String(mark.num).padStart(2, '0');
-                const color = numberColors[numStr] || '#ffffff';
+            // Hits This Week section (repeats)
+            const weeklyHits = Object.entries(currentWeekHits || {})
+                .filter(([_, count]) => count > 1)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (weeklyHits.length > 0) {
+                html += `<div style="text-align:center; color:#ff001e; font-weight:bold; margin-bottom:8px;">
+                    📍 HITS THIS WEEK: 🔵 x2 | 🟠 x3 | 🔴 x4
+                </div>`;
+                html += `<div style="display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">`;
+                for (let [num, count] of weeklyHits) {
+                    let color = count >= 4 ? "#d90f0f" : count === 3 ? "#ed9907" : "#0c10f2";
+                    html += `<div style="width:28px; height:28px; border-radius:14px; background:${color}; color:white; font-weight:bold; display:flex; align-items:center; justify-content:center; font-size:14px;">
+                        ${String(num).padStart(2,'0')}
+                    </div>`;
+                }
+                html += `</div>`;
+            }
+            
+            // Table Header
+            html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:2px solid #333; margin-bottom:8px;">
+                <div style="width:50px; text-align:center; color:#00ff00; font-weight:bold;">MARK</div>
+                <div style="width:90px; text-align:center; color:#00ff00; font-weight:bold;">LAST DRAW</div>
+                <div style="width:80px; text-align:center; color:#00ff00; font-weight:bold;">TIME</div>
+                <div style="width:80px; text-align:center; color:#00ff00; font-weight:bold;">DAYS AGO</div>
+                <div style="width:50px; text-align:center; color:#00ff00; font-weight:bold;">FREQ</div>
+            </div>`;
+            
+            // Rows
+            coldestMarks.forEach(item => {
+                let weeksAgo = Math.floor(item.days / 7);
+                let bg = item.days >= 30 ? "#d90f0f60" : item.days >= 15 ? "#b0720760" : "#04853360";
+                let wkLabel = weeksAgo === 1 ? "wk" : "wks";
                 
-                // Determine status color
-                let statusColor = '#32d74b'; // Normal
-                if (mark.days > mark.avg) statusColor = '#ff453a'; // Overdue
-                else if (mark.days > mark.avg - 2) statusColor = '#ff9f0a'; // Close
-                
-                html += `
-                    <div class="coldest-item">
-                        <div class="coldest-rank">#${rank}</div>
-                        <div class="coldest-ball" style="background:${color}">${numStr}</div>
-                        <div class="coldest-info">
-                            <div class="coldest-name">${mark.spirit}</div>
-                            <div class="coldest-days">${mark.days} days ago • Last: ${mark.date}</div>
-                        </div>
-                        <div style="font-weight:bold; font-size:12px; color:${statusColor};">
-                            ${mark.status === 'OVERDUE' ? 'TODAY' : (mark.status === 'CLOSE' ? 'CLOSE' : mark.dLeft + 'd left')}
-                        </div>
-                    </div>
-                `;
+                html += `<div style="display:flex; justify-content:space-between; padding:8px 0; background:${bg}; border-radius:8px; margin:4px 0;">
+                    <div style="width:50px; text-align:center; font-weight:bold; font-size:16px;">${String(item.num).padStart(2,'0')}</div>
+                    <div style="width:90px; text-align:center; font-size:14px;">${item.date}</div>
+                    <div style="width:80px; text-align:center; color:#f7f7f7; font-size:14px;">${item.time || 'N/A'}</div>
+                    <div style="width:80px; text-align:center; color:#f7f7f7; font-size:14px;">${item.days}d • ${weeksAgo}${wkLabel}</div>
+                    <div style="width:50px; text-align:center; font-size:15px;">${item.freq || item.frequency || 0}x</div>
+                </div>`;
             });
             
+            // Footer update time
+            let now = new Date();
+            let dayNum = String(now.getDate()).padStart(2, "0");
+            let month = now.toLocaleString("en-GB", { month: "short" }).toUpperCase();
+            let time = now.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+            
+            html += `<div style="text-align:center; margin-top:12px; color:#666; font-size:11px;">
+                Updated ${dayNum}-${month} ${time} 
+            </div>`;
+            
+            html += `</div>`;
             container.innerHTML = html;
         }
 
@@ -2431,10 +2834,9 @@
         return '<div style="text-align:center; padding:20px; color:#ff6b6b;">No data available</div>';
     }
     
-    // Get current day (skip Sunday)
+    // Get current day
     const now = new Date();
     let currentDayName = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
-    currentDayName = currentDayName === 'Sunday' ? 'Monday' : currentDayName;
     
     // Sort weeks by date (most recent first)
     const sortedWeeks = [...weeksData].sort((a, b) => {
@@ -2442,13 +2844,6 @@
         const dateB = new Date(b.startDate.split(' ').reverse().join('-'));
         return dateB - dateA; // Most recent first
     });
-    
-    // Debug: Log the first few weeks to see their order
-    console.log('First 5 sorted weeks:', sortedWeeks.slice(0, 5).map(w => ({
-        weekNumber: w.weekNumber,
-        startDate: w.startDate,
-        isCurrentWeek: w.isCurrentWeek
-    })));
     
     // Find current week - check both isCurrentWeek and by date
     let currentWeek = sortedWeeks.find(w => w.isCurrentWeek);
@@ -2458,28 +2853,31 @@
         currentWeek = sortedWeeks[0];
     }
     
-    // Find last week - the week with weekNumber = currentWeek.weekNumber + 1
+    // Find last week - find by date (previous week)
     let lastWeek;
     
-    if (currentWeek.weekNumber) {
-        // Look for the week with weekNumber = currentWeek.weekNumber + 1
-        lastWeek = sortedWeeks.find(w => w.weekNumber === (parseInt(currentWeek.weekNumber) + 1));
-    }
-    
-    // If we couldn't find by weekNumber, try to find by date (previous week)
-    if (!lastWeek && currentWeek.startDate) {
+    if (currentWeek.startDate) {
         try {
             // Parse current week start date
-            const currentDate = new Date(currentWeek.startDate.split(' ').reverse().join('-'));
+            const currentDateParts = currentWeek.startDate.split(' ');
+            const currentDay = parseInt(currentDateParts[0], 10);
+            const currentMonth = currentDateParts[1];
+            const currentYear = parseInt(currentDateParts[2], 10);
+            
+            const monthMap = {
+                "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+            };
+            
+            const currentDate = new Date(currentYear, monthMap[currentMonth], currentDay);
             const oneWeekAgo = new Date(currentDate);
             oneWeekAgo.setDate(currentDate.getDate() - 7);
             
             // Format as "DD MMM YYYY"
-            const lastWeekDateStr = oneWeekAgo.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
+            const lastWeekDay = oneWeekAgo.getDate();
+            const lastWeekMonth = Object.keys(monthMap).find(key => monthMap[key] === oneWeekAgo.getMonth());
+            const lastWeekYear = oneWeekAgo.getFullYear();
+            const lastWeekDateStr = `${lastWeekDay} ${lastWeekMonth} ${lastWeekYear}`;
             
             // Find week with that start date
             lastWeek = sortedWeeks.find(w => w.startDate === lastWeekDateStr);
@@ -2499,7 +2897,7 @@
     console.log('Last week:', lastWeek?.weekNumber, 'Start:', lastWeek?.startDate);
     
     // Define the constants needed for the table
-    const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const slots = ["MOR", "MID", "NON", "EVE"];
 
     function buildTable(weekData, title, titleColor, highlightCurrentDay = false) {
@@ -2513,11 +2911,15 @@
             </div>`;
         }
         
-        const wkNum = weekData.weekNumber || '';
+        // Extract week number from start date (last 2 digits of year + week number)
+        const startDateParts = weekData.startDate.split(' ');
+        const yearShort = startDateParts[2].slice(-2);
+        const weekDisplay = `Wk ${weekData.weekNumber || '?'} • ${startDateParts[0]} ${startDateParts[1]} '${yearShort}`;
+        
         let html = `<div style="margin-bottom:15px;">
             <div class="week-header" style="background:${titleColor}">
                 <span>${title}</span>
-                <span style="opacity:0.7;">Wk ${wkNum}</span>
+                <span style="opacity:0.7;">${weekDisplay}</span>
             </div>
             <table class="comparison-table">
                 <thead>
@@ -2578,6 +2980,143 @@
             ${buildTable(lastWeek, "PREVIOUS WEEK ANALYSIS", "#333333", true)}
             ${buildTable(currentWeek, "CURRENT WEEK TRACKING", "#007AFF", true)}
         </div>`;
+}
+
+// ========== IMPROVED WHE PLAY MARKS (Spirit • Partner • Mirror) ==========
+function renderMarksTable() {
+    const container = document.getElementById('marks-container');
+    if (!container) return;
+    
+    // Clear container
+    container.innerHTML = '';
+    
+    // Create main container
+    const mainContainer = document.createElement('div');
+    mainContainer.style.cssText = 'background: var(--bg-card); border-radius: 16px; padding: 15px; margin: 10px; border: 1px solid var(--border-color);';
+    
+    // Create two-column layout for marks 1-36
+    const marksContainer = document.createElement('div');
+    marksContainer.style.cssText = 'display: flex; gap: 10px;';
+    
+    // Left column (marks 1-18)
+    const leftColumn = document.createElement('div');
+    leftColumn.style.cssText = 'flex: 1; display: flex; flex-direction: column; gap: 4px;';
+    
+    // Right column (marks 19-36)
+    const rightColumn = document.createElement('div');
+    rightColumn.style.cssText = 'flex: 1; display: flex; flex-direction: column; gap: 4px;';
+    
+    // Populate both columns
+    for (let i = 1; i <= 36; i++) {
+        const data = playWheMasterData[i];
+        const numStr = String(i).padStart(2, '0');
+        const color = numberColors[numStr] || '#ffffff';
+        const mirrorStr = String(data.mirror).padStart(2, '0');
+        const mirrorColor = numberColors[mirrorStr] || '#ffffff';
+        
+        const markRow = document.createElement('div');
+        markRow.className = 'wheplay-mark-row';
+        markRow.setAttribute('onclick', `highlightWhePlayMark(${i})`);
+        markRow.setAttribute('data-mark', i);
+        
+        markRow.innerHTML = `
+            <div class="wheplay-mark-number" style="background: ${color};">${i}</div>
+            <div class="wheplay-mark-info">
+                <span class="wheplay-mark-name">${data.emoji} ${data.name}</span>
+                <div class="wheplay-mark-tags">
+                    <span class="wheplay-tag wheplay-tag-spirit">S:${data.spirit}</span>
+                    <span class="wheplay-tag wheplay-tag-partner">P:${data.partner}</span>
+                    <span class="wheplay-tag wheplay-tag-mirror">
+                        M:<span class="wheplay-mirror-ball" style="background: ${mirrorColor};">${data.mirror}</span>
+                    </span>
+                </div>
+            </div>
+        `;
+        
+        if (i <= 18) {
+            leftColumn.appendChild(markRow);
+        } else {
+            rightColumn.appendChild(markRow);
+        }
+    }
+    
+    marksContainer.appendChild(leftColumn);
+    marksContainer.appendChild(rightColumn);
+    mainContainer.appendChild(marksContainer);
+    
+    // Add 1/16 Chart - Clean version like second example
+    const chart16 = document.createElement('div');
+    chart16.className = 'chart-16';
+    chart16.innerHTML = `
+        <div class="chart-16-header">THE 1/16 CHART</div>
+        <div id="grid-16-content" class="grid-16"></div>
+    `;
+    
+    mainContainer.appendChild(chart16);
+    container.appendChild(mainContainer);
+    
+    // Render 1/16 chart
+    renderSixteenChart();
+}
+
+// ========== RENDER 1/16 CHART (Clean version) ==========
+function renderSixteenChart() {
+    const container = document.getElementById('grid-16-content');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Generate 1/16 chart data - exactly like second example
+    for (let i = 1; i <= 36; i++) {
+        // Calculate the two following numbers (like in second example)
+        const next1 = (i % 36) + 1;
+        const next2 = ((i + 1) % 36) + 1;
+        
+        const cell = document.createElement('div');
+        cell.className = 'cell-16';
+        cell.setAttribute('onclick', `highlightWhePlayMark(${i})`);
+        cell.innerHTML = `
+            <span class="c16-main">${i}</span>
+            <span class="c16-sub">${String(next1).padStart(2, '0')}-${String(next2).padStart(2, '0')}</span>
+        `;
+        
+        container.appendChild(cell);
+    }
+}
+
+// ========== HIGHLIGHT WHE PLAY MARK ==========
+function highlightWhePlayMark(num) {
+    // Remove all highlights
+    document.querySelectorAll('.wheplay-mark-row').forEach(row => {
+        row.style.background = '';
+        row.style.borderColor = '';
+        row.style.transform = '';
+    });
+    
+    // Find and highlight the selected row
+    const selectedRow = document.querySelector(`.wheplay-mark-row[data-mark="${num}"]`);
+    if (selectedRow) {
+        selectedRow.style.background = 'rgba(88, 166, 255, 0.2)';
+        selectedRow.style.borderColor = '#58a6ff';
+        selectedRow.style.transform = 'translateX(4px)';
+        selectedRow.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+    
+    // Also highlight in 1/16 chart
+    document.querySelectorAll('.cell-16').forEach((cell, index) => {
+        cell.style.background = '';
+        cell.style.transform = '';
+        if (index + 1 === num) {
+            cell.style.background = '#1e5e2e';  // Darker green highlight
+            cell.style.transform = 'scale(1.02)';
+        }
+    });
+    
+    // Show notification with mark info
+    const data = playWheMasterData[num];
+    if (data) {
+        showNotification(`${num} • ${data.name} | Spirit: ${data.spirit} | Partner: ${data.partner} | Mirror: ${data.mirror}`, 'info');
+    }
 }
 
         // ========== MARK APPEARANCE CHART FUNCTIONS ==========
@@ -2940,10 +3479,9 @@
                             days: week.days || []
                         })).reverse(); // Most recent first (week 0 = current/most recent)
                         
-                        // Get today's day name (skip Sunday)
+                        // Get today's day name
                         const today = new Date();
                         let todayName = today.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
-                        todayName = todayName === 'Sunday' ? 'Monday' : todayName;
                         currentDayOfWeek = todayName;
                         
                         // Find current week index (week containing today)
@@ -2980,9 +3518,8 @@
                 return;
             }
             
-            // Get day name (handle Sunday)
+            // Get day name
             let dayName = currentDayOfWeek;
-            if (dayName === 'Sunday') dayName = 'Monday';
             
             // Find 5 most recent weeks that have this day
             const daysToShow = [];
@@ -3004,8 +3541,7 @@
                     
                     // Create base date (Monday)
                     const baseDate = new Date(year, monthMap[monthName], dayNum);
-                    const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);
-                    const actualDate = new Date(baseDate);
+                    const dayIndex = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);                    const actualDate = new Date(baseDate);
                     actualDate.setDate(baseDate.getDate() + dayIndex);
                     
                     // Format date
@@ -3028,12 +3564,12 @@
                         actualDate: actualDate
                     });
                     
-                    if (daysToShow.length >= 6) break;
+                    if (daysToShow.length >= 7) break;
                 }
             }
             
             // If we don't have enough recent weeks, look further back
-            if (daysToShow.length < 5) {
+            if (daysToShow.length < 7) {
                 for (let i = currentWeekIndex + 1; i < calendarWeeks.length; i++) {
                     const week = calendarWeeks[i];
                     const day = week.days.find(d => d.dayName === dayName);
@@ -3050,7 +3586,7 @@
                         };
                         
                         const baseDate = new Date(year, monthMap[monthName], dayNum);
-                        const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);
+                        const dayIndex = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(dayName);
                         const actualDate = new Date(baseDate);
                         actualDate.setDate(baseDate.getDate() + dayIndex);
                         
@@ -3073,7 +3609,7 @@
                             actualDate: actualDate
                         });
                         
-                        if (daysToShow.length >= 6) break;
+                        if (daysToShow.length >= 7) break;
                     }
                 }
             }
@@ -3271,16 +3807,15 @@
         function navigateDay(direction) {
             if (!calendarWeeks || calendarWeeks.length === 0) return;
             
-            // Get list of weekdays (skip Sunday)
-            const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const currentIndex = weekdays.indexOf(currentDayOfWeek);
+            // Get list of weekdays
+            const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];            const currentIndex = weekdays.indexOf(currentDayOfWeek);
             
             if (currentIndex === -1) return;
             
             // Calculate new day index with wrapping
             let newIndex = currentIndex + direction;
-            if (newIndex < 0) newIndex = 5; // Wrap to Saturday
-            if (newIndex > 5) newIndex = 0; // Wrap to Monday
+            if (newIndex < 0) newIndex = 6; // Wrap to Saturday
+            if (newIndex > 6) newIndex = 0; // Wrap to Sunday
             
             currentDayOfWeek = weekdays[newIndex];
             renderCalendarWidgetStyle();
@@ -3356,7 +3891,7 @@
     
         function processData(weeks) {
             // EXACT data processing logic from your second code
-            const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const dayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const timeOrder = ["MOR", "MID", "NON", "EVE"];
             const timeNames = { MOR: "Morning", MID: "Midday", NON: "Afternoon", EVE: "Evening" };
             
@@ -3504,11 +4039,10 @@
                         currentWeekIndex = 0; // Show most recent week by default
                     }
                     
-                    // Get today's day (skip Sunday)
+                    // Get today's day
                     const today = new Date();
-                    let todayName = today.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
-                    todayName = todayName === 'Sunday' ? 'Monday' : todayName;
-                    currentDayOfWeek = todayName;
+                  let todayName = today.toLocaleString('en-US', { weekday: 'long', timeZone: 'America/Barbados' });
+                  currentDayOfWeek = todayName;
                     
                     console.log(`Processed ${calendarWeeks.length} calendar weeks`);
                     console.log(`Current day: ${currentDayOfWeek}, Week index: ${currentWeekIndex}`);
@@ -3522,7 +4056,7 @@
             // Generate sample data matching your structure
             const sampleWeeks = [];
             const now = new Date();
-            const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const dayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const timeOrder = ["MOR", "MID", "NON", "EVE"];
             
             for (let w = 0; w < 12; w++) {
