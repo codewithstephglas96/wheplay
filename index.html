@@ -4571,74 +4571,78 @@
         renderSixteenChart();
       }
 
-      // ========== RENDER 1/16 CHART (Clean version) ==========
-      function renderSixteenChart() {
-        const container = document.getElementById("grid-16-content");
+    // ========== RENDER 1/16 CHART (Using sixteenGroups) ==========
+    function renderSixteenChart() {
+        const container = document.getElementById('grid-16-content');
         if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Use the sixteenGroups array from your quantum data
+        const sixteenGroups = [
+            [1, 16, 29], [2, 17, 30], [3, 18, 31], [4, 19, 32], [5, 20, 33], [6, 21, 34],
+            [7, 22, 35], [8, 23, 36], [9, 24, 1], [10, 25, 2], [11, 26, 3], [12, 27, 4],
+            [13, 28, 5], [14, 29, 6], [15, 30, 7], [16, 31, 8], [17, 32, 9], [18, 33, 10],
+            [19, 34, 11], [20, 35, 12], [21, 36, 13], [22, 1, 14], [23, 2, 15], [24, 3, 16],
+            [25, 4, 17], [26, 5, 18], [27, 6, 19], [28, 7, 20], [29, 8, 21], [30, 9, 22],
+            [31, 10, 23], [32, 11, 24], [33, 12, 25], [34, 13, 26], [35, 14, 27], [36, 15, 28]
+        ];
+        
+        // Generate 1/16 chart using the sixteenGroups
+        sixteenGroups.forEach((group) => {
+            const mainNum = group[0]; // The main number for this cell
+            
+            // Format the two following numbers without leading zeros
+            const follow1 = group[1];
+            const follow2 = group[2];
+            
+            const cell = document.createElement('div');
+            cell.className = 'cell-16';
+            cell.setAttribute('onclick', `highlightWhePlayMark(${mainNum})`);
+            cell.setAttribute('data-main', mainNum);
+            cell.innerHTML = `
+                <span class="c16-main">${mainNum}</span>
+                <span class="c16-sub">${follow1}-${follow2}</span>
+            `;
+            
+            container.appendChild(cell);
+        });
+    }
 
-        container.innerHTML = "";
-
-        // Generate 1/16 chart data - exactly like second example
-        for (let i = 1; i <= 36; i++) {
-          // Calculate the two following numbers (like in second example)
-          const next1 = (i % 36) + 1;
-          const next2 = ((i + 1) % 36) + 1;
-
-          const cell = document.createElement("div");
-          cell.className = "cell-16";
-          cell.setAttribute("onclick", `highlightWhePlayMark(${i})`);
-          cell.innerHTML = `
-            <span class="c16-main">${i}</span>
-            <span class="c16-sub">${String(next1).padStart(2, "0")}-${String(next2).padStart(2, "0")}</span>
-        `;
-
-          container.appendChild(cell);
-        }
-      }
-
-      // ========== HIGHLIGHT WHE PLAY MARK ==========
-      function highlightWhePlayMark(num) {
+    // Also update the highlight function to work with the new structure
+    function highlightWhePlayMark(num) {
         // Remove all highlights
-        document.querySelectorAll(".wheplay-mark-row").forEach((row) => {
-          row.style.background = "";
-          row.style.borderColor = "";
-          row.style.transform = "";
+        document.querySelectorAll('.wheplay-mark-row').forEach(row => {
+            row.style.background = '';
+            row.style.borderColor = '';
+            row.style.transform = '';
         });
-
+        
         // Find and highlight the selected row
-        const selectedRow = document.querySelector(
-          `.wheplay-mark-row[data-mark="${num}"]`,
-        );
+        const selectedRow = document.querySelector(`.wheplay-mark-row[data-mark="${num}"]`);
         if (selectedRow) {
-          selectedRow.style.background = "rgba(88, 166, 255, 0.2)";
-          selectedRow.style.borderColor = "#58a6ff";
-          selectedRow.style.transform = "translateX(4px)";
-          selectedRow.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "nearest",
-          });
+            selectedRow.style.background = 'rgba(88, 166, 255, 0.2)';
+            selectedRow.style.borderColor = '#58a6ff';
+            selectedRow.style.transform = 'translateX(4px)';
+            selectedRow.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
         }
-
-        // Also highlight in 1/16 chart
-        document.querySelectorAll(".cell-16").forEach((cell, index) => {
-          cell.style.background = "";
-          cell.style.transform = "";
-          if (index + 1 === num) {
-            cell.style.background = "#1e5e2e"; // Darker green highlight
-            cell.style.transform = "scale(1.02)";
-          }
+        
+        // Also highlight in 1/16 chart using data-main attribute
+        document.querySelectorAll('.cell-16').forEach(cell => {
+            cell.style.background = '';
+            cell.style.transform = '';
+            if (parseInt(cell.getAttribute('data-main')) === num) {
+                cell.style.background = '#1e5e2e';  // Darker green highlight
+                cell.style.transform = 'scale(1.02)';
+            }
         });
-
+        
         // Show notification with mark info
         const data = playWheMasterData[num];
         if (data) {
-          showNotification(
-            `${num} • ${data.name} | Spirit: ${data.spirit} | Partner: ${data.partner} | Mirror: ${data.mirror}`,
-            "info",
-          );
+            showNotification(`${num} • ${data.name} | Spirit: ${data.spirit} | Partner: ${data.partner} | Mirror: ${data.mirror}`, 'info');
         }
-      }
+    }
 
       // ========== MARK APPEARANCE CHART FUNCTIONS ==========
       function generateMarkAppearanceHTML(weeksData) {
