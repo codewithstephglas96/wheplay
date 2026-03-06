@@ -3631,7 +3631,7 @@
             document.getElementById('historyModal').style.display = 'none';
         }
 
-        function renderExportTable() {
+       function renderExportTable() {
     const container = document.getElementById("modalContent");
     
     // 1. Safety Check
@@ -3643,94 +3643,44 @@
     // 2. Get weeks in chronological order (oldest first)
     const weeks = [...calendarWeeks].reverse();
     
-    // 3. Get current date and time info
-    const now = new Date();
-    const todayIndex = now.getDay();
+    // 3. Automated Sliding Highlight Logic (Matches CS Chart Pattern)
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const todayIndex = new Date().getDay();
     const todayName = dayNames[todayIndex];
-    
-    // Get current time in hours and minutes for comparison
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const currentTimeInMinutes = currentHour * 60 + currentMinute;
-    
-    // Draw time thresholds (in minutes from midnight)
-    const drawTimes = {
-        "MOR": 10 * 60 + 30, // 10:30 AM
-        "MID": 13 * 60 + 0,   // 1:00 PM
-        "NON": 16 * 60 + 0,   // 4:00 PM
-        "EVE": 19 * 60 + 0    // 7:00 PM
-    };
     
     const currentWk = weeks[weeks.length - 1]; // Most recent week
     const lastWk = weeks.length >= 2 ? weeks[weeks.length - 2] : currentWk;
     
-    // 4. Determine which draws have already occurred today
-    const getDrawsIfOccurred = function(wk, dayName, slotKeys) {
+    const getDraws = function(wk, dayName, slotKeys) {
         if (!wk) return [];
         const day = wk.days.find(d => d.dayName === dayName);
         if (!day) return [];
         const found = [];
         slotKeys.forEach(s => {
-            // Only include the draw if its time has passed OR if it has a value (already drawn)
-            const hasValue = (day.draws[s] && day.draws[s] !== "-" && day.draws[s] !== "PENDING");
-            const timePassed = currentTimeInMinutes > drawTimes[s];
-            
-            if (hasValue || (dayName === todayName && timePassed)) {
-                if (hasValue) {
-                    found.push(day.draws[s].toString());
-                }
+            const val = day.draws[s];
+            if (val && val !== "-" && val !== "PENDING") {
+                found.push(val.toString());
             }
         });
         return found;
     };
     
-    // 5. Dynamic highlight logic based on what's already happened today
-    let highlightA = []; // The "leaving" numbers (most recent completed draws)
-    let highlightB = []; // The "meeting" numbers (what they should meet today)
+    let highlightA = []; // The Recent Draws
+    let highlightB = []; // The Last Week Reference
     
-    // Determine which slots have already occurred today
-    const occurredSlots = [];
-    if (currentTimeInMinutes > drawTimes.MOR) occurredSlots.push("MOR");
-    if (currentTimeInMinutes > drawTimes.MID) occurredSlots.push("MID");
-    if (currentTimeInMinutes > drawTimes.NON) occurredSlots.push("NON");
-    if (currentTimeInMinutes > drawTimes.EVE) occurredSlots.push("EVE");
-    
+    // Monday handles the weekend reset; Tuesday-Saturday handles the sliding daily cross-check
     if (todayName === "Monday" || todayName === "Sunday") {
-        // Weekend/Monday logic
-        if (occurredSlots.length > 0) {
-            // If any draws have occurred today, use them
-            highlightA = getDrawsIfOccurred(currentWk, todayName, occurredSlots);
-            // For meeting numbers, look at last week's same day and same slots
-            highlightB = getDrawsIfOccurred(lastWk, todayName, occurredSlots);
-        } else {
-            // No draws yet today - use Saturday's NON/EVE as leaving
-            highlightA = getDrawsIfOccurred(lastWk, "Saturday", ["NON", "EVE"]);
-            // And Monday's MOR/MID as what they're meeting
-            highlightB = getDrawsIfOccurred(currentWk, "Monday", ["MOR", "MID"]);
-        }
+        highlightA = getDraws(lastWk, "Saturday", ["NON", "EVE"]);
+        highlightB = getDraws(currentWk, "Monday", ["MOR", "MID"]);
     } else {
-        // Tuesday-Saturday logic
         const yesterdayName = dayNames[todayIndex - 1];
-        
-        if (occurredSlots.length > 0) {
-            // If draws have occurred today, use the most recent completed slot as leaving
-            const lastCompletedSlot = occurredSlots[occurredSlots.length - 1];
-            highlightA = getDrawsIfOccurred(currentWk, todayName, [lastCompletedSlot]);
-            
-            // For meeting numbers, look at last week's same day and same time slot
-            highlightB = getDrawsIfOccurred(lastWk, todayName, [lastCompletedSlot]);
-        } else {
-            // No draws yet today - use yesterday's NON/EVE as leaving
-            highlightA = getDrawsIfOccurred(currentWk, yesterdayName, ["NON", "EVE"]);
-            // And today's MOR/MID as what they're meeting
-            highlightB = getDrawsIfOccurred(lastWk, todayName, ["MOR", "MID"]);
-        }
+        highlightA = getDraws(currentWk, yesterdayName, ["NON", "EVE"]);
+        highlightB = getDraws(lastWk, todayName, ["MOR", "MID"]);
     }
     
     const activeHighlights = highlightA.concat(highlightB);
     
-    // 6. Active colors mapping from Scriptable
+    // 4. Active colors mapping from Scriptable
     const activeColors = {
         "1":"#ff6b6b", "01":"#ff6b6b", "2":"#ffa94d", "02":"#ffa94d", "3":"#ffd43b", "03":"#ffd43b",
         "4":"#69db7c", "04":"#69db7c", "5":"#38d9a9", "05":"#38d9a9", "6":"#4dabf7", "06":"#4dabf7",
@@ -3742,7 +3692,7 @@
         "34":"#69db7c", "35":"#4dabf7", "36":"#9775fa"
     };
     
-    // 7. Table UI Setup
+    // 5. Table UI Setup
     const weekLimit = parseInt(document.getElementById("modalWeekCount").value);
     const historyWeeks = weeks.slice(-weekLimit);
     const slots = ["MOR", "MID", "NON", "EVE"];
@@ -3752,7 +3702,7 @@
     const endStr = historyWeeks[historyWeeks.length - 1].startDate;
     document.getElementById("modalDateRange").innerText = "PERIOD: " + startStr + " TO " + endStr;
     
-    // 8. Generate HTML Table
+    // 6. Generate HTML Table
     let html = "<table class='export-table'><thead><tr><th>WEEK</th>";
     displayDayNames.forEach(d => {
         html += "<th colspan='4' style='border-left:2px solid #ccc;'>" + d.slice(0,3).toUpperCase() + "</th>";
@@ -3782,16 +3732,17 @@
                     
                     if (hasValue) {
                         const valStr = val.toString();
-                        // Default deep blue for standard numbers
+                        // Default deep blue for standard numbers (exactly like Scriptable)
                         let bgColor = "#0c3359";
                         let textColor = "white";
                         
-                        // Check against the Active Sliding Highlights
+                        // 1. Check against the Active Sliding Highlights
                         if (activeHighlights.includes(valStr)) {
+                            // LOOKUP in activeColors - if found, use that color
                             bgColor = activeColors[valStr] || "orange";
-                            textColor = "#000";
+                            textColor = "#000"; // Dark text for readability on bright colors
                         }
-                        // Special Spirit 12 case
+                        // 2. Special Spirit 12 case (exactly like Scriptable)
                         else if (valStr === "12") {
                             bgColor = "#fcc419";
                             textColor = "#000";
@@ -3799,13 +3750,7 @@
                         
                         html += "<div style='width:22px; height:22px; line-height:22px; border-radius:50%; background:" + bgColor + "; color:" + textColor + "; font-weight:bold; font-size:11px; margin:auto;'>" + valStr + "</div>";
                     } else if (isCurrent) {
-                        // For current week, show placeholder based on time of day
-                        const timePassed = currentTimeInMinutes > drawTimes[slot];
-                        if (timePassed) {
-                            html += "<span style='color:#999; font-size:10px;'>⏳</span>";
-                        } else {
-                            html += "<span style='color:#999;'>—</span>";
-                        }
+                        html += "<span style='color:#999;'>—</span>";
                     }
                     
                     html += "</td>";
