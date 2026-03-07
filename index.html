@@ -5705,7 +5705,7 @@
           return sorted.join('');
       }
 
-      // ========== PICK 2 DRAW CHART RENDERING ==========
+      // ========== ENHANCED PICK 2 DRAW CHART RENDERING WITH HIGHLIGHTING ==========
       function renderPick2DrawChart() {
           const container = document.getElementById("pick2-calendar-content");
           const title = document.getElementById("pick2-current-week-title");
@@ -5718,56 +5718,34 @@
           
           let dayName = pick2CurrentDayOfWeek;
           
-          // Get the current week data to find the most recent draw for highlighting
+          // Get the current week data
           const currentWeek = pick2WeeksData[pick2CurrentWeekIndex];
-          const lastWeek = pick2WeeksData[pick2CurrentWeekIndex + 1];
           
-          // Find the most recent draw in current week to highlight matching combinations
+          // Collect ALL combinations from the CURRENT WEEK to use as highlights
           const activeCombinations = new Set();
           
           if (currentWeek && currentWeek.days) {
-              // Look for the most recent draw with actual numbers
+              // Go through all days and times in current week to collect draws
               const dayOrder = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-              const timeOrder = ["EVE","NON","MID","MOR"]; // Check in reverse order
+              const timeOrder = ["MOR","MID","NON","EVE"];
               
-              // First, try to find the most recent draw in current week
-              for (let d = dayOrder.length - 1; d >= 0; d--) {
-                  const day = currentWeek.days.find(dy => dy.dayName === dayOrder[d]);
+              dayOrder.forEach(dayName => {
+                  const day = currentWeek.days.find(d => d.dayName === dayName);
                   if (day) {
-                      for (let t of timeOrder) {
-                          const drawValue = day.draws[t];
+                      timeOrder.forEach(timeSlot => {
+                          const drawValue = day.draws[timeSlot];
                           if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
                               const comboKey = getPick2CombinationKey(drawValue);
                               if (comboKey) {
                                   activeCombinations.add(comboKey);
                               }
-                              break;
                           }
-                      }
+                      });
                   }
-                  if (activeCombinations.size > 0) break;
-              }
-              
-              // If no draw in current week, check last week
-              if (activeCombinations.size === 0 && lastWeek && lastWeek.days) {
-                  for (let d = dayOrder.length - 1; d >= 0; d--) {
-                      const day = lastWeek.days.find(dy => dy.dayName === dayOrder[d]);
-                      if (day) {
-                          for (let t of timeOrder) {
-                              const drawValue = day.draws[t];
-                              if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
-                                  const comboKey = getPick2CombinationKey(drawValue);
-                                  if (comboKey) {
-                                      activeCombinations.add(comboKey);
-                                  }
-                                  break;
-                              }
-                          }
-                      }
-                      if (activeCombinations.size > 0) break;
-                  }
-              }
+              });
           }
+          
+          console.log(`Pick 2: Found ${activeCombinations.size} combinations in current week to highlight`);
           
           // Find weeks that have this day
           const daysToShow = [];
@@ -5815,18 +5793,23 @@
                       padding: 2px 6px;
                       border-radius: 12px;
                       box-shadow: 0 0 10px #ffd700;
-                      animation: pulse-gold 1.5s infinite;
+                      animation: pulse-gold 2s infinite;
+                      display: inline-block;
                   }
                   @keyframes pulse-gold {
                       0% { box-shadow: 0 0 5px #ffd700; }
                       50% { box-shadow: 0 0 15px #ffaa00; }
                       100% { box-shadow: 0 0 5px #ffd700; }
                   }
-                  .combination-match {
-                      background: rgba(255, 215, 0, 0.2);
-                      border-radius: 4px;
+                  .current-week-draw {
+                      font-weight: bold;
+                      font-size: 14px;
+                      color: #00ccff !important;
+                      border-bottom: 2px solid #00ccff;
+                      padding-bottom: 2px;
                   }
               </style>
+              
               <table class="calendar-table-widget">
                   <thead>
                       <tr>
@@ -5860,7 +5843,7 @@
               } else {
                   ["MOR","MID","NON","EVE"].forEach(timeSlot => {
                       const drawValue = draws[timeSlot];
-                      html += "<td>";
+                      html += "<td style='position: relative;'>";
                       
                       if (!drawValue || drawValue === "-" || drawValue === "PENDING") {
                           if (isCurrentWeek) {
@@ -5884,7 +5867,7 @@
                               html += '<span style="color:#666; font-size:11px;">–</span>';
                           }
                       } else {
-                          // Pick 2 format: show as #,# and check for combinations
+                          // Pick 2 format: show as #,# and check if it matches ANY current week combination
                           const drawKey = getPick2CombinationKey(drawValue);
                           const isHighlighted = activeCombinations.has(drawKey);
                           
@@ -5897,12 +5880,15 @@
                               displayStr = nums.join(',');
                           }
                           
-                          const highlightClass = isHighlighted ? 'highlighted-combination' : '';
-                          html += `<span class="${highlightClass}" style="font-weight:bold; font-size:14px; color:#fff;">${displayStr}</span>`;
-                          
-                          // Add a small indicator for combination matches
-                          if (isHighlighted) {
-                              html += `<span style="display:block; font-size:8px; color:#ffd700;">↻ match</span>`;
+                          if (isCurrentWeek) {
+                              // Current week draws - show with blue highlight
+                              html += `<span class="current-week-draw">${displayStr}</span>`;
+                          } else if (isHighlighted) {
+                              // Previous weeks that match current week - gold highlight
+                              html += `<span class="highlighted-combination">${displayStr}</span>`;
+                          } else {
+                              // Regular previous week draws
+                              html += `<span style="font-weight:bold; font-size:14px; color:#fff;">${displayStr}</span>`;
                           }
                       }
                       
@@ -5914,6 +5900,14 @@
           });
           
           html += `</tbody></table>`;
+          
+          // Add footer with active combinations count
+          if (activeCombinations.size > 0) {
+              html += `<div style="text-align:center; margin-top:10px; padding:5px; background:rgba(255,215,0,0.1); border-radius:8px; font-size:11px; color:#ffd700;">
+                  🔍 ${activeCombinations.size} active combination${activeCombinations.size > 1 ? 's' : ''} from current week highlighted in previous weeks
+              </div>`;
+          }
+          
           container.innerHTML = html;
           
           // Update title
@@ -5921,8 +5915,8 @@
           const weekLabel = weekDiff === 0 ? "THIS WEEK" : weekDiff === 1 ? "LAST WEEK" : `${weekDiff} WEEKS AGO`;
           title.textContent = `${weekLabel} (${dayName}) • ${daysToShow.length} WKS`;
       }
-
-      // ========== PICK 4 DRAW CHART RENDERING ==========
+      
+      // ========== ENHANCED PICK 4 DRAW CHART RENDERING WITH HIGHLIGHTING ==========
       function renderPick4DrawChart() {
           const container = document.getElementById("pick4-calendar-content");
           const title = document.getElementById("pick4-current-week-title");
@@ -5935,56 +5929,34 @@
           
           let dayName = pick4CurrentDayOfWeek;
           
-          // Get the current week data to find the most recent draw for highlighting
+          // Get the current week data
           const currentWeek = pick4WeeksData[pick4CurrentWeekIndex];
-          const lastWeek = pick4WeeksData[pick4CurrentWeekIndex + 1];
           
-          // Find the most recent draw in current week to highlight matching combinations
+          // Collect ALL combinations from the CURRENT WEEK to use as highlights
           const activeCombinations = new Set();
           
           if (currentWeek && currentWeek.days) {
-              // Look for the most recent draw with actual numbers
+              // Go through all days and times in current week to collect draws
               const dayOrder = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-              const timeOrder = ["EVE","NON","MID","MOR"]; // Check in reverse order
+              const timeOrder = ["MOR","MID","NON","EVE"];
               
-              // First, try to find the most recent draw in current week
-              for (let d = dayOrder.length - 1; d >= 0; d--) {
-                  const day = currentWeek.days.find(dy => dy.dayName === dayOrder[d]);
+              dayOrder.forEach(dayName => {
+                  const day = currentWeek.days.find(d => d.dayName === dayName);
                   if (day) {
-                      for (let t of timeOrder) {
-                          const drawValue = day.draws[t];
+                      timeOrder.forEach(timeSlot => {
+                          const drawValue = day.draws[timeSlot];
                           if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
                               const comboKey = getPick4CombinationKey(drawValue);
                               if (comboKey) {
                                   activeCombinations.add(comboKey);
                               }
-                              break;
                           }
-                      }
+                      });
                   }
-                  if (activeCombinations.size > 0) break;
-              }
-              
-              // If no draw in current week, check last week
-              if (activeCombinations.size === 0 && lastWeek && lastWeek.days) {
-                  for (let d = dayOrder.length - 1; d >= 0; d--) {
-                      const day = lastWeek.days.find(dy => dy.dayName === dayOrder[d]);
-                      if (day) {
-                          for (let t of timeOrder) {
-                              const drawValue = day.draws[t];
-                              if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
-                                  const comboKey = getPick4CombinationKey(drawValue);
-                                  if (comboKey) {
-                                      activeCombinations.add(comboKey);
-                                  }
-                                  break;
-                              }
-                          }
-                      }
-                      if (activeCombinations.size > 0) break;
-                  }
-              }
+              });
           }
+          
+          console.log(`Pick 4: Found ${activeCombinations.size} combinations in current week to highlight`);
           
           // Find weeks that have this day
           const daysToShow = [];
@@ -6032,30 +6004,27 @@
                       padding: 2px 6px;
                       border-radius: 12px;
                       box-shadow: 0 0 10px #ffd700;
-                      animation: pulse-gold 1.5s infinite;
+                      animation: pulse-gold 2s infinite;
+                      display: inline-block;
+                      font-family: monospace;
+                      letter-spacing: 1px;
                   }
                   @keyframes pulse-gold {
                       0% { box-shadow: 0 0 5px #ffd700; }
                       50% { box-shadow: 0 0 15px #ffaa00; }
                       100% { box-shadow: 0 0 5px #ffd700; }
                   }
-                  .combination-match {
-                      background: rgba(255, 215, 0, 0.2);
-                      border-radius: 4px;
-                  }
-                  .pick4-digits {
-                      display: inline-flex;
-                      gap: 2px;
-                  }
-                  .pick4-digit {
-                      display: inline-block;
-                      width: 20px;
-                      height: 20px;
-                      line-height: 20px;
-                      text-align: center;
+                  .current-week-draw {
                       font-weight: bold;
+                      font-size: 14px;
+                      color: #00ccff !important;
+                      border-bottom: 2px solid #00ccff;
+                      padding-bottom: 2px;
+                      font-family: monospace;
+                      letter-spacing: 1px;
                   }
               </style>
+              
               <table class="calendar-table-widget">
                   <thead>
                       <tr>
@@ -6089,7 +6058,7 @@
               } else {
                   ["MOR","MID","NON","EVE"].forEach(timeSlot => {
                       const drawValue = draws[timeSlot];
-                      html += "<td>";
+                      html += "<td style='position: relative;'>";
                       
                       if (!drawValue || drawValue === "-" || drawValue === "PENDING") {
                           if (isCurrentWeek) {
@@ -6113,11 +6082,11 @@
                               html += '<span style="color:#666; font-size:11px;">–</span>';
                           }
                       } else {
-                          // Pick 4 format: show as #### and check for combinations
+                          // Pick 4 format: show as ####
                           const drawKey = getPick4CombinationKey(drawValue);
                           const isHighlighted = activeCombinations.has(drawKey);
                           
-                          // Format the display string (ensure 4 digits)
+                          // Format as 4-digit string
                           let displayStr;
                           if (typeof drawValue === 'number') {
                               displayStr = drawValue.toString().padStart(4, '0');
@@ -6125,18 +6094,15 @@
                               displayStr = drawValue.toString().replace(/[^0-9]/g, '').padStart(4, '0');
                           }
                           
-                          const highlightClass = isHighlighted ? 'highlighted-combination' : '';
-                          
-                          // Show as individual digits for better visibility
-                          html += `<span class="${highlightClass}" style="display:inline-flex; gap:2px; font-weight:bold; font-size:16px;">`;
-                          for (let i = 0; i < displayStr.length; i++) {
-                              html += `<span>${displayStr[i]}</span>`;
-                          }
-                          html += `</span>`;
-                          
-                          // Add a small indicator for combination matches
-                          if (isHighlighted) {
-                              html += `<span style="display:block; font-size:8px; color:#ffd700;">🔄 perm match</span>`;
+                          if (isCurrentWeek) {
+                              // Current week draws - show with blue highlight
+                              html += `<span class="current-week-draw">${displayStr}</span>`;
+                          } else if (isHighlighted) {
+                              // Previous weeks that match current week - gold highlight
+                              html += `<span class="highlighted-combination">${displayStr}</span>`;
+                          } else {
+                              // Regular previous week draws
+                              html += `<span style="font-weight:bold; font-size:14px; color:#fff; font-family:monospace;">${displayStr}</span>`;
                           }
                       }
                       
@@ -6148,6 +6114,14 @@
           });
           
           html += `</tbody></table>`;
+          
+          // Add footer with active combinations count
+          if (activeCombinations.size > 0) {
+              html += `<div style="text-align:center; margin-top:10px; padding:5px; background:rgba(255,215,0,0.1); border-radius:8px; font-size:11px; color:#ffd700;">
+                  🔍 ${activeCombinations.size} active permutation${activeCombinations.size > 1 ? 's' : ''} from current week highlighted in previous weeks
+              </div>`;
+          }
+          
           container.innerHTML = html;
           
           // Update title
