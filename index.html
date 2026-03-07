@@ -5705,6 +5705,322 @@
           return sorted.join('');
       }
 
+      function analyzePick2Combinations(weeksData) {
+        const comboStats = new Map();
+        const reversalPairs = new Map();
+        
+        // Analyze all weeks data
+        weeksData.forEach(week => {
+            if (week && week.days) {
+                week.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(drawValue => {
+                        if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
+                            const comboKey = getPick2CombinationKey(drawValue);
+                            const original = drawValue.toString();
+                            
+                            // Parse the actual numbers
+                            const nums = original.split(/[,\/-]/).map(n => parseInt(n.trim(), 10));
+                            if (nums.length >= 2) {
+                                const sorted = [...nums].sort((a,b) => a-b);
+                                const reversed = `${nums[1]},${nums[0]}`;
+                                
+                                if (!comboStats.has(comboKey)) {
+                                    comboStats.set(comboKey, {
+                                        key: comboKey,
+                                        combinations: new Set(),
+                                        count: 0,
+                                        firstSeen: null,
+                                        lastSeen: null,
+                                        reversalCount: 0,
+                                        directCount: 0
+                                    });
+                                }
+                                
+                                const stats = comboStats.get(comboKey);
+                                stats.combinations.add(original);
+                                stats.count++;
+                                
+                                // Track if this is the direct order or reversal
+                                if (original === `${nums[0]},${nums[1]}`) {
+                                    stats.directCount++;
+                                } else {
+                                    stats.reversalCount++;
+                                }
+                                
+                                // Track reversal pairs
+                                const pairKey = `${sorted[0]}-${sorted[1]}`;
+                                if (!reversalPairs.has(pairKey)) {
+                                    reversalPairs.set(pairKey, {
+                                        pair: `${sorted[0]},${sorted[1]}`,
+                                        direct: `${sorted[0]},${sorted[1]}`,
+                                        reverse: `${sorted[1]},${sorted[0]}`,
+                                        directCount: 0,
+                                        reverseCount: 0,
+                                        total: 0
+                                    });
+                                }
+                                
+                                const pair = reversalPairs.get(pairKey);
+                                if (original === `${sorted[0]},${sorted[1]}`) {
+                                    pair.directCount++;
+                                } else {
+                                    pair.reverseCount++;
+                                }
+                                pair.total++;
+                            }
+                        }
+                    });
+                });
+            }
+        });
+        
+        // Convert to array and sort by count
+        const combinations = Array.from(comboStats.values()).map(stat => ({
+            combination: Array.from(stat.combinations).join(' / '),
+            key: stat.key,
+            count: stat.count,
+            directCount: stat.directCount,
+            reversalCount: stat.reversalCount,
+            reversalRatio: stat.directCount > 0 ? (stat.reversalCount / stat.directCount).toFixed(2) : 'N/A'
+        })).sort((a, b) => b.count - a.count);
+        
+        const reversals = Array.from(reversalPairs.values())
+            .filter(p => p.directCount > 0 && p.reverseCount > 0)
+            .sort((a, b) => (b.directCount + b.reverseCount) - (a.directCount + a.reverseCount));
+        
+        return { combinations, reversals };
+    }
+
+    function analyzePick4Combinations(weeksData) {
+        const comboStats = new Map();
+        const permGroups = new Map();
+        
+        weeksData.forEach(week => {
+            if (week && week.days) {
+                week.days.forEach(day => {
+                    Object.values(day.draws || {}).forEach(drawValue => {
+                        if (drawValue && drawValue !== "-" && drawValue !== "PENDING") {
+                            const comboKey = getPick4CombinationKey(drawValue);
+                            const original = drawValue.toString().replace(/[^0-9]/g, '').padStart(4, '0');
+                            
+                            if (!comboStats.has(comboKey)) {
+                                comboStats.set(comboKey, {
+                                    key: comboKey,
+                                    permutations: new Set(),
+                                    count: 0,
+                                    digits: comboKey.split('').join('')
+                                });
+                            }
+                            
+                            const stats = comboStats.get(comboKey);
+                            stats.permutations.add(original);
+                            stats.count++;
+                            
+                            // Group by permutation family
+                            if (!permGroups.has(comboKey)) {
+                                permGroups.set(comboKey, {
+                                    key: comboKey,
+                                    digits: comboKey,
+                                    permutations: [],
+                                    total: 0,
+                                    examples: []
+                                });
+                            }
+                            
+                            const group = permGroups.get(comboKey);
+                            if (!group.permutations.includes(original)) {
+                                group.permutations.push(original);
+                                if (group.examples.length < 3) {
+                                    group.examples.push(original);
+                                }
+                            }
+                            group.total++;
+                        }
+                    });
+                });
+            }
+        });
+        
+        const combinations = Array.from(comboStats.values()).map(stat => ({
+            digitSet: stat.digits,
+            permutations: stat.permutations.size,
+            count: stat.count,
+            examples: Array.from(stat.permutations).slice(0, 3).join(', ')
+        })).sort((a, b) => b.count - a.count);
+        
+        const families = Array.from(permGroups.values())
+            .filter(g => g.permutations.length > 1)
+            .sort((a, b) => b.total - a.total);
+        
+        return { combinations, families };
+    }
+
+    // Add this to your render functions, after building the table
+    function addCombinationAnalytics(container, gameType, weeksData) {
+        const analyticsDiv = document.createElement('div');
+        analyticsDiv.className = 'combination-analytics';
+        analyticsDiv.style.marginTop = '15px';
+        analyticsDiv.style.borderTop = '1px solid #334155';
+        analyticsDiv.style.paddingTop = '10px';
+        
+        // Toggle button
+        analyticsDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleAnalytics(this)">
+                <span style="color: #58a6ff; font-weight: bold; font-size: 12px;">
+                    📊 COMBINATION INSIGHTS ▾
+                </span>
+                <span style="color: #888; font-size: 11px;">
+                    Click to expand
+                </span>
+            </div>
+            <div class="analytics-content" style="display: none; margin-top: 10px;">
+                ${generateAnalyticsContent(gameType, weeksData)}
+            </div>
+        `;
+        
+        container.appendChild(analyticsDiv);
+    }
+
+    function generateAnalyticsContent(gameType, weeksData) {
+        if (gameType === 'pick2') {
+            const { combinations, reversals } = analyzePick2Combinations(weeksData);
+            
+            return `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <!-- Most Played Combinations -->
+                    <div style="background: #0f172a; border-radius: 8px; padding: 10px; border: 1px solid #334155;">
+                        <div style="color: #58a6ff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+                            🔥 HOT COMBINATIONS
+                        </div>
+                        ${combinations.slice(0, 5).map(c => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="background: #ffd700; color: #000; padding: 2px 6px; border-radius: 12px; font-weight: bold;">${c.key}</span>
+                                    <span style="color: #888;">(${c.combination})</span>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <span style="color: #32d74b;">${c.count}x</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${combinations.length > 5 ? `
+                            <div style="text-align: center; margin-top: 6px; color: #666; font-size: 10px;">
+                                +${combinations.length - 5} more combinations
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Reversal Analysis -->
+                    <div style="background: #0f172a; border-radius: 8px; padding: 10px; border: 1px solid #334155;">
+                        <div style="color: #ff9f0a; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+                            🔄 REVERSAL PLAYS
+                        </div>
+                        ${reversals.slice(0, 5).map(r => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                <div>
+                                    <span style="font-weight: bold;">${r.direct}</span>
+                                    <span style="color: #888;"> ⇄ </span>
+                                    <span style="font-weight: bold;">${r.reverse}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="color: #32d74b;">${r.directCount}</span>
+                                    <span style="color: #ff9f0a;">${r.reverseCount}</span>
+                                    <span style="color: #888;">|</span>
+                                    <span style="color: #58a6ff;">${r.total}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div style="margin-top: 6px; display: flex; justify-content: space-around; font-size: 10px; color: #888; border-top: 1px solid #334155; padding-top: 6px;">
+                            <span>⬅️ Direct</span>
+                            <span>➡️ Reverse</span>
+                            <span>📊 Total</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats Bar -->
+                <div style="display: flex; gap: 15px; margin-top: 10px; padding: 8px; background: #0f172a; border-radius: 8px; border: 1px solid #334155; justify-content: space-around; font-size: 11px;">
+                    <div><span style="color: #888;">Total Combinations:</span> <span style="color: #58a6ff; font-weight: bold;">${combinations.length}</span></div>
+                    <div><span style="color: #888;">Active Reversals:</span> <span style="color: #ff9f0a; font-weight: bold;">${reversals.length}</span></div>
+                    <div><span style="color: #888;">Most Played:</span> <span style="color: #32d74b; font-weight: bold;">${combinations[0]?.key || 'N/A'}</span></div>
+                </div>
+            `;
+        } else {
+            const { combinations, families } = analyzePick4Combinations(weeksData);
+            
+            return `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <!-- Digit Families -->
+                    <div style="background: #0f172a; border-radius: 8px; padding: 10px; border: 1px solid #334155;">
+                        <div style="color: #58a6ff; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+                            🎲 DIGIT FAMILIES (Most Played)
+                        </div>
+                        ${combinations.slice(0, 5).map(c => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div>
+                                        <span style="background: #ffd700; color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; letter-spacing: 1px;">${c.digitSet}</span>
+                                    </div>
+                                    <div style="font-size: 9px; color: #888;">
+                                        ${c.examples}
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: #32d74b; font-weight: bold; font-size: 12px;">${c.count}x</div>
+                                    <div style="color: #888; font-size: 9px;">${c.permutations} perm</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Permutation Groups -->
+                    <div style="background: #0f172a; border-radius: 8px; padding: 10px; border: 1px solid #334155;">
+                        <div style="color: #ff9f0a; font-size: 11px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+                🔄 ACTIVE PERMUTATION GROUPS
+                        </div>
+                        ${families.slice(0, 4).map(f => `
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: bold; color: #ffd700; font-size: 12px;">${f.digits}</span>
+                                    <span style="color: #58a6ff; font-size: 11px;">${f.total}x total</span>
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px;">
+                                    ${f.permutations.slice(0, 4).map(p => `
+                                        <span style="background: #1e293b; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: monospace;">${p}</span>
+                                    `).join('')}
+                                    ${f.permutations.length > 4 ? `
+                                        <span style="color: #888; font-size: 9px;">+${f.permutations.length-4}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Quick Stats Bar -->
+                <div style="display: flex; gap: 15px; margin-top: 10px; padding: 8px; background: #0f172a; border-radius: 8px; border: 1px solid #334155; justify-content: space-around; font-size: 11px;">
+                    <div><span style="color: #888;">Unique Families:</span> <span style="color: #58a6ff; font-weight: bold;">${combinations.length}</span></div>
+                    <div><span style="color: #888;">Active Perm Groups:</span> <span style="color: #ff9f0a; font-weight: bold;">${families.length}</span></div>
+                    <div><span style="color: #888;">Most Played Set:</span> <span style="color: #32d74b; font-weight: bold;">${combinations[0]?.digitSet || 'N/A'}</span></div>
+                </div>
+            `;
+        }
+    }
+
+    // Toggle function for expand/collapse
+    window.toggleAnalytics = function(header) {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('span:first-child');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            arrow.innerHTML = arrow.innerHTML.replace('▾', '▴');
+        } else {
+            content.style.display = 'none';
+            arrow.innerHTML = arrow.innerHTML.replace('▴', '▾');
+        }
+    };
+
       // ========== ENHANCED PICK 2 DRAW CHART RENDERING WITH HIGHLIGHTING ==========
       function renderPick2DrawChart() {
           const container = document.getElementById("pick2-calendar-content");
@@ -5909,13 +6225,18 @@
           }
           
           container.innerHTML = html;
+
+          const analyticsContainer = document.createElement('div');
+          analyticsContainer.id = 'pick2-analytics';
+          container.parentNode.appendChild(analyticsContainer);
+          addCombinationAnalytics(analyticsContainer, 'pick2', pick2WeeksData);
           
           // Update title
           const weekDiff = pick2CurrentWeekIndex;
           const weekLabel = weekDiff === 0 ? "THIS WEEK" : weekDiff === 1 ? "LAST WEEK" : `${weekDiff} WEEKS AGO`;
           title.textContent = `${weekLabel} (${dayName}) • ${daysToShow.length} WKS`;
       }
-      
+
       // ========== ENHANCED PICK 4 DRAW CHART RENDERING WITH HIGHLIGHTING ==========
       function renderPick4DrawChart() {
           const container = document.getElementById("pick4-calendar-content");
@@ -6123,6 +6444,11 @@
           }
           
           container.innerHTML = html;
+
+          const analyticsContainer = document.createElement('div');
+          analyticsContainer.id = 'pick4-analytics';
+          container.parentNode.appendChild(analyticsContainer);
+          addCombinationAnalytics(analyticsContainer, 'pick4', pick4WeeksData);
           
           // Update title
           const weekDiff = pick4CurrentWeekIndex;
