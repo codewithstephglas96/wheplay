@@ -6226,8 +6226,16 @@
           
           container.innerHTML = html;
 
+          // Remove existing analytics container if it exists
+          const existingAnalytics = document.getElementById('pick2-analytics');
+          if (existingAnalytics) {
+              existingAnalytics.remove();
+          }
+
+          // Create new analytics container
           const analyticsContainer = document.createElement('div');
           analyticsContainer.id = 'pick2-analytics';
+          analyticsContainer.style.marginTop = '10px';
           container.parentNode.appendChild(analyticsContainer);
           addCombinationAnalytics(analyticsContainer, 'pick2', pick2WeeksData);
           
@@ -6445,8 +6453,16 @@
           
           container.innerHTML = html;
 
+          // Remove existing analytics container if it exists
+          const existingAnalytics = document.getElementById('pick4-analytics');
+          if (existingAnalytics) {
+              existingAnalytics.remove();
+          }
+
+          // Create new analytics container
           const analyticsContainer = document.createElement('div');
           analyticsContainer.id = 'pick4-analytics';
+          analyticsContainer.style.marginTop = '10px';
           container.parentNode.appendChild(analyticsContainer);
           addCombinationAnalytics(analyticsContainer, 'pick4', pick4WeeksData);
           
