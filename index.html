@@ -5417,6 +5417,19 @@
         html += `</tbody></table>`;
         container.innerHTML = html;
 
+        // Remove existing analytics if any
+        const existingAnalytics = document.getElementById('playwhe-analytics');
+        if (existingAnalytics) {
+            existingAnalytics.remove();
+        }
+
+        // Add new analytics
+        const analyticsContainer = document.createElement('div');
+        analyticsContainer.id = 'playwhe-analytics';
+        analyticsContainer.style.marginTop = '15px';
+        container.parentNode.appendChild(analyticsContainer);
+        addPlayWheAnalytics(analyticsContainer, calendarWeeks, currentWeekIndex);
+
         // Update title
         const weekDiff = currentWeekIndex; // Weeks from most recent
         const weekLabel =
@@ -6009,6 +6022,383 @@
 
     // Toggle function for expand/collapse
     window.toggleAnalytics = function(header) {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('span:first-child');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            arrow.innerHTML = arrow.innerHTML.replace('▾', '▴');
+        } else {
+            content.style.display = 'none';
+            arrow.innerHTML = arrow.innerHTML.replace('▴', '▾');
+        }
+    };
+
+    // ========== PLAY WHE DEEP ANALYTICS FUNCTIONS ==========
+
+    function analyzePlayWheTrends(weeksData, currentWeekIndex) {
+        const currentWeek = weeksData[currentWeekIndex];
+        const lastWeek = weeksData[currentWeekIndex + 1];
+        
+        // Get current week and last week played numbers
+        const currentPlayed = new Set();
+        const lastWeekPlayed = new Set();
+        const currentDraws = []; // Store actual draws with times
+        
+        if (currentWeek && currentWeek.days) {
+            currentWeek.days.forEach(day => {
+                Object.entries(day.draws || {}).forEach(([time, val]) => {
+                    if (val && val !== "-" && val !== "PENDING") {
+                        const num = parseInt(val);
+                        currentPlayed.add(num);
+                        currentDraws.push({
+                            number: num,
+                            day: day.dayName,
+                            time: time,
+                            spirit: spirits[num]
+                        });
+                    }
+                });
+            });
+        }
+        
+        if (lastWeek && lastWeek.days) {
+            lastWeek.days.forEach(day => {
+                Object.values(day.draws || {}).forEach(val => {
+                    if (val && val !== "-" && val !== "PENDING") {
+                        lastWeekPlayed.add(parseInt(val));
+                    }
+                });
+            });
+        }
+        
+        // Analyze line completion
+        const lineCompletion = [];
+        for (let line = 1; line <= 9; line++) {
+            const lineNums = lineNumbers[line];
+            const playedInLine = lineNums.filter(n => currentPlayed.has(n));
+            const lastWeekInLine = lineNums.filter(n => lastWeekPlayed.has(n));
+            const missing = lineNums.filter(n => !currentPlayed.has(n));
+            
+            // Find coldest missing number
+            let coldestMissing = null;
+            let coldestDays = 0;
+            if (missing.length > 0) {
+                missing.forEach(num => {
+                    const info = markInfo[num] || { lastDate: null };
+                    const daysAgo = info.lastDate
+                        ? Math.floor((Date.now() - info.lastDate.getTime()) / 86400000)
+                        : 999;
+                    if (daysAgo > coldestDays) {
+                        coldestDays = daysAgo;
+                        coldestMissing = num;
+                    }
+                });
+            }
+            
+            lineCompletion.push({
+                line: line,
+                played: playedInLine,
+                playedCount: playedInLine.length,
+                lastWeekCount: lastWeekInLine.length,
+                missing: missing,
+                missingCount: missing.length,
+                coldestMissing: coldestMissing,
+                coldestDays: coldestDays,
+                trend: playedInLine.length - lastWeekInLine.length,
+                complete: missing.length === 0
+            });
+        }
+        
+        // Analyze suite completion
+        const suiteCompletion = [];
+        for (let suite = 0; suite <= 9; suite++) {
+            const suiteNums = suites[suite] || [];
+            const playedInSuite = suiteNums.filter(n => currentPlayed.has(n));
+            const lastWeekInSuite = suiteNums.filter(n => lastWeekPlayed.has(n));
+            const missing = suiteNums.filter(n => !currentPlayed.has(n));
+            
+            // Find coldest missing number
+            let coldestMissing = null;
+            let coldestDays = 0;
+            if (missing.length > 0) {
+                missing.forEach(num => {
+                    const info = markInfo[num] || { lastDate: null };
+                    const daysAgo = info.lastDate
+                        ? Math.floor((Date.now() - info.lastDate.getTime()) / 86400000)
+                        : 999;
+                    if (daysAgo > coldestDays) {
+                        coldestDays = daysAgo;
+                        coldestMissing = num;
+                    }
+                });
+            }
+            
+            suiteCompletion.push({
+                suite: suite,
+                played: playedInSuite,
+                playedCount: playedInSuite.length,
+                lastWeekCount: lastWeekInSuite.length,
+                missing: missing,
+                missingCount: missing.length,
+                coldestMissing: coldestMissing,
+                coldestDays: coldestDays,
+                trend: playedInSuite.length - lastWeekInSuite.length,
+                complete: missing.length === 0
+            });
+        }
+        
+        // Analyze number relationships (what numbers tend to appear together in same day)
+        const relationships = {};
+        if (currentWeek && currentWeek.days) {
+            currentWeek.days.forEach(day => {
+                const dayNumbers = Object.values(day.draws || {})
+                    .filter(v => v && v !== "-" && v !== "PENDING")
+                    .map(v => parseInt(v));
+                
+                // For each number, track what else played on same day
+                dayNumbers.forEach(num1 => {
+                    relationships[num1] = relationships[num1] || new Set();
+                    dayNumbers.forEach(num2 => {
+                        if (num1 !== num2) {
+                            relationships[num1].add(num2);
+                        }
+                    });
+                });
+            });
+        }
+        
+        return {
+            currentPlayed: Array.from(currentPlayed).sort((a,b) => a-b),
+            lastWeekPlayed: Array.from(lastWeekPlayed).sort((a,b) => a-b),
+            lineCompletion,
+            suiteCompletion,
+            relationships,
+            currentDraws
+        };
+    }
+
+    function addPlayWheAnalytics(container, weeksData, currentWeekIndex) {
+        const analyticsDiv = document.createElement('div');
+        analyticsDiv.className = 'playwhe-analytics';
+        analyticsDiv.style.marginTop = '15px';
+        analyticsDiv.style.borderTop = '1px solid #334155';
+        analyticsDiv.style.paddingTop = '10px';
+        
+        const analysis = analyzePlayWheTrends(weeksData, currentWeekIndex);
+        
+        // Toggle button
+        analyticsDiv.innerHTML = `
+            <style>
+                .playwhe-analytics-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+                .playwhe-analytics-card {
+                    background: #0f172a;
+                    border-radius: 8px;
+                    padding: 10px;
+                    border: 1px solid #334155;
+                }
+                .playwhe-analytics-title {
+                    color: #58a6ff;
+                    font-size: 11px;
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                    border-bottom: 1px solid #334155;
+                    padding-bottom: 4px;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                .completion-badge {
+                    padding: 2px 6px;
+                    border-radius: 12px;
+                    font-size: 9px;
+                    font-weight: bold;
+                }
+                .badge-complete {
+                    background: #32d74b;
+                    color: #000;
+                }
+                .badge-missing {
+                    background: #ff453a;
+                    color: #fff;
+                }
+                .badge-warning {
+                    background: #ff9f0a;
+                    color: #000;
+                }
+                .number-bubble {
+                    display: inline-block;
+                    width: 22px;
+                    height: 22px;
+                    line-height: 22px;
+                    text-align: center;
+                    border-radius: 50%;
+                    font-size: 11px;
+                    font-weight: bold;
+                    margin: 2px;
+                    color: #000;
+                }
+                .relationship-tag {
+                    display: inline-block;
+                    background: #1e293b;
+                    padding: 3px 8px;
+                    border-radius: 16px;
+                    margin: 2px;
+                    font-size: 10px;
+                    border: 1px solid #334155;
+                }
+                .trend-up { color: #ff4444; }
+                .trend-down { color: #69db7c; }
+                .trend-neutral { color: #888; }
+                @media (max-width: 768px) {
+                    .playwhe-analytics-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 10px;" onclick="togglePlayWheAnalytics(this)">
+                <span style="color: #58a6ff; font-weight: bold; font-size: 12px;">
+                    📊 PLAY WHE DEEP INSIGHTS ▾
+                </span>
+                <span style="color: #888; font-size: 11px;">
+                    Click to expand
+                </span>
+            </div>
+            <div class="playwhe-analytics-content" style="display: none;">
+                <!-- Quick Stats Bar -->
+                <div style="display: flex; gap: 15px; margin-bottom: 15px; padding: 8px; background: #0f172a; border-radius: 8px; border: 1px solid #334155; justify-content: space-around; font-size: 11px; flex-wrap: wrap;">
+                    <div><span style="color: #888;">Current Week:</span> <span style="color: #58a6ff; font-weight: bold;">${analysis.currentPlayed.length} numbers</span></div>
+                    <div><span style="color: #888;">Last Week:</span> <span style="color: #888; font-weight: bold;">${analysis.lastWeekPlayed.length} numbers</span></div>
+                    <div><span style="color: #888;">New This Week:</span> <span style="color: #32d74b; font-weight: bold;">${analysis.currentPlayed.filter(n => !analysis.lastWeekPlayed.includes(n)).length}</span></div>
+                    <div><span style="color: #888;">Repeats:</span> <span style="color: #ff9f0a; font-weight: bold;">${analysis.currentPlayed.filter(n => analysis.lastWeekPlayed.includes(n)).length}</span></div>
+                </div>
+                
+                <div class="playwhe-analytics-grid">
+                    <!-- LINE COMPLETION ANALYSIS -->
+                    <div class="playwhe-analytics-card">
+                        <div class="playwhe-analytics-title">
+                            <span>📏 LINE COMPLETION</span>
+                            <span style="color: #888;">Current vs Last Week</span>
+                        </div>
+                        ${analysis.lineCompletion.map(l => {
+                            const trendIcon = l.trend > 0 ? '↑' : l.trend < 0 ? '↓' : '→';
+                            const trendClass = l.trend > 0 ? 'trend-up' : l.trend < 0 ? 'trend-down' : 'trend-neutral';
+                            const badgeClass = l.complete ? 'badge-complete' : l.missingCount === 1 ? 'badge-warning' : 'badge-missing';
+                            const badgeText = l.complete ? 'COMPLETE' : `MISSING ${l.missingCount}`;
+                            
+                            return `
+                                <div style="margin-bottom: 10px; padding: 6px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                        <span style="font-weight: bold; color: #58a6ff;">LINE ${l.line}</span>
+                                        <span class="completion-badge ${badgeClass}">${badgeText}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px;">
+                                        ${lineNumbers[l.line].map(n => {
+                                            const isPlayed = l.played.includes(n);
+                                            const bgColor = isPlayed ? numberColors[String(n).padStart(2,'0')] : '#333';
+                                            return `<span class="number-bubble" style="background: ${bgColor}; opacity: ${isPlayed ? 1 : 0.3};">${n}</span>`;
+                                        }).join('')}
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                                        <span class="${trendClass}">${trendIcon} ${Math.abs(l.trend)} vs last week</span>
+                                        ${l.coldestMissing ? 
+                                            `<span style="color: #ff9f0a;">❄️ Coldest: ${l.coldestMissing} (${l.coldestDays}d)</span>` : 
+                                            '<span style="color: #32d74b;">✓ All played</span>'}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <!-- SUITE COMPLETION ANALYSIS -->
+                    <div class="playwhe-analytics-card">
+                        <div class="playwhe-analytics-title">
+                            <span>🎲 SUITE COMPLETION</span>
+                            <span style="color: #888;">Current vs Last Week</span>
+                        </div>
+                        ${analysis.suiteCompletion.map(s => {
+                            const trendIcon = s.trend > 0 ? '↑' : s.trend < 0 ? '↓' : '→';
+                            const trendClass = s.trend > 0 ? 'trend-up' : s.trend < 0 ? 'trend-down' : 'trend-neutral';
+                            const badgeClass = s.complete ? 'badge-complete' : s.missingCount === 1 ? 'badge-warning' : 'badge-missing';
+                            const badgeText = s.complete ? 'COMPLETE' : `MISSING ${s.missingCount}`;
+                            
+                            return `
+                                <div style="margin-bottom: 10px; padding: 6px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                        <span style="font-weight: bold; color: #ffd43b;">SUITE ${s.suite}</span>
+                                        <span class="completion-badge ${badgeClass}">${badgeText}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px;">
+                                        ${suites[s.suite] ? suites[s.suite].map(n => {
+                                            const isPlayed = s.played.includes(n);
+                                            const bgColor = isPlayed ? numberColors[String(n).padStart(2,'0')] : '#333';
+                                            return `<span class="number-bubble" style="background: ${bgColor}; opacity: ${isPlayed ? 1 : 0.3};">${n}</span>`;
+                                        }).join('') : ''}
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                                        <span class="${trendClass}">${trendIcon} ${Math.abs(s.trend)} vs last week</span>
+                                        ${s.coldestMissing ? 
+                                            `<span style="color: #ff9f0a;">❄️ Coldest: ${s.coldestMissing} (${s.coldestDays}d)</span>` : 
+                                            '<span style="color: #32d74b;">✓ All played</span>'}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <!-- NUMBER RELATIONSHIPS (What plays together) -->
+                    <div class="playwhe-analytics-card">
+                        <div class="playwhe-analytics-title">
+                            <span>🤝 NUMBER RELATIONSHIPS</span>
+                            <span style="color: #888;">Played together this week</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            ${Object.entries(analysis.relationships).length > 0 ? 
+                                Object.entries(analysis.relationships).map(([num, relations]) => `
+                                    <div class="relationship-tag" title="Plays with: ${Array.from(relations).join(', ')}">
+                                        <span class="number-bubble" style="background: ${numberColors[String(num).padStart(2,'0')]}; width: 18px; height: 18px; line-height: 18px; margin-right: 4px;">${num}</span>
+                                        <span style="color: #888;">↔</span>
+                                        <span style="color: #ffd700;">${relations.size}</span>
+                                    </div>
+                                `).join('') : 
+                                '<div style="color: #888; text-align: center; padding: 10px;">No relationship data available</div>'
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Week Draw Log -->
+                <div style="margin-top: 10px; padding: 8px; background: #0f172a; border-radius: 8px; border: 1px solid #334155;">
+                    <div style="color: #58a6ff; font-size: 11px; font-weight: bold; margin-bottom: 6px;">
+                        📋 CURRENT WEEK DRAWS
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${analysis.currentDraws.sort((a,b) => {
+                            const dayOrder = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+                            const timeOrder = {"MOR":1,"MID":2,"NON":3,"EVE":4};
+                            return (dayOrder.indexOf(a.day) * 4 + timeOrder[a.time]) - 
+                                  (dayOrder.indexOf(b.day) * 4 + timeOrder[b.time]);
+                        }).map(draw => `
+                            <div style="background: #1e293b; padding: 4px 8px; border-radius: 6px; font-size: 10px; border-left: 3px solid ${numberColors[String(draw.number).padStart(2,'0')]};">
+                                <span style="font-weight: bold; color: ${numberColors[String(draw.number).padStart(2,'0')]};">${draw.number}</span>
+                                <span style="color: #888;"> ${draw.day.slice(0,3)} ${draw.time}</span>
+                                <span style="color: #ffd700; display: block; font-size: 9px;">${draw.spirit}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(analyticsDiv);
+    }
+
+    // Toggle function for Play Whe analytics
+    window.togglePlayWheAnalytics = function(header) {
         const content = header.nextElementSibling;
         const arrow = header.querySelector('span:first-child');
         
