@@ -6897,74 +6897,84 @@
       }
 
       function toggleDropdown(type) {
-          let dropdown, button;
-          
-          switch(type) {
-              case 'calendar':
-                  dropdown = document.getElementById("calendar-dropdown");
-                  button = document.getElementById("calBtn");
-                  break;
-              case 'outstanding':
-                  dropdown = document.getElementById("outstanding-dropdown");
-                  button = document.getElementById("outBtn");
-                  break;
-              case 'pick2':
-                  dropdown = document.getElementById("pick2-calendar-dropdown");
-                  button = document.getElementById("pick2CalBtn");
-                  if (!pick2WeeksData || pick2WeeksData.length === 0) {
-                      loadPick2Data().then(() => {
-                          renderPick2DrawChart();
-                      });
-                  } else {
-                      renderPick2DrawChart();
-                  }
-                  break;
-              case 'pick4':
-                  dropdown = document.getElementById("pick4-calendar-dropdown");
-                  button = document.getElementById("pick4CalBtn");
-                  if (!pick4WeeksData || pick4WeeksData.length === 0) {
-                      loadPick4Data().then(() => {
-                          renderPick4DrawChart();
-                      });
-                  } else {
-                      renderPick4DrawChart();
-                  }
-                  break;
-              default:
-                  return;
-          }
-          
-          if (!dropdown || !button) return;
-          
-          // Close other dropdowns
-          const allDropdowns = ['calendar-dropdown', 'outstanding-dropdown', 'pick2-calendar-dropdown', 'pick4-calendar-dropdown'];
-          allDropdowns.forEach(id => {
-              if (id !== `${type}-dropdown` && id !== (type === 'calendar' ? 'calendar-dropdown' : type === 'pick2' ? 'calendar-dropdown' : type === 'pick4' ? 'calendar-dropdown' : type === 'outstanding' ? 'outstanding-dropdown' : '')) {
-                  const otherDropdown = document.getElementById(id);
-                  if (otherDropdown && otherDropdown.style.display === 'block') {
-                      otherDropdown.style.display = 'none';
-                      const otherType = id.replace('-dropdown', '');
-                      const otherButton = otherType === 'calendar' ? document.getElementById('calBtn') : 
-                                        otherType === 'outstanding' ? document.getElementById('outBtn') :
-                                        otherType === 'pick2' ? document.getElementById('pick2CalBtn') :
-                                        otherType === 'pick4' ? document.getElementById('pick4CalBtn') : null;
-                      if (otherButton) {
-                          otherButton.innerHTML = otherButton.innerHTML.replace('▴', '▾');
-                      }
-                  }
-              }
-          });
-          
-          // Toggle current dropdown
-          if (dropdown.style.display === "block") {
-              dropdown.style.display = "none";
-              button.innerHTML = button.innerHTML.replace("▴", "▾");
-          } else {
-              dropdown.style.display = "block";
-              button.innerHTML = button.innerHTML.replace("▾", "▴");
-          }
-      }
-
+        let dropdown, button;
+        let dropdownId, buttonId;
+        
+        // Map the type to actual IDs
+        switch(type) {
+            case 'calendar':
+                dropdownId = 'calendar-dropdown';
+                buttonId = 'calBtn';
+                break;
+            case 'outstanding':
+                dropdownId = 'outstanding-dropdown';
+                buttonId = 'outBtn';
+                break;
+            case 'pick2':
+                dropdownId = 'pick2-calendar-dropdown';
+                buttonId = 'pick2CalBtn';
+                if (!pick2WeeksData || pick2WeeksData.length === 0) {
+                    loadPick2Data().then(() => {
+                        renderPick2DrawChart();
+                    });
+                } else {
+                    renderPick2DrawChart();
+                }
+                break;
+            case 'pick4':
+                dropdownId = 'pick4-calendar-dropdown';
+                buttonId = 'pick4CalBtn';
+                if (!pick4WeeksData || pick4WeeksData.length === 0) {
+                    loadPick4Data().then(() => {
+                        renderPick4DrawChart();
+                    });
+                } else {
+                    renderPick4DrawChart();
+                }
+                break;
+            default:
+                return;
+        }
+        
+        dropdown = document.getElementById(dropdownId);
+        button = document.getElementById(buttonId);
+        
+        if (!dropdown || !button) return;
+        
+        // Define all dropdown-button pairs
+        const allPairs = [
+            { dropdownId: 'calendar-dropdown', buttonId: 'calBtn' },
+            { dropdownId: 'outstanding-dropdown', buttonId: 'outBtn' },
+            { dropdownId: 'pick2-calendar-dropdown', buttonId: 'pick2CalBtn' },
+            { dropdownId: 'pick4-calendar-dropdown', buttonId: 'pick4CalBtn' }
+        ];
+        
+        // Close all OTHER dropdowns
+        allPairs.forEach(pair => {
+            // Skip the current dropdown
+            if (pair.dropdownId === dropdownId) return;
+            
+            const otherDropdown = document.getElementById(pair.dropdownId);
+            const otherButton = document.getElementById(pair.buttonId);
+            
+            if (otherDropdown && otherDropdown.style.display === 'block') {
+                otherDropdown.style.display = 'none';
+                if (otherButton) {
+                    // Replace up arrow with down arrow
+                    otherButton.innerHTML = otherButton.innerHTML.replace('▴', '▾');
+                }
+            }
+        });
+        
+        // Toggle current dropdown
+        if (dropdown.style.display === "block") {
+            dropdown.style.display = "none";
+            button.innerHTML = button.innerHTML.replace("▴", "▾");
+        } else {
+            dropdown.style.display = "block";
+            button.innerHTML = button.innerHTML.replace("▾", "▴");
+        }
+    }
       function processData(weeks) {
         // EXACT data processing logic from your second code
         const dayOrder = [
