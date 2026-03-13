@@ -3680,62 +3680,122 @@ async function checkAccess() {
     }
 }
 
+/**
+ * DEBUG HELPER: Displays logs directly on the mobile screen.
+ * Add this above your submitAuth function.
+ */
+function sagiDebug(msg, data = null) {
+    let debugBox = document.getElementById('sagi-debug-box');
+    if (!debugBox) {
+        debugBox = document.createElement('div');
+        debugBox.id = 'sagi-debug-box';
+        // Styled to be unobtrusive but readable at the bottom of the iPhone screen
+        debugBox.style = "position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); color:#00ff00; font-family:monospace; font-size:11px; z-index:10000; max-height:120px; overflow-y:auto; padding:8px; pointer-events:none; border-top:1px solid #333;";
+        document.body.appendChild(debugBox);
+    }
+    const timestamp = new Date().toLocaleTimeString();
+    const dataStr = data ? JSON.stringify(data) : '';
+    debugBox.innerHTML += `<div>[${timestamp}] ${msg} ${dataStr}</div>`;
+    debugBox.scrollTop = debugBox.scrollHeight;
+}
+
+/**
+ * UPDATED AUTH SUBMISSION
+ * Now includes real-time debugging for iPhone troubleshooting.
+ */
 async function submitAuth() {
     const codeInput = document.getElementById('access-code-input');
     const userInitialsInput = document.getElementById('user-id-input');
     const errorMsg = document.getElementById('auth-error');
+    
     const initials = userInitialsInput.value.trim().toUpperCase();
     
     if (!initials || initials.length < 2) {
-        errorMsg.innerText = "Please Enter Your Initials.";
+        errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
         return;
     }
 
     const isReturningUser = codeInput.style.display === 'none';
-    let code = isReturningUser ? deviceRegistrationData?.registeredCode : codeInput.value.trim();
+    let code = '';
     
-    if (!isReturningUser && (!code || code.length < 6)) {
-        errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
-        return;
+    if (isReturningUser) {
+        if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
+            sagiDebug("Error: No registration data found for returning user.");
+            errorMsg.innerText = "Session Error. Please Refresh.";
+            return;
+        }
+        code = deviceRegistrationData.registeredCode;
+        await sagiSpeak(`Checking Access For ${initials}...`);
+    } else {
+        code = codeInput.value.trim();
+        if (code.length < 6) {
+            errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
+            return;
+        }
+        await sagiSpeak("Verifying Credentials With Server...");
     }
 
     errorMsg.innerText = "";
     showAuthUI(false);
     document.getElementById('auth-loading').style.display = 'flex';
 
+    const currentUID = getUID();
+    sagiDebug("Attempting Auth with UID:", currentUID);
+
     try {
         const queryParams = new URLSearchParams({
             code: code,
-            uid: getUID(),
+            uid: currentUID,
             initials: initials,
             action: "check"
         });
 
-        // FIX: Added redirect: follow
+        // The critical 'redirect: follow' for Safari/iOS
         const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`, {
             method: 'GET',
             mode: 'cors',
             redirect: 'follow'
         });
+
         const data = await response.json();
+        sagiDebug("Server Response Received:", data);
 
         if (data.status === "authorized") {
+            sagiDebug("Success: User authorized.");
             localStorage.setItem('f_suite_initials', initials);
+            
             const greeting = getTimeGreeting();
-            await sagiSpeak(`${greeting}, ${initials}! Access Granted.`);
+            if (isReturningUser) {
+                await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
+            } else {
+                await sagiSpeak(`${greeting}, ${initials}! Access Granted.`);
+            }
+            
             setTimeout(() => unlockApp(data.expiry, initials), 1500);
+            
         } else if (data.status === "revoked") {
+            sagiDebug("Warning: This device is revoked.");
             document.getElementById('auth-loading').style.display = 'none';
             await sagiSpeak("This Device Has Been Restricted.");
             showRevokedUI();
+            
         } else {
+            sagiDebug("Auth Rejected. Status:", data.status);
             document.getElementById('auth-loading').style.display = 'none';
             showAuthUI(true);
-            errorMsg.innerText = isReturningUser ? "Access not found." : "Invalid Access Code.";
+            
+            // Helpful error reporting
+            if (isReturningUser) {
+                errorMsg.innerText = `Access not found for ${initials}.`;
+            } else {
+                errorMsg.innerText = "Invalid Access Code.";
+            }
         }
     } catch (e) {
+        sagiDebug("CRITICAL FETCH ERROR:", e.message);
         console.error("SubmitAuth error:", e);
-        await sagiSpeak("Connection error.");
+        document.getElementById('auth-loading').style.display = 'none';
+        await sagiSpeak("Connection error. Please check your signal.");
         showAuthUI(true);
     }
 }
