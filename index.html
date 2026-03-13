@@ -3607,83 +3607,95 @@
       // Check access on page load
       window.addEventListener('load', checkAccess);
 
-      async function checkAccess() {
-          const uid = getUID();
-          
-          const initialsBox = document.getElementById('initials-box');
-          const codeInput = document.getElementById('access-code-input');
-          const initialsInput = document.getElementById('user-id-input');
-          const btnText = document.getElementById('btn-text');
-          const delay = ms => new Promise(res => setTimeout(res, ms));
+async function checkAccess() {
+    const uid = getUID();
+    
+    const initialsBox = document.getElementById('initials-box');
+    const codeInput = document.getElementById('access-code-input');
+    const initialsInput = document.getElementById('user-id-input');
+    const btnText = document.getElementById('btn-text');
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
-          try {
-              await sagiSpeak("Hello, I Am SAGi, Your Personal Assistant For This WhePlay Analysis WebApp. Checking This Device Registration One Moment...");
-              
-              // Check if the device is recognized
-              const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
-              const checkData = await checkRes.json();
+    try {
+        await sagiSpeak("Hello, I Am SAGi, Your Personal Assistant For This PlayWhe, Pick 2 And Pick 4 WebApp. Checking Device Registration...");
+        
+        // MOBILE FIX: Add cache buster
+        const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration&_t=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+        
+        if (!checkRes.ok) {
+            throw new Error(`HTTP error! status: ${checkRes.status}`);
+        }
+        
+        const checkData = await checkRes.json();
 
-              console.log("Check data:", checkData);
+        console.log("Check data:", checkData);
 
-              // CASE 1: Device is revoked
-              if (checkData.status === "revoked") {
-                  await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
-                  showRevokedUI();
-                  return;
-              }
-              
-              // CASE 2: Device is recognized (returning user)
-              if (checkData.status === "recognized") {
-                  // Store the registration data for later use
-                  deviceRegistrationData = {
-                      registeredCode: checkData.registeredCode,
-                      registeredInitials: checkData.registeredInitials
-                  };
-                  
-                  // Pre-fill initials if we have them from API
-                  if (checkData.registeredInitials) {
-                      initialsInput.value = checkData.registeredInitials;
-                  }
-                  
-                  // Hide the PIN input - returning users ONLY need initials
-                  codeInput.style.display = 'none';
-                  initialsBox.style.display = "flex";
-                  
-                  await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
-                  await delay(1500);
-                  
-                  // Change button text
-                  btnText.innerText = "Continue";
-                  showAuthUI(true);
-                  return;
-              }
-              
-              // CASE 3: New user (first time)
-              if (checkData.status === "unknown") {
-                  // Clear any stored registration data
-                  deviceRegistrationData = null;
-                  
-                  // Show both initials and PIN for new users
-                  codeInput.style.display = 'block';
-                  codeInput.value = '';
-                  initialsBox.style.display = "flex";
-                  
-                  await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
-                  await delay(2000);
-                  
-                  // Set button text
-                  btnText.innerText = "Proceed Access";
-                  showAuthUI(true);
-                  return;
-              }
-              
-          } catch (e) {
-              console.error("SAGi Error:", e);
-              await sagiSpeak("Connection error. Please check your internet and try again.");
-              showAuthUI(true);
-          }
-      }
-
+        // CASE 1: Device is revoked
+        if (checkData.status === "revoked") {
+            await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
+            showRevokedUI();
+            return;
+        }
+        
+        // CASE 2: Device is recognized (returning user)
+        if (checkData.status === "recognized") {
+            // Store the registration data for later use
+            deviceRegistrationData = {
+                registeredCode: checkData.registeredCode,
+                registeredInitials: checkData.registeredInitials
+            };
+            
+            // Pre-fill initials if we have them from API
+            if (checkData.registeredInitials) {
+                initialsInput.value = checkData.registeredInitials;
+            }
+            
+            // Hide the PIN input - returning users ONLY need initials
+            codeInput.style.display = 'none';
+            initialsBox.style.display = "flex";
+            
+            await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
+            await delay(1500);
+            
+            // Change button text
+            btnText.innerText = "Continue";
+            showAuthUI(true);
+            return;
+        }
+        
+        // CASE 3: New user (first time)
+        if (checkData.status === "unknown") {
+            // Clear any stored registration data
+            deviceRegistrationData = null;
+            
+            // Show both initials and PIN for new users
+            codeInput.style.display = 'block';
+            codeInput.value = '';
+            initialsBox.style.display = "flex";
+            
+            await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
+            await delay(2000);
+            
+            // Set button text
+            btnText.innerText = "Proceed Access";
+            showAuthUI(true);
+            return;
+        }
+        
+    } catch (e) {
+        console.error("SAGi Error:", e);
+        await sagiSpeak("Connection error. Please check your internet and try again.");
+        showAuthUI(true);
+    }
+}
       function showRevokedUI() {
           document.getElementById('auth-form').style.display = 'none';
           document.getElementById('auth-loading').style.display = 'none';
@@ -3743,97 +3755,112 @@
       }
 
       async function submitAuth() {
-          const codeInput = document.getElementById('access-code-input');
-          const userInitialsInput = document.getElementById('user-id-input');
-          const errorMsg = document.getElementById('auth-error');
-          
-          const initials = userInitialsInput.value.trim().toUpperCase();
-          
-          // Always validate initials
-          if (!initials || initials.length < 2) {
-              errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
-              return;
-          }
+    const codeInput = document.getElementById('access-code-input');
+    const userInitialsInput = document.getElementById('user-id-input');
+    const errorMsg = document.getElementById('auth-error');
+    
+    const initials = userInitialsInput.value.trim().toUpperCase();
+    
+    // Always validate initials
+    if (!initials || initials.length < 2) {
+        errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
+        return;
+    }
 
-          // Check if this is a returning user (PIN field hidden)
-          const isReturningUser = codeInput.style.display === 'none';
-          
-          let code = '';
-          
-          if (isReturningUser) {
-              // For returning users, use the code from the registration data
-              if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
-                  errorMsg.innerText = "Session Error. Please Refresh And Try Again.";
-                  return;
-              }
-              code = deviceRegistrationData.registeredCode;
-              await sagiSpeak(`Checking Access For ${initials}...`);
-          } else {
-              // For NEW users, they MUST provide a code
-              code = codeInput.value.trim();
-              if (code.length < 6) {
-                  errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
-                  return;
-              }
-              await sagiSpeak("Verifying Credentials With Server...");
-          }
+    // Check if this is a returning user (PIN field hidden)
+    const isReturningUser = codeInput.style.display === 'none';
+    
+    let code = '';
+    
+    if (isReturningUser) {
+        // For returning users, use the code from the registration data
+        if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
+            errorMsg.innerText = "Session Error. Please Refresh And Try Again.";
+            return;
+        }
+        code = deviceRegistrationData.registeredCode;
+        await sagiSpeak(`Checking Access For ${initials}...`);
+    } else {
+        // For NEW users, they MUST provide a code
+        code = codeInput.value.trim();
+        if (code.length < 6) {
+            errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
+            return;
+        }
+        await sagiSpeak("Verifying Credentials With Server...");
+    }
 
-          errorMsg.innerText = "";
-          showAuthUI(false);
-          document.getElementById('auth-loading').style.display = 'flex';
+    errorMsg.innerText = "";
+    showAuthUI(false);
+    document.getElementById('auth-loading').style.display = 'flex';
 
-          const uid = getUID();
+    const uid = getUID();
 
-          try {
-              const queryParams = new URLSearchParams({
-                  code: code,
-                  uid: uid,
-                  initials: initials,
-                  action: "check"
-              });
+    try {
+        // MOBILE FIX: Add cache busting and proper headers
+        const queryParams = new URLSearchParams({
+            code: code,
+            uid: uid,
+            initials: initials,
+            action: "check",
+            _t: Date.now() // Cache buster
+        });
 
-              const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`);
-              const data = await response.json();
+        const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Auth response:", data);
 
-              console.log("Auth response:", data);
-
-              if (data.status === "authorized") {
-                  // Store initials for display purposes
-                  localStorage.setItem('f_suite_initials', initials);
-                  
-                  const greeting = getTimeGreeting();
-                  
-                  if (isReturningUser) {
-                      await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
-                  } else {
-                      await sagiSpeak(`${greeting}, ${initials}! Access Granted. Welcome To The WhePlay Analysis Dashboard!`);
-                  }
-                  
-                  setTimeout(() => unlockApp(data.expiry, initials), 1500);
-                  
-              } else if (data.status === "revoked") {
-                  document.getElementById('auth-loading').style.display = 'none';
-                  await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
-                  showRevokedUI();
-                  
-              } else {
-                  document.getElementById('auth-loading').style.display = 'none';
-                  showAuthUI(true);
-                  
-                  if (isReturningUser) {
-                      await sagiSpeak("Access not found. Please contact CWG for assistance.");
-                      errorMsg.innerText = "Access not found. Contact support.";
-                  } else {
-                      await sagiSpeak("Invalid access code. Please try again or contact CWG.");
-                      errorMsg.innerText = "Invalid Access Code.";
-                  }
-              }
-          } catch (e) {
-              console.error("SubmitAuth error:", e);
-              await sagiSpeak("Connection error. Please check your internet.");
-              showAuthUI(true);
-          }
-      }
+        if (data.status === "authorized") {
+            // Store initials for display purposes
+            localStorage.setItem('f_suite_initials', initials);
+            
+            const greeting = getTimeGreeting();
+            
+            if (isReturningUser) {
+                await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
+            } else {
+                await sagiSpeak(`${greeting}, ${initials}! Access Granted. Welcome To The WhePlay Analysis Dashboard!`);
+            }
+            
+            setTimeout(() => unlockApp(data.expiry, initials), 1500);
+            
+        } else if (data.status === "revoked") {
+            document.getElementById('auth-loading').style.display = 'none';
+            await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
+            showRevokedUI();
+            
+        } else {
+            document.getElementById('auth-loading').style.display = 'none';
+            showAuthUI(true);
+            
+            if (isReturningUser) {
+                await sagiSpeak("Access not found. Please contact CWG for assistance.");
+                errorMsg.innerText = "Access not found. Contact support.";
+            } else {
+                await sagiSpeak("Invalid access code. Please try again or contact CWG.");
+                errorMsg.innerText = "Invalid Access Code.";
+            }
+        }
+    } catch (e) {
+        console.error("SubmitAuth error:", e);
+        await sagiSpeak("Connection error. Please check your internet.");
+        showAuthUI(true);
+        errorMsg.innerText = "Network error. Please try again.";
+    }
+}
 
       function unlockApp(expiry, initials) {
           document.getElementById('app-content').style.display = 'block';
