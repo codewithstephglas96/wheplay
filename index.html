@@ -3544,92 +3544,69 @@
       }
 
       ///////////////////////////////////////////////////////////////////////////////////
-      // ========== SAGi AUTHENTICATION SYSTEM ==========
-      const AUTH_API_URL = "https://script.google.com/macros/s/AKfycbyKA2smH8eiDPQ8_CkF03lhcbqCmDzUaLeK3zfBGe277hK8ZXUJGMSMLWXGBMCoBTgY1A/exec";
+// ========== SAGi AUTHENTICATION SYSTEM ==========
+const ORIGINAL_API_URL = "https://script.google.com/macros/s/AKfycbyKA2smH8eiDPQ8_CkF03lhcbqCmDzUaLeK3zfBGe277hK8ZXUJGMSMLWXGBMCoBTgY1A/exec";
+const AUTH_API_URL = "https://cors-anywhere.herokuapp.com/" + ORIGINAL_API_URL;
 
-// JSONP helper for mobile CORS issues
-function jsonpRequest(url, callback) {
-    const script = document.createElement('script');
-    const callbackName = 'jsonp_callback_' + Date.now();
+// Store registration data temporarily
+let deviceRegistrationData = null;
+
+// Set current year in footer
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// SAGi's Typewriter Effect
+async function sagiSpeak(text) {
+    const sagiText = document.getElementById('sagi-text');
+    if (!sagiText) return;
     
-    window[callbackName] = function(data) {
-        document.body.removeChild(script);
-        delete window[callbackName];
-        callback(data);
-    };
+    sagiText.innerHTML = '';
+    let i = 0;
     
-    // Add callback to URL
-    const separator = url.includes('?') ? '&' : '?';
-    script.src = url + separator + 'callback=' + callbackName;
-    document.body.appendChild(script);
-    
-    // Timeout fallback
-    setTimeout(() => {
-        if (window[callbackName]) {
-            window[callbackName]({ status: 'timeout' });
+    return new Promise(resolve => {
+        function type() {
+            if (i < text.length) {
+                sagiText.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, 30);
+            } else {
+                resolve();
+            }
         }
-    }, 10000);
+        type();
+    });
 }
 
-      // Store registration data temporarily
-      let deviceRegistrationData = null;
+// Show/Hide SAGi UI Elements
+function showAuthUI(show) {
+    const form = document.getElementById('auth-form');
+    if (form) form.style.display = show ? 'flex' : 'none';
+}
 
-      // Set current year in footer
-      document.getElementById('year').textContent = new Date().getFullYear();
+// Get Unique Device ID
+function getUID() {
+    const navigator_info = window.navigator;
+    const screen_info = window.screen;
+    
+    let uid = navigator_info.mimeTypes.length;
+    uid += navigator_info.userAgent.replace(/\D+/g, '');
+    uid += navigator_info.plugins.length;
+    uid += screen_info.height || '';
+    uid += screen_info.width || '';
+    uid += screen_info.pixelDepth || '';
+    
+    return 'DPWAWAppv1-FP-' + btoa(uid).substring(0, 12).toUpperCase();
+}
 
-      // SAGi's Typewriter Effect
-      async function sagiSpeak(text) {
-          const sagiText = document.getElementById('sagi-text');
-          if (!sagiText) return;
-          
-          sagiText.innerHTML = '';
-          let i = 0;
-          
-          return new Promise(resolve => {
-              function type() {
-                  if (i < text.length) {
-                      sagiText.innerHTML += text.charAt(i);
-                      i++;
-                      setTimeout(type, 30);
-                  } else {
-                      resolve();
-                  }
-              }
-              type();
-          });
-      }
+// Get time-based greeting
+function getTimeGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+}
 
-      // Show/Hide SAGi UI Elements
-      function showAuthUI(show) {
-          const form = document.getElementById('auth-form');
-          if (form) form.style.display = show ? 'flex' : 'none';
-      }
-
-      // Get Unique Device ID
-      function getUID() {
-          const navigator_info = window.navigator;
-          const screen_info = window.screen;
-          
-          let uid = navigator_info.mimeTypes.length;
-          uid += navigator_info.userAgent.replace(/\D+/g, '');
-          uid += navigator_info.plugins.length;
-          uid += screen_info.height || '';
-          uid += screen_info.width || '';
-          uid += screen_info.pixelDepth || '';
-          
-          return 'DPWAWAppv1-FP-' + btoa(uid).substring(0, 12).toUpperCase();
-      }
-
-      // Get time-based greeting
-      function getTimeGreeting() {
-          const hour = new Date().getHours();
-          if (hour < 12) return "Good Morning";
-          if (hour < 17) return "Good Afternoon";
-          return "Good Evening";
-      }
-
-      // Check access on page load
-      window.addEventListener('load', checkAccess);
+// Check access on page load
+window.addEventListener('load', checkAccess);
 
 async function checkAccess() {
     const uid = getUID();
@@ -3643,61 +3620,67 @@ async function checkAccess() {
     try {
         await sagiSpeak("Hello, I Am SAGi, Your Personal Assistant For This PlayWhe, Pick 2 And Pick 4 WebApp. Checking Device Registration...");
         
-        // Use JSONP instead of fetch for mobile
-        jsonpRequest(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`, async (checkData) => {
-            
-            if (checkData.status === 'timeout') {
-                await sagiSpeak("Connection timeout. Please check your internet and try again.");
-                showAuthUI(true);
-                return;
-            }
-            
-            console.log("Check data:", checkData);
-
-            // CASE 1: Device is revoked
-            if (checkData.status === "revoked") {
-                await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
-                showRevokedUI();
-                return;
-            }
-            
-            // CASE 2: Device is recognized (returning user)
-            if (checkData.status === "recognized") {
-                deviceRegistrationData = {
-                    registeredCode: checkData.registeredCode,
-                    registeredInitials: checkData.registeredInitials
-                };
-                
-                if (checkData.registeredInitials) {
-                    initialsInput.value = checkData.registeredInitials;
-                }
-                
-                codeInput.style.display = 'none';
-                initialsBox.style.display = "flex";
-                
-                await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
-                await delay(1500);
-                
-                btnText.innerText = "Continue";
-                showAuthUI(true);
-                return;
-            }
-            
-            // CASE 3: New user
-            if (checkData.status === "unknown") {
-                deviceRegistrationData = null;
-                codeInput.style.display = 'block';
-                codeInput.value = '';
-                initialsBox.style.display = "flex";
-                
-                await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
-                await delay(2000);
-                
-                btnText.innerText = "Proceed Access";
-                showAuthUI(true);
-                return;
+        // Add cache buster to URL
+        const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration&_t=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
+        
+        if (!checkRes.ok) {
+            throw new Error(`HTTP error! status: ${checkRes.status}`);
+        }
+        
+        const checkData = await checkRes.json();
+        console.log("Check data:", checkData);
+
+        // CASE 1: Device is revoked
+        if (checkData.status === "revoked") {
+            await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
+            showRevokedUI();
+            return;
+        }
+        
+        // CASE 2: Device is recognized (returning user)
+        if (checkData.status === "recognized") {
+            deviceRegistrationData = {
+                registeredCode: checkData.registeredCode,
+                registeredInitials: checkData.registeredInitials
+            };
+            
+            if (checkData.registeredInitials) {
+                initialsInput.value = checkData.registeredInitials;
+            }
+            
+            codeInput.style.display = 'none';
+            initialsBox.style.display = "flex";
+            
+            await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
+            await delay(1500);
+            
+            btnText.innerText = "Continue";
+            showAuthUI(true);
+            return;
+        }
+        
+        // CASE 3: New user (first time)
+        if (checkData.status === "unknown") {
+            deviceRegistrationData = null;
+            codeInput.style.display = 'block';
+            codeInput.value = '';
+            initialsBox.style.display = "flex";
+            
+            await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
+            await delay(2000);
+            
+            btnText.innerText = "Proceed Access";
+            showAuthUI(true);
+            return;
+        }
         
     } catch (e) {
         console.error("SAGi Error:", e);
@@ -3705,65 +3688,68 @@ async function checkAccess() {
         showAuthUI(true);
     }
 }
-      function showRevokedUI() {
-          document.getElementById('auth-form').style.display = 'none';
-          document.getElementById('auth-loading').style.display = 'none';
-          document.getElementById('sagi-bubble').style.marginBottom = '20px';
-          
-          // Create restricted message
-          const restrictedDiv = document.createElement('div');
-          restrictedDiv.id = 'revoked-message';
-          restrictedDiv.style.textAlign = 'center';
-          restrictedDiv.style.marginTop = '20px';
-          restrictedDiv.innerHTML = `
-              <div style="color: #ff453a; font-size: 16px; font-weight: bold; margin-bottom: 10px;">⛔ ACCESS REVOKED</div>
-              <div style="color: #fff; font-size: 14px; margin-bottom: 20px;">This device has been restricted. Please contact support via WhatsApp for activation.</div>
-              <div id="reactivation-check" style="color: #58a6ff; font-size: 12px; margin-top: 10px;">Checking for reactivation...</div>
-          `;
-          document.getElementById('sagi-container').appendChild(restrictedDiv);
-          
-          // Start checking for reactivation
-          checkForReactivation();
-      }
 
-      async function checkForReactivation() {
-          const uid = getUID();
-          const checkInterval = setInterval(async () => {
-              try {
-                  const response = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
-                  const data = await response.json();
-                  
-                  // If status is no longer revoked
-                  if (data.status !== "revoked") {
-                      clearInterval(checkInterval);
-                      
-                      // Update the message
-                      const reactivationDiv = document.getElementById('reactivation-check');
-                      if (reactivationDiv) {
-                          reactivationDiv.innerHTML = '✅ Access restored! Redirecting...';
-                          reactivationDiv.style.color = '#32d74b';
-                      }
-                      
-                      await sagiSpeak("Access has been restored! Redirecting you now...");
-                      
-                      // Wait a moment then restart the auth flow
-                      setTimeout(() => {
-                          // Remove revoked UI
-                          const revokedMsg = document.getElementById('revoked-message');
-                          if (revokedMsg) revokedMsg.remove();
-                          
-                          // Reset and restart checkAccess
-                          deviceRegistrationData = null;
-                          checkAccess();
-                      }, 2000);
-                  }
-              } catch (e) {
-                  console.log("Reactivation check error:", e);
-              }
-          }, 5000); // Check every 5 seconds for reactivation
-      }
+function showRevokedUI() {
+    document.getElementById('auth-form').style.display = 'none';
+    document.getElementById('auth-loading').style.display = 'none';
+    document.getElementById('sagi-bubble').style.marginBottom = '20px';
+    
+    if (document.getElementById('revoked-message')) return;
+    
+    const restrictedDiv = document.createElement('div');
+    restrictedDiv.id = 'revoked-message';
+    restrictedDiv.style.textAlign = 'center';
+    restrictedDiv.style.marginTop = '20px';
+    restrictedDiv.innerHTML = `
+        <div style="color: #ff453a; font-size: 16px; font-weight: bold; margin-bottom: 10px;">⛔ ACCESS REVOKED</div>
+        <div style="color: #fff; font-size: 14px; margin-bottom: 20px;">This device has been restricted. Please contact support via WhatsApp for activation.</div>
+        <div id="reactivation-check" style="color: #58a6ff; font-size: 12px; margin-top: 10px;">Checking for reactivation...</div>
+    `;
+    document.getElementById('sagi-container').appendChild(restrictedDiv);
+    
+    checkForReactivation();
+}
 
-      async function submitAuth() {
+async function checkForReactivation() {
+    const uid = getUID();
+    const checkInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration&_t=${Date.now()}`, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const data = await response.json();
+            
+            if (data.status !== "revoked") {
+                clearInterval(checkInterval);
+                
+                const reactivationDiv = document.getElementById('reactivation-check');
+                if (reactivationDiv) {
+                    reactivationDiv.innerHTML = '✅ Access restored! Redirecting...';
+                    reactivationDiv.style.color = '#32d74b';
+                }
+                
+                await sagiSpeak("Access has been restored! Redirecting you now...");
+                
+                setTimeout(() => {
+                    const revokedMsg = document.getElementById('revoked-message');
+                    if (revokedMsg) revokedMsg.remove();
+                    deviceRegistrationData = null;
+                    checkAccess();
+                }, 2000);
+            }
+        } catch (e) {
+            console.log("Reactivation check error:", e);
+        }
+    }, 5000);
+}
+
+async function submitAuth() {
     const codeInput = document.getElementById('access-code-input');
     const userInitialsInput = document.getElementById('user-id-input');
     const errorMsg = document.getElementById('auth-error');
@@ -3801,17 +3787,22 @@ async function checkAccess() {
 
     const uid = getUID();
 
-    // Use JSONP for submit
-    jsonpRequest(`${AUTH_API_URL}?code=${code}&uid=${uid}&initials=${initials}&action=check`, async (data) => {
+    try {
+        const response = await fetch(`${AUTH_API_URL}?code=${code}&uid=${uid}&initials=${initials}&action=check&_t=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
         
-        document.getElementById('auth-loading').style.display = 'none';
-        
-        if (data.status === 'timeout') {
-            await sagiSpeak("Connection timeout. Please check your internet.");
-            showAuthUI(true);
-            return;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
+        const data = await response.json();
         console.log("Auth response:", data);
 
         if (data.status === "authorized") {
@@ -3828,10 +3819,12 @@ async function checkAccess() {
             setTimeout(() => unlockApp(data.expiry, initials), 1500);
             
         } else if (data.status === "revoked") {
+            document.getElementById('auth-loading').style.display = 'none';
             await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
             showRevokedUI();
             
         } else {
+            document.getElementById('auth-loading').style.display = 'none';
             showAuthUI(true);
             
             if (isReturningUser) {
@@ -3842,67 +3835,86 @@ async function checkAccess() {
                 errorMsg.innerText = "Invalid Access Code.";
             }
         }
-    });
+    } catch (e) {
+        console.error("SubmitAuth error:", e);
+        await sagiSpeak("Connection error. Please check your internet.");
+        showAuthUI(true);
+    }
 }
 
-      function unlockApp(expiry, initials) {
-          document.getElementById('app-content').style.display = 'block';
-          document.getElementById('auth-overlay').style.display = 'none';
-          
-          // Show welcome notification
-          showNotification(`Welcome back, ${initials}! 👋`, 'success');
-          
-          if (expiry) {
-              localStorage.setItem('f_suite_expiry', expiry);
-              startCountdown(expiry);
-          }
-          
-          // THIS IS THE KEY - Initialize the app after authentication
-          setTimeout(() => {
-              initializeApp();
-          }, 500);
-      }
+function unlockApp(expiry, initials) {
+    document.getElementById('app-content').style.display = 'block';
+    document.getElementById('auth-overlay').style.display = 'none';
+    
+    showNotification(`Welcome back, ${initials}! 👋`, 'success');
+    
+    if (expiry) {
+        localStorage.setItem('f_suite_expiry', expiry);
+        startCountdown(expiry);
+    }
+    
+    setTimeout(() => {
+        initializeApp();
+    }, 500);
+}
 
-      function startCountdown(expiryStr) {
-          const expiry = new Date(expiryStr);
-          const now = new Date();
-          const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+function startCountdown(expiryStr) {
+    const expiry = new Date(expiryStr);
+    const now = new Date();
+    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
-          if (diffDays <= 5 && diffDays > 0) {
-              document.getElementById('warning-toast').style.display = 'block';
-              document.getElementById('days-text').innerText = diffDays;
-          } else if (diffDays <= 0) {
-              showNotification("⚠️ Your access has expired. Please contact CWG to renew.", "warning");
-          }
-      }
+    if (diffDays <= 5 && diffDays > 0) {
+        document.getElementById('warning-toast').style.display = 'block';
+        document.getElementById('days-text').innerText = diffDays;
+    } else if (diffDays <= 0) {
+        showNotification("⚠️ Your access has expired. Please contact CWG to renew.", "warning");
+    }
+}
 
-      async function extendNow() {
-          const uid = getUID();
-          const initials = localStorage.getItem('f_suite_initials');
-          
-          try {
-              const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=extend`);
-              const data = await response.json();
-              
-              if (data.status === "authorized") {
-                  showNotification("✅ Access Extended Successfully!", "success");
-                  setTimeout(() => location.reload(), 1500);
-              }
-          } catch (error) {
-              showNotification("❌ Error extending access", "error");
-          }
-      }
+async function extendNow() {
+    const uid = getUID();
+    const initials = localStorage.getItem('f_suite_initials');
+    
+    try {
+        const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=extend&_t=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        const data = await response.json();
+        
+        if (data.status === "authorized") {
+            showNotification("✅ Access Extended Successfully!", "success");
+            setTimeout(() => location.reload(), 1500);
+        }
+    } catch (error) {
+        showNotification("❌ Error extending access", "error");
+    }
+}
 
-      // Periodic check (every minute)
-// Periodic check using JSONP
-setInterval(() => {
+// Periodic check with CORS proxy
+setInterval(async () => {
     const uid = getUID();
     const initials = localStorage.getItem('f_suite_initials');
     
     if (document.getElementById('auth-overlay').style.display !== 'none') return;
     if (!initials) return;
     
-    jsonpRequest(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=check`, (data) => {
+    try {
+        const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=check&_t=${Date.now()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        const data = await response.json();
         
         if (data.status === "revoked" || data.status === "denied") {
             showNotification("⛔ Your access has been revoked! Logging out...", "error");
@@ -3925,21 +3937,21 @@ setInterval(() => {
         } else if (data.status === "authorized" && data.expiry) {
             startCountdown(data.expiry);
         }
-    });
+    } catch (e) {
+        console.log("Periodic check error:", e);
+    }
 }, 60000);
 
-      function resetAuthForm() {
-          const codeInput = document.getElementById('access-code-input');
-          const initialsInput = document.getElementById('user-id-input');
-          const btnText = document.getElementById('btn-text');
-          
-          // Reset inputs
-          codeInput.value = '';
-          initialsInput.value = '';
-          codeInput.style.display = 'block'; // Show PIN field by default
-          btnText.innerText = "Proceed Access";
-      }
-
+function resetAuthForm() {
+    const codeInput = document.getElementById('access-code-input');
+    const initialsInput = document.getElementById('user-id-input');
+    const btnText = document.getElementById('btn-text');
+    
+    codeInput.value = '';
+    initialsInput.value = '';
+    codeInput.style.display = 'block';
+    btnText.innerText = "Proceed Access";
+}
       ///////////////////////////////////////////////////////////////////////////////////
 
       // ========== HOME WIDGET FUNCTIONS ==========
