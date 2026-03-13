@@ -2031,7 +2031,7 @@
               <p id="auth-error" style="color: #ef4444; margin-top: 10px; font-size: 13px; font-weight: bold;"></p>
           </div>
 
-          <a href="https://wa.me/18687437742?text=Hello%20CODEWITHGLASGOW%2C%20I%20need%20help%20with%20my%20webapp%20access" 
+          <a href="https://wa.me/18687815624?text=Hello%20CODEWITHGLASGOW%2C%20I%20need%20help%20with%20my%20webapp%20access" 
             id="whatsapp-link" class="whatsapp-btn" target="_blank">
               <svg viewBox="0 0 448 512">
                   <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-93.9-25.7l-6.7-4-69.8 18.3 18.7-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.4 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.4-29.8-17-40.7-4.5-10.7-9.1-9.2-12.4-9.4h-10.6c-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
@@ -3544,361 +3544,409 @@
       }
 
       ///////////////////////////////////////////////////////////////////////////////////
-// ========== SAGi AUTHENTICATION SYSTEM (iOS COMPATIBLE) ==========
-const AUTH_API_URL = "https://script.google.com/macros/s/AKfycbyKA2smH8eiDPQ8_CkF03lhcbqCmDzUaLeK3zfBGe277hK8ZXUJGMSMLWXGBMCoBTgY1A/exec";
+      // ========== SAGi AUTHENTICATION SYSTEM ==========
+      const AUTH_API_URL = "https://script.google.com/macros/s/AKfycbyKA2smH8eiDPQ8_CkF03lhcbqCmDzUaLeK3zfBGe277hK8ZXUJGMSMLWXGBMCoBTgY1A/exec";
 
-// Store registration data temporarily
-let deviceRegistrationData = null;
+      // Store registration data temporarily
+      let deviceRegistrationData = null;
 
-// Set current year in footer
-if (document.getElementById('year')) {
-    document.getElementById('year').textContent = new Date().getFullYear();
-}
+      // Set current year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
 
-// SAGi's Typewriter Effect
-async function sagiSpeak(text) {
-    const sagiText = document.getElementById('sagi-text');
-    if (!sagiText) return;
-    
-    sagiText.innerHTML = '';
-    let i = 0;
-    
-    return new Promise(resolve => {
-        function type() {
-            if (i < text.length) {
-                sagiText.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(type, 30);
-            } else {
-                resolve();
-            }
-        }
-        type();
-    });
-}
+      // SAGi's Typewriter Effect
+      async function sagiSpeak(text) {
+          const sagiText = document.getElementById('sagi-text');
+          if (!sagiText) return;
+          
+          sagiText.innerHTML = '';
+          let i = 0;
+          
+          return new Promise(resolve => {
+              function type() {
+                  if (i < text.length) {
+                      sagiText.innerHTML += text.charAt(i);
+                      i++;
+                      setTimeout(type, 30);
+                  } else {
+                      resolve();
+                  }
+              }
+              type();
+          });
+      }
 
-// Show/Hide SAGi UI Elements
-function showAuthUI(show) {
-    const form = document.getElementById('auth-form');
-    if (form) form.style.display = show ? 'flex' : 'none';
-}
+      // Show/Hide SAGi UI Elements
+      function showAuthUI(show) {
+          const form = document.getElementById('auth-form');
+          if (form) form.style.display = show ? 'flex' : 'none';
+      }
 
-/**
- * FIX: Persistent UID for iOS
- * Safari blocks hardware fingerprinting. We use a persistent random ID.
- */
-function getUID() {
-    let uid = localStorage.getItem('sagi_persistent_uid_v2');
-    if (!uid) {
-        // Create a unique ID if one doesn't exist
-        uid = 'DPWAW-V1-' + Math.random().toString(36).substring(2, 15).toUpperCase();
-        localStorage.setItem('sagi_persistent_uid_v2', uid);
-    }
-    return uid;
-}
+      // Get Unique Device ID
+      function getUID() {
+          const navigator_info = window.navigator;
+          const screen_info = window.screen;
+          
+          let uid = navigator_info.mimeTypes.length;
+          uid += navigator_info.userAgent.replace(/\D+/g, '');
+          uid += navigator_info.plugins.length;
+          uid += screen_info.height || '';
+          uid += screen_info.width || '';
+          uid += screen_info.pixelDepth || '';
+          
+          return 'DPWAWAppv1-FP-' + btoa(uid).substring(0, 12).toUpperCase();
+      }
 
-// Get time-based greeting
-function getTimeGreeting() {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
-}
+      // Get time-based greeting
+      function getTimeGreeting() {
+          const hour = new Date().getHours();
+          if (hour < 12) return "Good Morning";
+          if (hour < 17) return "Good Afternoon";
+          return "Good Evening";
+      }
 
-// Check access on page load
-window.addEventListener('load', checkAccess);
+      // Check access on page load
+      window.addEventListener('load', checkAccess);
 
-async function checkAccess() {
-    const uid = getUID();
-    const initialsBox = document.getElementById('initials-box');
-    const codeInput = document.getElementById('access-code-input');
-    const initialsInput = document.getElementById('user-id-input');
-    const btnText = document.getElementById('btn-text');
-    const delay = ms => new Promise(res => setTimeout(res, ms));
+      async function checkAccess() {
+          const uid = getUID();
+          
+          const initialsBox = document.getElementById('initials-box');
+          const codeInput = document.getElementById('access-code-input');
+          const initialsInput = document.getElementById('user-id-input');
+          const btnText = document.getElementById('btn-text');
+          const delay = ms => new Promise(res => setTimeout(res, ms));
 
-    try {
-        await sagiSpeak("Hello, I Am SAGi, Your Assistant. Checking Device Registration...");
-        
-        // FIX: Explicit Redirect and Mode for Safari
-        const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`, {
-            method: 'GET',
-            mode: 'cors',
-            redirect: 'follow'
-        });
-        const checkData = await checkRes.json();
+          try {
+              await sagiSpeak("Hello, I Am SAGi, Your Personal Assistant For This WhePlay Analysis WebApp. Checking This Device Registration One Moment...");
+              
+              // Check if the device is recognized
+              const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
+              const checkData = await checkRes.json();
 
-        console.log("Check data:", checkData);
+              console.log("Check data:", checkData);
 
-        // CASE 1: Device is revoked
-        if (checkData.status === "revoked") {
-            await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
-            showRevokedUI();
-            return;
-        }
-        
-        // CASE 2: Device is recognized (returning user)
-        if (checkData.status === "recognized") {
-            deviceRegistrationData = {
-                registeredCode: checkData.registeredCode,
-                registeredInitials: checkData.registeredInitials
-            };
-            
-            if (checkData.registeredInitials) {
-                initialsInput.value = checkData.registeredInitials;
-            }
-            
-            codeInput.style.display = 'none';
-            initialsBox.style.display = "flex";
-            
-            await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
-            await delay(1500);
-            
-            btnText.innerText = "Continue";
-            showAuthUI(true);
-            return;
-        }
-        
-        // CASE 3: New user (first time)
-        if (checkData.status === "unknown") {
-            deviceRegistrationData = null;
-            codeInput.style.display = 'block';
-            codeInput.value = '';
-            initialsBox.style.display = "flex";
-            
-            await sagiSpeak("Welcome! Please enter your initials and 6-digit access code.");
-            await delay(2000);
-            
-            btnText.innerText = "Proceed Access";
-            showAuthUI(true);
-            return;
-        }
-        
-    } catch (e) {
-        console.error("SAGi Error:", e);
-        await sagiSpeak("Connection error. Please check your internet and try again.");
-        showAuthUI(true);
-    }
-}
+              // CASE 1: Device is revoked
+              if (checkData.status === "revoked") {
+                  await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
+                  showRevokedUI();
+                  return;
+              }
+              
+              // CASE 2: Device is recognized (returning user)
+              if (checkData.status === "recognized") {
+                  // Store the registration data for later use
+                  deviceRegistrationData = {
+                      registeredCode: checkData.registeredCode,
+                      registeredInitials: checkData.registeredInitials
+                  };
+                  
+                  // Pre-fill initials if we have them from API
+                  if (checkData.registeredInitials) {
+                      initialsInput.value = checkData.registeredInitials;
+                  }
+                  
+                  // Hide the PIN input - returning users ONLY need initials
+                  codeInput.style.display = 'none';
+                  initialsBox.style.display = "flex";
+                  
+                  await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
+                  await delay(1500);
+                  
+                  // Change button text
+                  btnText.innerText = "Continue";
+                  showAuthUI(true);
+                  return;
+              }
+              
+              // CASE 3: New user (first time)
+              if (checkData.status === "unknown") {
+                  // Clear any stored registration data
+                  deviceRegistrationData = null;
+                  
+                  // Show both initials and PIN for new users
+                  codeInput.style.display = 'block';
+                  codeInput.value = '';
+                  initialsBox.style.display = "flex";
+                  
+                  await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
+                  await delay(2000);
+                  
+                  // Set button text
+                  btnText.innerText = "Proceed Access";
+                  showAuthUI(true);
+                  return;
+              }
+              
+          } catch (e) {
+              console.error("SAGi Error:", e);
+              await sagiSpeak("Connection error. Please check your internet and try again.");
+              showAuthUI(true);
+          }
+      }
 
-/**
- * DEBUG HELPER: Displays logs directly on the mobile screen.
- * Add this above your submitAuth function.
- */
-function sagiDebug(msg, data = null) {
-    let debugBox = document.getElementById('sagi-debug-box');
-    if (!debugBox) {
-        debugBox = document.createElement('div');
-        debugBox.id = 'sagi-debug-box';
-        // Styled to be unobtrusive but readable at the bottom of the iPhone screen
-        debugBox.style = "position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); color:#00ff00; font-family:monospace; font-size:11px; z-index:10000; max-height:120px; overflow-y:auto; padding:8px; pointer-events:none; border-top:1px solid #333;";
-        document.body.appendChild(debugBox);
-    }
-    const timestamp = new Date().toLocaleTimeString();
-    const dataStr = data ? JSON.stringify(data) : '';
-    debugBox.innerHTML += `<div>[${timestamp}] ${msg} ${dataStr}</div>`;
-    debugBox.scrollTop = debugBox.scrollHeight;
-}
+      function showRevokedUI() {
+          document.getElementById('auth-form').style.display = 'none';
+          document.getElementById('auth-loading').style.display = 'none';
+          document.getElementById('sagi-bubble').style.marginBottom = '20px';
+          
+          // Create restricted message
+          const restrictedDiv = document.createElement('div');
+          restrictedDiv.id = 'revoked-message';
+          restrictedDiv.style.textAlign = 'center';
+          restrictedDiv.style.marginTop = '20px';
+          restrictedDiv.innerHTML = `
+              <div style="color: #ff453a; font-size: 16px; font-weight: bold; margin-bottom: 10px;">⛔ ACCESS REVOKED</div>
+              <div style="color: #fff; font-size: 14px; margin-bottom: 20px;">This device has been restricted. Please contact support via WhatsApp for activation.</div>
+              <div id="reactivation-check" style="color: #58a6ff; font-size: 12px; margin-top: 10px;">Checking for reactivation...</div>
+          `;
+          document.getElementById('sagi-container').appendChild(restrictedDiv);
+          
+          // Start checking for reactivation
+          checkForReactivation();
+      }
 
-/**
- * UPDATED AUTH SUBMISSION
- * Now includes real-time debugging for iPhone troubleshooting.
- */
-async function submitAuth() {
-    const codeInput = document.getElementById('access-code-input');
-    const userInitialsInput = document.getElementById('user-id-input');
-    const errorMsg = document.getElementById('auth-error');
-    
-    const initials = userInitialsInput.value.trim().toUpperCase();
-    
-    if (!initials || initials.length < 2) {
-        errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
-        return;
-    }
+      async function checkForReactivation() {
+          const uid = getUID();
+          const checkInterval = setInterval(async () => {
+              try {
+                  const response = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
+                  const data = await response.json();
+                  
+                  // If status is no longer revoked
+                  if (data.status !== "revoked") {
+                      clearInterval(checkInterval);
+                      
+                      // Update the message
+                      const reactivationDiv = document.getElementById('reactivation-check');
+                      if (reactivationDiv) {
+                          reactivationDiv.innerHTML = '✅ Access restored! Redirecting...';
+                          reactivationDiv.style.color = '#32d74b';
+                      }
+                      
+                      await sagiSpeak("Access has been restored! Redirecting you now...");
+                      
+                      // Wait a moment then restart the auth flow
+                      setTimeout(() => {
+                          // Remove revoked UI
+                          const revokedMsg = document.getElementById('revoked-message');
+                          if (revokedMsg) revokedMsg.remove();
+                          
+                          // Reset and restart checkAccess
+                          deviceRegistrationData = null;
+                          checkAccess();
+                      }, 2000);
+                  }
+              } catch (e) {
+                  console.log("Reactivation check error:", e);
+              }
+          }, 5000); // Check every 5 seconds for reactivation
+      }
 
-    const isReturningUser = codeInput.style.display === 'none';
-    let code = '';
-    
-    if (isReturningUser) {
-        if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
-            sagiDebug("Error: No registration data found for returning user.");
-            errorMsg.innerText = "Session Error. Please Refresh.";
-            return;
-        }
-        code = deviceRegistrationData.registeredCode;
-        await sagiSpeak(`Checking Access For ${initials}...`);
-    } else {
-        code = codeInput.value.trim();
-        if (code.length < 6) {
-            errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
-            return;
-        }
-        await sagiSpeak("Verifying Credentials With Server...");
-    }
+      async function submitAuth() {
+          const codeInput = document.getElementById('access-code-input');
+          const userInitialsInput = document.getElementById('user-id-input');
+          const errorMsg = document.getElementById('auth-error');
+          
+          const initials = userInitialsInput.value.trim().toUpperCase();
+          
+          // Always validate initials
+          if (!initials || initials.length < 2) {
+              errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
+              return;
+          }
 
-    errorMsg.innerText = "";
-    showAuthUI(false);
-    document.getElementById('auth-loading').style.display = 'flex';
+          // Check if this is a returning user (PIN field hidden)
+          const isReturningUser = codeInput.style.display === 'none';
+          
+          let code = '';
+          
+          if (isReturningUser) {
+              // For returning users, use the code from the registration data
+              if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
+                  errorMsg.innerText = "Session Error. Please Refresh And Try Again.";
+                  return;
+              }
+              code = deviceRegistrationData.registeredCode;
+              await sagiSpeak(`Checking Access For ${initials}...`);
+          } else {
+              // For NEW users, they MUST provide a code
+              code = codeInput.value.trim();
+              if (code.length < 6) {
+                  errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
+                  return;
+              }
+              await sagiSpeak("Verifying Credentials With Server...");
+          }
 
-    const currentUID = getUID();
-    sagiDebug("Attempting Auth with UID:", currentUID);
+          errorMsg.innerText = "";
+          showAuthUI(false);
+          document.getElementById('auth-loading').style.display = 'flex';
 
-    try {
-        const queryParams = new URLSearchParams({
-            code: code,
-            uid: currentUID,
-            initials: initials,
-            action: "check"
-        });
+          const uid = getUID();
 
-        // The critical 'redirect: follow' for Safari/iOS
-        const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`, {
-            method: 'GET',
-            mode: 'cors',
-            redirect: 'follow'
-        });
+          try {
+              const queryParams = new URLSearchParams({
+                  code: code,
+                  uid: uid,
+                  initials: initials,
+                  action: "check"
+              });
 
-        const data = await response.json();
-        sagiDebug("Server Response Received:", data);
+              const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`);
+              const data = await response.json();
 
-        if (data.status === "authorized") {
-            sagiDebug("Success: User authorized.");
-            localStorage.setItem('f_suite_initials', initials);
-            
-            const greeting = getTimeGreeting();
-            if (isReturningUser) {
-                await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
-            } else {
-                await sagiSpeak(`${greeting}, ${initials}! Access Granted.`);
-            }
-            
-            setTimeout(() => unlockApp(data.expiry, initials), 1500);
-            
-        } else if (data.status === "revoked") {
-            sagiDebug("Warning: This device is revoked.");
-            document.getElementById('auth-loading').style.display = 'none';
-            await sagiSpeak("This Device Has Been Restricted.");
-            showRevokedUI();
-            
-        } else {
-            sagiDebug("Auth Rejected. Status:", data.status);
-            document.getElementById('auth-loading').style.display = 'none';
-            showAuthUI(true);
-            
-            // Helpful error reporting
-            if (isReturningUser) {
-                errorMsg.innerText = `Access not found for ${initials}.`;
-            } else {
-                errorMsg.innerText = "Invalid Access Code.";
-            }
-        }
-    } catch (e) {
-        sagiDebug("CRITICAL FETCH ERROR:", e.message);
-        console.error("SubmitAuth error:", e);
-        document.getElementById('auth-loading').style.display = 'none';
-        await sagiSpeak("Connection error. Please check your signal.");
-        showAuthUI(true);
-    }
-}
+              console.log("Auth response:", data);
 
-function showRevokedUI() {
-    document.getElementById('auth-form').style.display = 'none';
-    document.getElementById('auth-loading').style.display = 'none';
-    
-    const restrictedDiv = document.createElement('div');
-    restrictedDiv.id = 'revoked-message';
-    restrictedDiv.style.textAlign = 'center';
-    restrictedDiv.style.marginTop = '20px';
-    restrictedDiv.innerHTML = `
-        <div style="color: #ff453a; font-size: 16px; font-weight: bold; margin-bottom: 10px;">⛔ ACCESS REVOKED</div>
-        <div style="color: #fff; font-size: 14px; margin-bottom: 20px;">Device restricted. Contact support via WhatsApp.</div>
-        <div id="reactivation-check" style="color: #58a6ff; font-size: 12px; margin-top: 10px;">Checking status...</div>
-    `;
-    document.getElementById('sagi-container').appendChild(restrictedDiv);
-    checkForReactivation();
-}
+              if (data.status === "authorized") {
+                  // Store initials for display purposes
+                  localStorage.setItem('f_suite_initials', initials);
+                  
+                  const greeting = getTimeGreeting();
+                  
+                  if (isReturningUser) {
+                      await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
+                  } else {
+                      await sagiSpeak(`${greeting}, ${initials}! Access Granted. Welcome To The WhePlay Analysis Dashboard!`);
+                  }
+                  
+                  setTimeout(() => unlockApp(data.expiry, initials), 1500);
+                  
+              } else if (data.status === "revoked") {
+                  document.getElementById('auth-loading').style.display = 'none';
+                  await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
+                  showRevokedUI();
+                  
+              } else {
+                  document.getElementById('auth-loading').style.display = 'none';
+                  showAuthUI(true);
+                  
+                  if (isReturningUser) {
+                      await sagiSpeak("Access not found. Please contact CWG for assistance.");
+                      errorMsg.innerText = "Access not found. Contact support.";
+                  } else {
+                      await sagiSpeak("Invalid access code. Please try again or contact CWG.");
+                      errorMsg.innerText = "Invalid Access Code.";
+                  }
+              }
+          } catch (e) {
+              console.error("SubmitAuth error:", e);
+              await sagiSpeak("Connection error. Please check your internet.");
+              showAuthUI(true);
+          }
+      }
 
-async function checkForReactivation() {
-    const uid = getUID();
-    const checkInterval = setInterval(async () => {
-        try {
-            const response = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`, {
-                method: 'GET',
-                mode: 'cors',
-                redirect: 'follow'
-            });
-            const data = await response.json();
-            if (data.status !== "revoked") {
-                clearInterval(checkInterval);
-                const reactDiv = document.getElementById('reactivation-check');
-                if (reactDiv) reactDiv.innerHTML = '✅ Access restored!';
-                await sagiSpeak("Access restored! Redirecting...");
-                setTimeout(() => {
-                    const msg = document.getElementById('revoked-message');
-                    if (msg) msg.remove();
-                    checkAccess();
-                }, 2000);
-            }
-        } catch (e) { console.log("Recheck error:", e); }
-    }, 5000);
-}
+      function unlockApp(expiry, initials) {
+          document.getElementById('app-content').style.display = 'block';
+          document.getElementById('auth-overlay').style.display = 'none';
+          
+          // Show welcome notification
+          showNotification(`Welcome back, ${initials}! 👋`, 'success');
+          
+          if (expiry) {
+              localStorage.setItem('f_suite_expiry', expiry);
+              startCountdown(expiry);
+          }
+          
+          // THIS IS THE KEY - Initialize the app after authentication
+          setTimeout(() => {
+              initializeApp();
+          }, 500);
+      }
 
-function unlockApp(expiry, initials) {
-    document.getElementById('app-content').style.display = 'block';
-    document.getElementById('auth-overlay').style.display = 'none';
-    if (typeof showNotification === 'function') {
-        showNotification(`Welcome back, ${initials}! 👋`, 'success');
-    }
-    if (expiry) {
-        localStorage.setItem('f_suite_expiry', expiry);
-        startCountdown(expiry);
-    }
-    setTimeout(() => { if(typeof initializeApp === 'function') initializeApp(); }, 500);
-}
+      function startCountdown(expiryStr) {
+          const expiry = new Date(expiryStr);
+          const now = new Date();
+          const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
-function startCountdown(expiryStr) {
-    const expiry = new Date(expiryStr);
-    const now = new Date();
-    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-    const warningToast = document.getElementById('warning-toast');
-    if (warningToast && diffDays <= 5 && diffDays > 0) {
-        warningToast.style.display = 'block';
-        document.getElementById('days-text').innerText = diffDays;
-    }
-}
+          if (diffDays <= 5 && diffDays > 0) {
+              document.getElementById('warning-toast').style.display = 'block';
+              document.getElementById('days-text').innerText = diffDays;
+          } else if (diffDays <= 0) {
+              showNotification("⚠️ Your access has expired. Please contact CWG to renew.", "warning");
+          }
+      }
 
-async function extendNow() {
-    const uid = getUID();
-    const initials = localStorage.getItem('f_suite_initials');
-    try {
-        const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=extend`, {
-            method: 'GET',
-            mode: 'cors',
-            redirect: 'follow'
-        });
-        const data = await response.json();
-        if (data.status === "authorized") {
-            location.reload();
-        }
-    } catch (error) { console.error("Extend error:", error); }
-}
+      async function extendNow() {
+          const uid = getUID();
+          const initials = localStorage.getItem('f_suite_initials');
+          
+          try {
+              const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=extend`);
+              const data = await response.json();
+              
+              if (data.status === "authorized") {
+                  showNotification("✅ Access Extended Successfully!", "success");
+                  setTimeout(() => location.reload(), 1500);
+              }
+          } catch (error) {
+              showNotification("❌ Error extending access", "error");
+          }
+      }
 
-// Periodic check (every minute)
-setInterval(async () => {
-    const initials = localStorage.getItem('f_suite_initials');
-    if (!initials || document.getElementById('auth-overlay').style.display !== 'none') return;
-    
-    try {
-        const response = await fetch(`${AUTH_API_URL}?uid=${getUID()}&initials=${initials}&action=check`, {
-            method: 'GET',
-            mode: 'cors',
-            redirect: 'follow'
-        });
-        const data = await response.json();
-        if (data.status === "revoked") {
-            location.reload(); // Force re-auth
-        }
-    } catch (e) { console.log("Interval error:", e); }
-}, 60000);
+      // Periodic check (every minute)
+      setInterval(async () => {
+          const uid = getUID();
+          const initials = localStorage.getItem('f_suite_initials');
+          
+          // Don't run if we're already showing auth overlay
+          if (document.getElementById('auth-overlay').style.display !== 'none') return;
+          
+          try {
+              const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=check`);
+              const data = await response.json();
+              
+              console.log("Periodic check - Status:", data.status); // Debug log
+              
+              if (data.status === "revoked") {
+                  // Show immediate notification
+                  showNotification("⛔ Your access has been revoked! Logging out...", "error");
+                  
+                  // Clear stored data
+                  localStorage.removeItem('f_suite_initials');
+                  localStorage.removeItem('f_suite_expiry');
+                  deviceRegistrationData = null;
+                  
+                  // Hide app and show auth overlay with revoked message
+                  setTimeout(() => {
+                      document.getElementById('app-content').style.display = 'none';
+                      document.getElementById('auth-overlay').style.display = 'flex';
+                      
+                      // Clear any existing content in sagi-container
+                      const sagiContainer = document.getElementById('sagi-container');
+                      
+                      // Remove any existing revoked messages
+                      const existingMsg = document.getElementById('revoked-message');
+                      if (existingMsg) existingMsg.remove();
+                      
+                      // Show revoked UI
+                      showRevokedUI();
+                      
+                      // Update SAGi text
+                      sagiSpeak("Your access has been revoked. Please contact support.");
+                  }, 2000);
+                  
+              } else if (data.status === "authorized") {
+                  // Still authorized - update expiry if needed
+                  if (data.expiry) {
+                      startCountdown(data.expiry);
+                  }
+              }
+          } catch (e) {
+              console.log("Periodic check error:", e);
+          }
+      }, 60000); // Check every minute
+
+      function resetAuthForm() {
+          const codeInput = document.getElementById('access-code-input');
+          const initialsInput = document.getElementById('user-id-input');
+          const btnText = document.getElementById('btn-text');
+          
+          // Reset inputs
+          codeInput.value = '';
+          initialsInput.value = '';
+          codeInput.style.display = 'block'; // Show PIN field by default
+          btnText.innerText = "Proceed Access";
+      }
 
       ///////////////////////////////////////////////////////////////////////////////////
 
