@@ -5,6 +5,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
+    
     <!-- ALL FAVICONS FOR MOBILE HOME SCREEN -->
     <link
       rel="icon"
@@ -1558,6 +1559,205 @@
         }
       }
 
+      /* Chart 1/8 Styles - Matching the 6x6 grid from image */
+    .chart-8 {
+        background-color: #2d8a44; /* Match the green from 1/16 chart */
+        border: 5px solid #5d4037; /* Bamboo brown border */
+        margin-top: 20px;
+        border-radius: 0;
+    }
+
+    .chart-8-header {
+        background: #5d4037; /* Bamboo brown */
+        color: white;
+        padding: 8px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .grid-8 {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* 6 columns for 6x6 grid */
+        background: #2d8a44;
+        gap: 1px;
+        padding: 1px;
+    }
+
+    .cell-8 {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 8px 4px;
+        text-align: center;
+        background: #2d8a44;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cell-8:hover {
+        background: #1e5e2e; /* Darker green on hover */
+    }
+
+    .c8-main {
+        font-weight: bold;
+        font-size: 1.1rem;
+        display: block;
+        color: white;
+        margin-bottom: 2px;
+    }
+
+    .c8-pair {
+        font-size: 10px;
+        display: block;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .grid-8 {
+            grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile */
+        }
+    }
+    
+    /* RAKE Chart Styles */
+.rake-chart {
+    background: #0f172a;
+    border-radius: 16px;
+    padding: 15px;
+    margin-top: 20px;
+    border: 2px solid #ffd700;
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2);
+}
+
+.rake-header {
+    text-align: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ffd700;
+}
+
+.rake-header h3 {
+    color: #ffd700;
+    font-size: 24px;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.rake-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.rake-column {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #334155;
+}
+
+.rake-column h4 {
+    color: #58a6ff;
+    font-size: 14px;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #334155;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rake-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.rake-item:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-left-color: #ffd700;
+    transform: translateX(2px);
+}
+
+.rake-numbers {
+    min-width: 60px;
+    font-weight: 900;
+    color: #ffd700;
+    font-size: 14px;
+    font-family: monospace;
+}
+
+.rake-name {
+    flex: 1;
+    color: #fff;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.rake-name b {
+    color: #58a6ff;
+    font-weight: 800;
+}
+
+.rake-total {
+    grid-column: span 2;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: linear-gradient(145deg, #2d3748, #1a202c);
+    border-radius: 8px;
+    border: 1px solid #ffd700;
+}
+
+.rake-total span {
+    color: #ffd700;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+    .rake-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .rake-total {
+        grid-column: span 1;
+    }
+    
+    .rake-item {
+        padding: 8px;
+    }
+    
+    .rake-numbers {
+        min-width: 50px;
+        font-size: 13px;
+    }
+    
+    .rake-name {
+        font-size: 12px;
+    }
+}
+
       /* Enhanced Shelf Card Animations */
       .card.data-card {
         transition: all 0.3s ease;
@@ -1744,6 +1944,163 @@
         font-weight: bold;
         border: 2px solid #ff9f0a;
     }
+
+    /* Auth Overlay Styles */
+    #auth-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: white;
+        padding: 20px;
+    }
+
+    .sagi-glow {
+        position: relative;
+        animation: glowPulse 2s infinite;
+    }
+
+    @keyframes glowPulse {
+        0% { filter: drop-shadow(0 0 5px #007aff); }
+        50% { filter: drop-shadow(0 0 20px #007aff); }
+        100% { filter: drop-shadow(0 0 5px #007aff); }
+    }
+
+    .sagi-online-dot {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 12px;
+        height: 12px;
+        background: #32d74b;
+        border-radius: 50%;
+        border: 2px solid #000;
+        animation: pulse 1.5s infinite;
+    }
+
+    .chat-bubble {
+        background: #1e293b;
+        padding: 15px 20px;
+        border-radius: 20px;
+        border-bottom-left-radius: 5px;
+        max-width: 300px;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,122,255,0.2);
+        border: 1px solid #334155;
+    }
+
+    #sagi-text {
+        color: #fff;
+        font-size: 14px;
+        line-height: 1.5;
+        font-family: -apple-system, sans-serif;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #334155;
+        border-top: 3px solid #007aff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .whatsapp-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: #25D366;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        transition: transform 0.3s ease;
+        z-index: 10000;
+    }
+
+    .whatsapp-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .whatsapp-btn svg {
+        width: 25px;
+        height: 25px;
+        fill: white;
+    }
+
+    .footer-logo {
+        color: #58a6ff;
+        font-weight: bold;
+    }
+
+    /* Toast Notification */
+    #warning-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: #ff9f0a;
+        color: #000;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: bold;
+        z-index: 10000;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .extend-btn {
+        background: #000;
+        color: #ff9f0a;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+    /* SweetAlert Custom Styles */
+    .swal-custom-popup {
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+    }
+
+    .swal-custom-title {
+        color: #58a6ff !important;
+    }
+
+    .swal-custom-text {
+        color: #fff !important;
+    }
+
+    .swal-custom-confirm {
+        background: #007aff !important;
+        color: white !important;
+        border-radius: 8px !important;
+    }
     </style>
   </head>
   <body>
@@ -1771,6 +2128,62 @@
     </div>
 
     <div id="main-content">
+      <!-- SAGi Authentication Overlay -->
+      <div id="auth-overlay" style="display: flex;">
+          <div id="sagi-container" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+              
+              <div id="sagi-avatar" class="sagi-glow">
+                  <img src="https://cdn-icons-gif.flaticon.com/12613/12613559.gif" 
+                      style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--accent); background: #000;" 
+                      alt="SAGi Assistant">
+                  <div class="sagi-online-dot"></div>
+              </div>
+
+              <div id="sagi-bubble" class="chat-bubble">
+                  <span id="sagi-text">Initializing SAGi Systems...</span>
+              </div>
+
+              <div id="auth-form" style="display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.5s;">
+                  <div id="initials-box" style="display: none; width: 100%; flex-direction: column; align-items: center;">
+                      <input type="text" id="user-id-input" placeholder="YOUR INITIALS" maxlength="3" 
+                          style="padding: 12px; font-size: 16px; text-align: center; border-radius: 12px; border: 1px solid #334155; background: #111; color: white; width: 220px; outline: none; text-transform: uppercase; margin-bottom: 15px;">
+                  </div>
+
+                  <input type="text" id="access-code-input" maxlength="6" inputmode="numeric" placeholder="000000" 
+                          style="padding: 15px; font-size: 24px; text-align: center; border-radius: 12px; border: 2px solid var(--accent); background: #111; color: white; width: 220px; letter-spacing: 5px; outline: none;">
+                  
+                  <button id="verify-btn" onclick="submitAuth()" style="margin-top: 20px; padding: 14px 40px; background: var(--accent); color: black; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 220px;">
+                      <span id="btn-text">Proceed Access</span>
+                  </button>
+              </div>
+
+              <div id="auth-loading" style="display: none; flex-direction: column; align-items: center;">
+                  <div class="spinner"></div>
+              </div>
+
+              <p id="auth-error" style="color: #ef4444; margin-top: 10px; font-size: 13px; font-weight: bold;"></p>
+          </div>
+
+          <a href="https://wa.me/18687815624?text=Hello%20CODEWITHGLASGOW%2C%20I%20need%20help%20with%20my%20webapp%20access" 
+            id="whatsapp-link" class="whatsapp-btn" target="_blank">
+              <svg viewBox="0 0 448 512">
+                  <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-93.9-25.7l-6.7-4-69.8 18.3 18.7-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.4 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.4-29.8-17-40.7-4.5-10.7-9.1-9.2-12.4-9.4h-10.6c-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+              </svg>
+          </a>
+          
+          <footer style="position: absolute; bottom: 20px; text-align: center;">
+              &copy; <span id="year"></span> <span class="footer-logo">FinFolio Suites Project</span>
+          </footer>
+      </div>
+
+      <!-- Warning Toast (for expiring access) -->
+      <div id="warning-toast" style="display: none;">
+          <span>⚠️ Your access expires in <span id="days-text"></span> days</span>
+          <button onclick="extendNow()" class="extend-btn">EXTEND</button>
+      </div>
+
+      <!-- Main App Content (initially hidden) -->
+      <div id="app-content" style="display: none;">
       <!-- NEW Ticker -->
       <div class="ticker-fixed">
         <!-- Ticker ribbons TOP support banner -->
@@ -2322,6 +2735,274 @@
                     
                     <div id="quantum-instructions" class="quantum-instructions"></div>
                 </div>-->
+                
+<div class="rake-chart">
+    <div class="rake-header">
+        <h3>RAKE</h3>
+    </div>
+    
+    <div class="rake-grid">
+        <div class="rake-column">
+            <div class="rake-item">
+                <span class="rake-numbers">1+36</span>
+                <span class="rake-name"><b>FIRST + LAST</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">2+16</span>
+                <span class="rake-name"><b>OLD JAMETTE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">3+34-22</span>
+                <span class="rake-name"><b>3 BLIND MICE</b></span>
+            </div>
+
+            <div class="rake-item">
+                <span class="rake-numbers">3+35</span>
+                <span class="rake-name"><b>CARRIAGE ON ROAD</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">4+32</span>
+                <span class="rake-name"><b>DEAD WOOD</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">4+21</span>
+                <span class="rake-name"><b>DEAD IN HOLE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">4+26</span>
+                <span class="rake-name"><b>CROWD FROM DEAD</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">5+31</span>
+                <span class="rake-name"><b>PARSON MAN + WIFE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">6+25</span>
+                <span class="rake-name"><b>BACK + BELLY</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">7+21</span>
+                <span class="rake-name"><b>HOG MOUTH</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">8+3</span>
+                <span class="rake-name"><b>TIGER IN CAGE</b></span>
+            </div>
+
+            <div class="rake-item">
+                <span class="rake-numbers">8+33</span>
+                <span class="rake-name"><b>LION IN NET</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">8+7</span>
+                <span class="rake-name"><b>TIGER HUNTING</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">9+32</span>
+                <span class="rake-name"><b>BULL PISTLE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">10+32</span>
+                <span class="rake-name"><b>MONKEY SHRIMPS</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">10+27</span>
+                <span class="rake-name"><b>MONKEY ON VINE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">11+17</span>
+                <span class="rake-name"><b>BLACK + WHITE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">12+10</span>
+                <span class="rake-name"><b>KING KONG</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">12+9</span>
+                <span class="rake-name"><b>CLEAR / DIRTY WATER</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">12+1</span>
+                <span class="rake-name"><b>KING + I</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">13+10</span>
+                <span class="rake-name"><b>GIRL + BOY CHILD</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">14+6</span>
+                <span class="rake-name"><b>MONEY IN POCKET</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">14+23</span>
+                <span class="rake-name"><b>MONEY IN BANK</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">15+20</span>
+                <span class="rake-name"><b>SICK LIKE A DOG</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">16+23</span>
+                <span class="rake-name"><b>JAMETTE IN HOTEL</b></span>
+            </div>
+        </div>
+        
+        <div class="rake-column">
+            <div class="rake-item">
+                <span class="rake-numbers">17+29</span>
+                <span class="rake-name"><b>YOUNG DRUNK</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">18+29</span>
+                <span class="rake-name"><b>ROCK D BOAT</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">19+35</span>
+                <span class="rake-name"><b>HORSE ON TRACK</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">20+5</span>
+                <span class="rake-name"><b>WORM ON LOG</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">21+19</span>
+                <span class="rake-name"><b>FROM HORSE'S MOUTH</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">22+24</span>
+                <span class="rake-name"><b>RAT LOOKING FOR GOLD</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">23+31</span>
+                <span class="rake-name"><b>HOUSE WIFE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">24+21</span>
+                <span class="rake-name"><b>FOOD IN MOUTH</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">25+13</span>
+                <span class="rake-name"><b>HARD + SOFT BACK</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">26+15</span>
+                <span class="rake-name"><b>FOWL + SICKNESS</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">27+35</span>
+                <span class="rake-name"><b>BIG + SMALL SNAKE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">28+36</span>
+                <span class="rake-name"><b>FISH IN SEA</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">28+6</span>
+                <span class="rake-name"><b>FISH GUTS</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">29+6</span>
+                <span class="rake-name"><b>RUM BELLY</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">29+13</span>
+                <span class="rake-name"><b>DRUNK + SPREAD OUT</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">29+1</span>
+                <span class="rake-name"><b>RUM BOTTLE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">30+35</span>
+                <span class="rake-name"><b>GOLDEN COBRA</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">30+6</span>
+                <span class="rake-name"><b>GOLD SACK</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">30+6</span>
+                <span class="rake-name"><b>CAT IN BAG</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">31+16</span>
+                <span class="rake-name"><b>BIG + SMALL JAMETTE</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">32+1</span>
+                <span class="rake-name"><b>BOTTLE + SPOON</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">33+9</span>
+                <span class="rake-name"><b>COW EATING GRASS</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">33+10</span>
+                <span class="rake-name"><b>SPIDER MONKEY</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">34+1</span>
+                <span class="rake-name"><b>CEMETARY LIGHTS</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">35+12</span>
+                <span class="rake-name"><b>KING COBRA</b></span>
+            </div>
+            
+            <div class="rake-item">
+                <span class="rake-numbers">36+18</span>
+                <span class="rake-name"><b>BRIDLE + WATER</b></span>
+            </div>
+        </div>
+    </div>
+</div>
+
         </div>
       </div>
 
@@ -2523,6 +3204,8 @@
           <div id="res" style="margin-top: 20px"></div>
         </div>
       </div>
+    </div>
+    </div>
     </div>
 
     <!-- History Modal for Shareable Chart -->
@@ -3121,6 +3804,52 @@
         36: [1, 25],
       };
 
+    // 1/8 Chart data - 6x6 grid of number pairs
+    const oneEightChart = [
+        // Row 1
+        { main: 1, pair: "8-25" },
+        { main: 2, pair: "9-26" },
+        { main: 3, pair: "10-27" },
+        { main: 4, pair: "11-28" },
+        { main: 5, pair: "12-29" },
+        { main: 6, pair: "13-30" },
+        // Row 2
+        { main: 7, pair: "14-31" },
+        { main: 8, pair: "15-32" },
+        { main: 9, pair: "16-33" },
+        { main: 10, pair: "17-34" },
+        { main: 11, pair: "18-35" },
+        { main: 12, pair: "19-36" },
+        // Row 3
+        { main: 13, pair: "20-1" },
+        { main: 14, pair: "21-2" },
+        { main: 15, pair: "22-3" },
+        { main: 16, pair: "23-4" },
+        { main: 17, pair: "24-5" },
+        { main: 18, pair: "25-6" },
+        // Row 4
+        { main: 19, pair: "26-7" },
+        { main: 20, pair: "27-8" },
+        { main: 21, pair: "28-9" },
+        { main: 22, pair: "29-10" },
+        { main: 23, pair: "30-11" },
+        { main: 24, pair: "31-12" },
+        // Row 5
+        { main: 25, pair: "32-13" },
+        { main: 26, pair: "33-14" },
+        { main: 27, pair: "34-15" },
+        { main: 28, pair: "35-16" },
+        { main: 29, pair: "36-17" },
+        { main: 30, pair: "1-18" },
+        // Row 6
+        { main: 31, pair: "2-19" },
+        { main: 32, pair: "3-20" },
+        { main: 33, pair: "4-21" },
+        { main: 34, pair: "5-22" },
+        { main: 35, pair: "6-23" },
+        { main: 36, pair: "7-24" }
+    ];
+
       // ========== GLOBAL VARIABLES ==========
       let timeline = [];
       let markInfo = {};
@@ -3151,59 +3880,476 @@
       let selectedQuantumNum = 27;
 
       // ========== INITIALIZATION ==========
+      // ========== PART 1: DOMContentLoaded (Only shows splash, doesn't load data) ==========
       document.addEventListener("DOMContentLoaded", async function () {
-        // Slash Screen
-        startSplash();
-
-        // First, restore tab from URL if it exists
-        setTimeout(() => {
-          restoreTabFromHash();
-        }, 100);
-
-        setTimeout(() => {
-          const lastTab = localStorage.getItem("lastActiveTab") || "home";
-          const tabButton = document.querySelector(
-            `.tab[onclick*="${lastTab}"]`,
-          );
-          if (tabButton) {
-            show(lastTab, tabButton);
-          }
-        }, 100);
-
-        // SAGi Quantum Chart
-        initializeQuantumChart();
-
-        // Load data from your APIs
-        await loadData();
-        await loadPick2Data();
-        await loadPick4Data();
-
-        // Setup ticker
-        setupTicker();
-
-        // Update Home tab widgets
-        updateHomeWidgets();
-
-        renderMarksTable();
-        renderMissingLinesAndSuits();
-
-        // Render charts if we're on home tab
-        if (weeksData.length > 0) {
-          renderChartData();
-        }
-
-        // Start periodic updates
-        setInterval(updateHomeWidgets, 60000); // Update every minute
-
-        // Start the alternating text after splash screen
-        setTimeout(() => {
-          setupSubscribeButton();
-        }, 4000); // Start after splash screen (4 seconds)
-
-        renderEnhancedShelf();
-        renderDrawsTab();
-        renderOutstandingTable();
+          // Slash Screen - This runs immediately
+          startSplash();
+          
+          // DON'T load data or restore tabs here anymore
+          // DON'T call loadData(), loadPick2Data(), etc.
+          // The auth system will call initializeApp() after successful login
       });
+
+      // ========== PART 2: initializeApp() - Runs AFTER authentication ==========
+      async function initializeApp() {
+          console.log("SAGi: Authentication successful, initializing app...");
+          
+          // First, restore tab from URL if it exists
+          setTimeout(() => {
+              restoreTabFromHash();
+          }, 100);
+
+          setTimeout(() => {
+              const lastTab = localStorage.getItem("lastActiveTab") || "home";
+              const tabButton = document.querySelector(`.tab[onclick*="${lastTab}"]`);
+              if (tabButton) {
+                  show(lastTab, tabButton);
+              }
+          }, 100);
+
+          // SAGi Quantum Chart
+          initializeQuantumChart();
+
+          // Load data from your APIs (NOW these happen after auth)
+          await loadData();
+          await loadPick2Data();
+          await loadPick4Data();
+
+          // Setup ticker
+          setupTicker();
+
+          // Update Home tab widgets
+          updateHomeWidgets();
+
+          renderMarksTable();
+          renderMissingLinesAndSuits();
+
+          // Render charts if we're on home tab
+          if (weeksData.length > 0) {
+              renderChartData();
+          }
+
+          // Start periodic updates
+          setInterval(updateHomeWidgets, 60000); // Update every minute
+
+          // Start the alternating text after splash screen
+          setTimeout(() => {
+              setupSubscribeButton();
+          }, 4000); // Start after splash screen (4 seconds)
+
+          renderEnhancedShelf();
+          renderDrawsTab();
+          renderOutstandingTable();
+          
+          console.log("SAGi: App initialization complete!");
+      }
+
+      ///////////////////////////////////////////////////////////////////////////////////
+      // ========== SAGi AUTHENTICATION SYSTEM ==========
+      const AUTH_API_URL = "https://script.google.com/macros/s/AKfycbyKA2smH8eiDPQ8_CkF03lhcbqCmDzUaLeK3zfBGe277hK8ZXUJGMSMLWXGBMCoBTgY1A/exec";
+
+      // Store registration data temporarily
+      let deviceRegistrationData = null;
+
+      // Set current year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // SAGi's Typewriter Effect
+      async function sagiSpeak(text) {
+          const sagiText = document.getElementById('sagi-text');
+          if (!sagiText) return;
+          
+          sagiText.innerHTML = '';
+          let i = 0;
+          
+          return new Promise(resolve => {
+              function type() {
+                  if (i < text.length) {
+                      sagiText.innerHTML += text.charAt(i);
+                      i++;
+                      setTimeout(type, 30);
+                  } else {
+                      resolve();
+                  }
+              }
+              type();
+          });
+      }
+
+      // Show/Hide SAGi UI Elements
+      function showAuthUI(show) {
+          const form = document.getElementById('auth-form');
+          if (form) form.style.display = show ? 'flex' : 'none';
+      }
+
+      // Get Unique Device ID
+      function getUID() {
+          const navigator_info = window.navigator;
+          const screen_info = window.screen;
+          
+          let uid = navigator_info.mimeTypes.length;
+          uid += navigator_info.userAgent.replace(/\D+/g, '');
+          uid += navigator_info.plugins.length;
+          uid += screen_info.height || '';
+          uid += screen_info.width || '';
+          uid += screen_info.pixelDepth || '';
+          
+          return 'DPWAWAppv1-FP-' + btoa(uid).substring(0, 12).toUpperCase();
+      }
+
+      // Get time-based greeting
+      function getTimeGreeting() {
+          const hour = new Date().getHours();
+          if (hour < 12) return "Good Morning";
+          if (hour < 17) return "Good Afternoon";
+          return "Good Evening";
+      }
+
+      // Check access on page load
+      window.addEventListener('load', checkAccess);
+
+      async function checkAccess() {
+          const uid = getUID();
+          
+          const initialsBox = document.getElementById('initials-box');
+          const codeInput = document.getElementById('access-code-input');
+          const initialsInput = document.getElementById('user-id-input');
+          const btnText = document.getElementById('btn-text');
+          const delay = ms => new Promise(res => setTimeout(res, ms));
+
+          try {
+              await sagiSpeak("Hello, I Am SAGi, Your Personal Assistant For This WhePlay Analysis WebApp. Checking This Device Registration One Moment...");
+              
+              // Check if the device is recognized
+              const checkRes = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
+              const checkData = await checkRes.json();
+
+              console.log("Check data:", checkData);
+
+              // CASE 1: Device is revoked
+              if (checkData.status === "revoked") {
+                  await sagiSpeak("This Device Has Been Restricted From Using This Web App. Please Click The WhatsApp Button Below For Activation.");
+                  showRevokedUI();
+                  return;
+              }
+              
+              // CASE 2: Device is recognized (returning user)
+              if (checkData.status === "recognized") {
+                  // Store the registration data for later use
+                  deviceRegistrationData = {
+                      registeredCode: checkData.registeredCode,
+                      registeredInitials: checkData.registeredInitials
+                  };
+                  
+                  // Pre-fill initials if we have them from API
+                  if (checkData.registeredInitials) {
+                      initialsInput.value = checkData.registeredInitials;
+                  }
+                  
+                  // Hide the PIN input - returning users ONLY need initials
+                  codeInput.style.display = 'none';
+                  initialsBox.style.display = "flex";
+                  
+                  await sagiSpeak(`Welcome back! Please enter your initials to continue.`);
+                  await delay(1500);
+                  
+                  // Change button text
+                  btnText.innerText = "Continue";
+                  showAuthUI(true);
+                  return;
+              }
+              
+              // CASE 3: New user (first time)
+              if (checkData.status === "unknown") {
+                  // Clear any stored registration data
+                  deviceRegistrationData = null;
+                  
+                  // Show both initials and PIN for new users
+                  codeInput.style.display = 'block';
+                  codeInput.value = '';
+                  initialsBox.style.display = "flex";
+                  
+                  await sagiSpeak("Welcome! Since this is your first time, please enter your initials and 6-digit access code.");
+                  await delay(2000);
+                  
+                  // Set button text
+                  btnText.innerText = "Proceed Access";
+                  showAuthUI(true);
+                  return;
+              }
+              
+          } catch (e) {
+              console.error("SAGi Error:", e);
+              await sagiSpeak("Connection error. Please check your internet and try again.");
+              showAuthUI(true);
+          }
+      }
+
+      function showRevokedUI() {
+          document.getElementById('auth-form').style.display = 'none';
+          document.getElementById('auth-loading').style.display = 'none';
+          document.getElementById('sagi-bubble').style.marginBottom = '20px';
+          
+          // Create restricted message
+          const restrictedDiv = document.createElement('div');
+          restrictedDiv.id = 'revoked-message';
+          restrictedDiv.style.textAlign = 'center';
+          restrictedDiv.style.marginTop = '20px';
+          restrictedDiv.innerHTML = `
+              <div style="color: #ff453a; font-size: 16px; font-weight: bold; margin-bottom: 10px;">⛔ ACCESS REVOKED</div>
+              <div style="color: #fff; font-size: 14px; margin-bottom: 20px;">This device has been restricted. Please contact support via WhatsApp for activation.</div>
+              <div id="reactivation-check" style="color: #58a6ff; font-size: 12px; margin-top: 10px;">Checking for reactivation...</div>
+          `;
+          document.getElementById('sagi-container').appendChild(restrictedDiv);
+          
+          // Start checking for reactivation
+          checkForReactivation();
+      }
+
+      async function checkForReactivation() {
+          const uid = getUID();
+          const checkInterval = setInterval(async () => {
+              try {
+                  const response = await fetch(`${AUTH_API_URL}?uid=${uid}&action=checkRegistration`);
+                  const data = await response.json();
+                  
+                  // If status is no longer revoked
+                  if (data.status !== "revoked") {
+                      clearInterval(checkInterval);
+                      
+                      // Update the message
+                      const reactivationDiv = document.getElementById('reactivation-check');
+                      if (reactivationDiv) {
+                          reactivationDiv.innerHTML = '✅ Access restored! Redirecting...';
+                          reactivationDiv.style.color = '#32d74b';
+                      }
+                      
+                      await sagiSpeak("Access has been restored! Redirecting you now...");
+                      
+                      // Wait a moment then restart the auth flow
+                      setTimeout(() => {
+                          // Remove revoked UI
+                          const revokedMsg = document.getElementById('revoked-message');
+                          if (revokedMsg) revokedMsg.remove();
+                          
+                          // Reset and restart checkAccess
+                          deviceRegistrationData = null;
+                          checkAccess();
+                      }, 2000);
+                  }
+              } catch (e) {
+                  console.log("Reactivation check error:", e);
+              }
+          }, 5000); // Check every 5 seconds for reactivation
+      }
+
+      async function submitAuth() {
+          const codeInput = document.getElementById('access-code-input');
+          const userInitialsInput = document.getElementById('user-id-input');
+          const errorMsg = document.getElementById('auth-error');
+          
+          const initials = userInitialsInput.value.trim().toUpperCase();
+          
+          // Always validate initials
+          if (!initials || initials.length < 2) {
+              errorMsg.innerText = "Please Enter Your Initials (2-3 Letters).";
+              return;
+          }
+
+          // Check if this is a returning user (PIN field hidden)
+          const isReturningUser = codeInput.style.display === 'none';
+          
+          let code = '';
+          
+          if (isReturningUser) {
+              // For returning users, use the code from the registration data
+              if (!deviceRegistrationData || !deviceRegistrationData.registeredCode) {
+                  errorMsg.innerText = "Session Error. Please Refresh And Try Again.";
+                  return;
+              }
+              code = deviceRegistrationData.registeredCode;
+              await sagiSpeak(`Checking Access For ${initials}...`);
+          } else {
+              // For NEW users, they MUST provide a code
+              code = codeInput.value.trim();
+              if (code.length < 6) {
+                  errorMsg.innerText = "Please Enter A Valid 6-Digit Code.";
+                  return;
+              }
+              await sagiSpeak("Verifying Credentials With Server...");
+          }
+
+          errorMsg.innerText = "";
+          showAuthUI(false);
+          document.getElementById('auth-loading').style.display = 'flex';
+
+          const uid = getUID();
+
+          try {
+              const queryParams = new URLSearchParams({
+                  code: code,
+                  uid: uid,
+                  initials: initials,
+                  action: "check"
+              });
+
+              const response = await fetch(`${AUTH_API_URL}?${queryParams.toString()}`);
+              const data = await response.json();
+
+              console.log("Auth response:", data);
+
+              if (data.status === "authorized") {
+                  // Store initials for display purposes
+                  localStorage.setItem('f_suite_initials', initials);
+                  
+                  const greeting = getTimeGreeting();
+                  
+                  if (isReturningUser) {
+                      await sagiSpeak(`${greeting}, ${initials}! Welcome Back!`);
+                  } else {
+                      await sagiSpeak(`${greeting}, ${initials}! Access Granted. Welcome To The WhePlay Analysis Dashboard!`);
+                  }
+                  
+                  setTimeout(() => unlockApp(data.expiry, initials), 1500);
+                  
+              } else if (data.status === "revoked") {
+                  document.getElementById('auth-loading').style.display = 'none';
+                  await sagiSpeak("This Device Has Been Restricted. Please Contact Support.");
+                  showRevokedUI();
+                  
+              } else {
+                  document.getElementById('auth-loading').style.display = 'none';
+                  showAuthUI(true);
+                  
+                  if (isReturningUser) {
+                      await sagiSpeak("Access not found. Please contact CWG for assistance.");
+                      errorMsg.innerText = "Access not found. Contact support.";
+                  } else {
+                      await sagiSpeak("Invalid access code. Please try again or contact CWG.");
+                      errorMsg.innerText = "Invalid Access Code.";
+                  }
+              }
+          } catch (e) {
+              console.error("SubmitAuth error:", e);
+              await sagiSpeak("Connection error. Please check your internet.");
+              showAuthUI(true);
+          }
+      }
+
+      function unlockApp(expiry, initials) {
+          document.getElementById('app-content').style.display = 'block';
+          document.getElementById('auth-overlay').style.display = 'none';
+          
+          // Show welcome notification
+          showNotification(`Welcome back, ${initials}! 👋`, 'success');
+          
+          if (expiry) {
+              localStorage.setItem('f_suite_expiry', expiry);
+              startCountdown(expiry);
+          }
+          
+          // THIS IS THE KEY - Initialize the app after authentication
+          setTimeout(() => {
+              initializeApp();
+          }, 500);
+      }
+
+      function startCountdown(expiryStr) {
+          const expiry = new Date(expiryStr);
+          const now = new Date();
+          const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+
+          if (diffDays <= 5 && diffDays > 0) {
+              document.getElementById('warning-toast').style.display = 'block';
+              document.getElementById('days-text').innerText = diffDays;
+          } else if (diffDays <= 0) {
+              showNotification("⚠️ Your access has expired. Please contact CWG to renew.", "warning");
+          }
+      }
+
+      async function extendNow() {
+          const uid = getUID();
+          const initials = localStorage.getItem('f_suite_initials');
+          
+          try {
+              const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=extend`);
+              const data = await response.json();
+              
+              if (data.status === "authorized") {
+                  showNotification("✅ Access Extended Successfully!", "success");
+                  setTimeout(() => location.reload(), 1500);
+              }
+          } catch (error) {
+              showNotification("❌ Error extending access", "error");
+          }
+      }
+
+      // Periodic check (every minute)
+      setInterval(async () => {
+          const uid = getUID();
+          const initials = localStorage.getItem('f_suite_initials');
+          
+          // Don't run if we're already showing auth overlay
+          if (document.getElementById('auth-overlay').style.display !== 'none') return;
+          
+          try {
+              const response = await fetch(`${AUTH_API_URL}?uid=${uid}&initials=${initials}&action=check`);
+              const data = await response.json();
+              
+              console.log("Periodic check - Status:", data.status); // Debug log
+              
+              if (data.status === "revoked") {
+                  // Show immediate notification
+                  showNotification("⛔ Your access has been revoked! Logging out...", "error");
+                  
+                  // Clear stored data
+                  localStorage.removeItem('f_suite_initials');
+                  localStorage.removeItem('f_suite_expiry');
+                  deviceRegistrationData = null;
+                  
+                  // Hide app and show auth overlay with revoked message
+                  setTimeout(() => {
+                      document.getElementById('app-content').style.display = 'none';
+                      document.getElementById('auth-overlay').style.display = 'flex';
+                      
+                      // Clear any existing content in sagi-container
+                      const sagiContainer = document.getElementById('sagi-container');
+                      
+                      // Remove any existing revoked messages
+                      const existingMsg = document.getElementById('revoked-message');
+                      if (existingMsg) existingMsg.remove();
+                      
+                      // Show revoked UI
+                      showRevokedUI();
+                      
+                      // Update SAGi text
+                      sagiSpeak("Your access has been revoked. Please contact support.");
+                  }, 2000);
+                  
+              } else if (data.status === "authorized") {
+                  // Still authorized - update expiry if needed
+                  if (data.expiry) {
+                      startCountdown(data.expiry);
+                  }
+              }
+          } catch (e) {
+              console.log("Periodic check error:", e);
+          }
+      }, 60000); // Check every minute
+
+      function resetAuthForm() {
+          const codeInput = document.getElementById('access-code-input');
+          const initialsInput = document.getElementById('user-id-input');
+          const btnText = document.getElementById('btn-text');
+          
+          // Reset inputs
+          codeInput.value = '';
+          initialsInput.value = '';
+          codeInput.style.display = 'block'; // Show PIN field by default
+          btnText.innerText = "Proceed Access";
+      }
+
+      ///////////////////////////////////////////////////////////////////////////////////
 
       // ========== HOME WIDGET FUNCTIONS ==========
       function updateHomeWidgets() {
@@ -3339,7 +4485,6 @@
 
             // Get day index (0 = Monday, 5 = Saturday)
             const dayIndex = [
-              "Sunday",
               "Monday",
               "Tuesday",
               "Wednesday",
@@ -3416,7 +4561,6 @@
 
               const baseDate = new Date(year, monthMap[monthName], dayNum);
               const dayIndex = [
-                "Sunday",
                 "Monday",
                 "Tuesday",
                 "Wednesday",
@@ -4626,6 +5770,15 @@
         marksContainer.appendChild(rightColumn);
         mainContainer.appendChild(marksContainer);
 
+        // Add 1/8 Chart (6x6 grid)
+        const chart8 = document.createElement("div");
+        chart8.className = "chart-8";
+        chart8.innerHTML = `
+        <div class="chart-8-header">THE 1/8 CHART</div>
+        <div id="grid-8-content" class="grid-8"></div>
+        `;
+        mainContainer.appendChild(chart8);
+
         // Add 1/16 Chart - Clean version like second example
         const chart16 = document.createElement("div");
         chart16.className = "chart-16";
@@ -4637,6 +5790,8 @@
         mainContainer.appendChild(chart16);
         container.appendChild(mainContainer);
 
+        // Render 1/8 chart
+        renderEightChart();
         // Render 1/16 chart
         renderSixteenChart();
       }
@@ -4697,6 +5852,24 @@
             selectedRow.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
         }
         
+        // Find which 1/8 cell contains this number (either as main or in the pair)
+        document.querySelectorAll('.cell-8').forEach(cell => {
+            cell.style.background = '';
+            cell.style.transform = '';
+            
+            const mainNum = parseInt(cell.getAttribute('data-main'));
+            const cellData = oneEightChart.find(c => c.main === mainNum);
+            
+            if (cellData) {
+                // Check if the clicked number is the main number or in the pair
+                const pairNumbers = cellData.pair.split('-').map(n => parseInt(n));
+                if (mainNum === num || pairNumbers.includes(num)) {
+                    cell.style.background = '#1e5e2e';
+                    cell.style.transform = 'scale(1.02)';
+                }
+            }
+        });
+
         // Also highlight in 1/16 chart using data-main attribute
         document.querySelectorAll('.cell-16').forEach(cell => {
             cell.style.background = '';
@@ -4711,6 +5884,51 @@
         const data = playWheMasterData[num];
         if (data) {
             showNotification(`${num} • ${data.name} | Spirit: ${data.spirit} | Partner: ${data.partner} | Mirror: ${data.mirror}`, 'info');
+        }
+    }
+
+    // ========== RENDER 1/8 CHART (6x6 Grid) ==========
+    function renderEightChart() {
+        const container = document.getElementById('grid-8-content');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Generate 1/8 chart 6x6 grid
+        oneEightChart.forEach((cell, index) => {
+            const cellDiv = document.createElement('div');
+            cellDiv.className = 'cell-8';
+            cellDiv.setAttribute('onclick', `highlightEightCell(${cell.main})`);
+            cellDiv.setAttribute('data-main', cell.main);
+            
+            cellDiv.innerHTML = `
+                <span class="c8-main">${cell.main}</span>
+                <span class="c8-pair">${cell.pair}</span>
+            `;
+            
+            container.appendChild(cellDiv);
+        });
+    }
+
+    // Highlight function for 1/8 chart
+    function highlightEightCell(mainNum) {
+        // Remove previous highlights
+        document.querySelectorAll('.cell-8').forEach(cell => {
+            cell.style.background = '';
+            cell.style.transform = '';
+        });
+        
+        // Highlight selected cell
+        const selectedCell = document.querySelector(`.cell-8[data-main="${mainNum}"]`);
+        if (selectedCell) {
+            selectedCell.style.background = '#1e5e2e';
+            selectedCell.style.transform = 'scale(1.02)';
+            
+            // Get the pair info
+            const cellData = oneEightChart.find(c => c.main === mainNum);
+            if (cellData) {
+                showNotification(`1/8 Chart: ${mainNum} → ${cellData.pair}`, 'info');
+            }
         }
     }
 
@@ -6899,84 +8117,85 @@
       }
 
       function toggleDropdown(type) {
-        let dropdown, button;
-        let dropdownId, buttonId;
-        
-        // Map the type to actual IDs
-        switch(type) {
-            case 'calendar':
-                dropdownId = 'calendar-dropdown';
-                buttonId = 'calBtn';
-                break;
-            case 'outstanding':
-                dropdownId = 'outstanding-dropdown';
-                buttonId = 'outBtn';
-                break;
-            case 'pick2':
-                dropdownId = 'pick2-calendar-dropdown';
-                buttonId = 'pick2CalBtn';
-                if (!pick2WeeksData || pick2WeeksData.length === 0) {
-                    loadPick2Data().then(() => {
-                        renderPick2DrawChart();
-                    });
-                } else {
-                    renderPick2DrawChart();
-                }
-                break;
-            case 'pick4':
-                dropdownId = 'pick4-calendar-dropdown';
-                buttonId = 'pick4CalBtn';
-                if (!pick4WeeksData || pick4WeeksData.length === 0) {
-                    loadPick4Data().then(() => {
-                        renderPick4DrawChart();
-                    });
-                } else {
-                    renderPick4DrawChart();
-                }
-                break;
-            default:
-                return;
-        }
-        
-        dropdown = document.getElementById(dropdownId);
-        button = document.getElementById(buttonId);
-        
-        if (!dropdown || !button) return;
-        
-        // Define all dropdown-button pairs
-        const allPairs = [
-            { dropdownId: 'calendar-dropdown', buttonId: 'calBtn' },
-            { dropdownId: 'outstanding-dropdown', buttonId: 'outBtn' },
-            { dropdownId: 'pick2-calendar-dropdown', buttonId: 'pick2CalBtn' },
-            { dropdownId: 'pick4-calendar-dropdown', buttonId: 'pick4CalBtn' }
-        ];
-        
-        // Close all OTHER dropdowns
-        allPairs.forEach(pair => {
-            // Skip the current dropdown
-            if (pair.dropdownId === dropdownId) return;
-            
-            const otherDropdown = document.getElementById(pair.dropdownId);
-            const otherButton = document.getElementById(pair.buttonId);
-            
-            if (otherDropdown && otherDropdown.style.display === 'block') {
-                otherDropdown.style.display = 'none';
-                if (otherButton) {
-                    // Replace up arrow with down arrow
-                    otherButton.innerHTML = otherButton.innerHTML.replace('▴', '▾');
-                }
-            }
-        });
-        
-        // Toggle current dropdown
-        if (dropdown.style.display === "block") {
-            dropdown.style.display = "none";
-            button.innerHTML = button.innerHTML.replace("▴", "▾");
-        } else {
-            dropdown.style.display = "block";
-            button.innerHTML = button.innerHTML.replace("▾", "▴");
-        }
-    }
+          let dropdown, button;
+          let dropdownId, buttonId;
+          
+          // Map the type to actual IDs
+          switch(type) {
+              case 'calendar':
+                  dropdownId = 'calendar-dropdown';
+                  buttonId = 'calBtn';
+                  break;
+              case 'outstanding':
+                  dropdownId = 'outstanding-dropdown';
+                  buttonId = 'outBtn';
+                  break;
+              case 'pick2':
+                  dropdownId = 'pick2-calendar-dropdown';
+                  buttonId = 'pick2CalBtn';
+                  if (!pick2WeeksData || pick2WeeksData.length === 0) {
+                      loadPick2Data().then(() => {
+                          renderPick2DrawChart();
+                      });
+                  } else {
+                      renderPick2DrawChart();
+                  }
+                  break;
+              case 'pick4':
+                  dropdownId = 'pick4-calendar-dropdown';
+                  buttonId = 'pick4CalBtn';
+                  if (!pick4WeeksData || pick4WeeksData.length === 0) {
+                      loadPick4Data().then(() => {
+                          renderPick4DrawChart();
+                      });
+                  } else {
+                      renderPick4DrawChart();
+                  }
+                  break;
+              default:
+                  return;
+          }
+          
+          dropdown = document.getElementById(dropdownId);
+          button = document.getElementById(buttonId);
+          
+          if (!dropdown || !button) return;
+          
+          // Define all dropdown-button pairs
+          const allPairs = [
+              { dropdownId: 'calendar-dropdown', buttonId: 'calBtn' },
+              { dropdownId: 'outstanding-dropdown', buttonId: 'outBtn' },
+              { dropdownId: 'pick2-calendar-dropdown', buttonId: 'pick2CalBtn' },
+              { dropdownId: 'pick4-calendar-dropdown', buttonId: 'pick4CalBtn' }
+          ];
+          
+          // Close all OTHER dropdowns
+          allPairs.forEach(pair => {
+              // Skip the current dropdown
+              if (pair.dropdownId === dropdownId) return;
+              
+              const otherDropdown = document.getElementById(pair.dropdownId);
+              const otherButton = document.getElementById(pair.buttonId);
+              
+              if (otherDropdown && otherDropdown.style.display === 'block') {
+                  otherDropdown.style.display = 'none';
+                  if (otherButton) {
+                      // Replace up arrow with down arrow
+                      otherButton.innerHTML = otherButton.innerHTML.replace('▴', '▾');
+                  }
+              }
+          });
+          
+          // Toggle current dropdown
+          if (dropdown.style.display === "block") {
+              dropdown.style.display = "none";
+              button.innerHTML = button.innerHTML.replace("▴", "▾");
+          } else {
+              dropdown.style.display = "block";
+              button.innerHTML = button.innerHTML.replace("▾", "▴");
+          }
+      }
+
       function processData(weeks) {
         // EXACT data processing logic from your second code
         const dayOrder = [
